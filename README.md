@@ -5,7 +5,7 @@ Para poder añadir el repositorio copiar este esquema
 {
    "repos": [
       {
-         "url": "[https://github.com/Drakayshin/Cartas-Custom---DrakayStudios]",
+         "url": "https://github.com/Drakayshin/Cartas-Custom---DrakayStudios",
          "repo_name": "Cartas Custom - DrakayStudios",
          "repo_path": "./repositories/Drakayshin",
          "should_update": true,
