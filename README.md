@@ -8,4 +8,4 @@ descarga este archivo
 
 [configs.json](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/files/13481679/configs.json)
 
-Luego cortalo en la carpeta de "config" donde tienes el EDOPRO. Y acepta la opción de reemplazar archivo.
+Luego pegalo y reemplazar el archivo que tiene el mismo nomber en la carpeta de "config" donde tienes el EDOPRO.
