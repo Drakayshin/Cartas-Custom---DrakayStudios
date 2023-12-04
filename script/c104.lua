@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,2})
+	e3:SetCountLimit(1,id)
 	e3:SetCondition(s.thcon)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
@@ -78,6 +78,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 	-- Special Summon 1 "Blue-Eyes" monster
+s.listed_names={id}
 s.listed_series={0xdd}
 	--Condition from Summon your opponent
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
