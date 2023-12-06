@@ -1,7 +1,8 @@
 # Cartas-Custom---DrakayStudios
 Un repositorio para cartas personalizadas creadas por DrakayStudios
 
-![Uploading Neo Blue Eyes Alternative Ultimate Dragon.jpg…]()
+![earth_s_fire_2_by_0zerokelvin_dgiljtu](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/assets/96027721/ca05c573-fd7b-4faf-a3c2-76174558bf4d)
+
 
 
 descarga este archivo
