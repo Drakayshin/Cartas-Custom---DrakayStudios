@@ -100,7 +100,7 @@ end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e)then
 	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,nil,e,tp)
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>1 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=g:Select(tp,1,1,nil)
