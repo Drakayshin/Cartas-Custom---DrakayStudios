@@ -30,6 +30,18 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_IMMUNE_EFFECT)
 	e3:SetValue(s.efilter)
 	c:RegisterEffect(e3)
+	--Normal monster
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetCode(EFFECT_ADD_TYPE)
+	e4:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e4:SetValue(TYPE_NORMAL)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_REMOVE_TYPE)
+	e5:SetValue(TYPE_EFFECT)
+	c:RegisterEffect(e5)
 end
 --Special Summon this card
 function s.cfilter(c,tp)
