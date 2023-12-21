@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Synchro summon
 	c:EnableReviveLimit()
-	Synchro.AddProcedure(c,nil,3,3,aux.FilterBoolFunction(Card.IsCode,89631139),1,1)
+	Synchro.AddProcedure(c,nil,2,2,aux.FilterBoolFunction(Card.IsCode,89631139),1,1)
 	--cannot special summon
 	local e6=Effect.CreateEffect(c)
 	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
