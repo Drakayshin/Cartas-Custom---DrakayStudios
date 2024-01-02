@@ -1,5 +1,4 @@
 --Adikia, Devastador Trascendental
-
 --Adikia, Devastador Trascendental
 local s,id=GetID()
 function s.initial_effect(c)

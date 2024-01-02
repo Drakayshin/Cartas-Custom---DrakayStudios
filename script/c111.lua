@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Fusion procedure
     c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsRace,RACE_BEAST+RACE_BEASTWARRIOR),s.ffilter)
+	Fusion.AddProcMix(c,true,true,69247929,s.ffilter)
     --Debe ser primero Invocador por Fusion
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

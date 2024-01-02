@@ -1,4 +1,5 @@
 --Jinete Drakaina
+--Jinete Drakaina
 local s,id=GetID()
 function s.initial_effect(c)
 	--Buscar carta de Equipo al ser Invocada
@@ -47,6 +48,10 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --SP summon de 1 monster del GY al ser destruida
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
+end
 function s.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -62,8 +67,4 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 end
