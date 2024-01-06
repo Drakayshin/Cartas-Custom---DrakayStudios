@@ -2,6 +2,7 @@
 --Luzbel, Querubín Ungido
 local s,id=GetID()
 function s.initial_effect(c)
+	-- 1 Solo Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	--Debe ser Invocada por Ritual

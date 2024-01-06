@@ -44,13 +44,13 @@ function s.initial_effect(c)
 	e5:SetCondition(s.thcon2)
 	c:RegisterEffect(e5)
 end
-	-- Special Summon this card no monster control
+	-- Invocacion Especial si no controlas monstruos
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-	--special summon a Monster Normal level 6 or low from Hand or Deck
+	--Invocar de Modo Especial 1 monstruo de nivel 6 o menor en tu mano o Deck
 function s.spfilter(c,ft)
 	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAbleToRemoveAsCost() and (ft>0 or c:GetSequence()<5)
 end
