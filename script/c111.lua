@@ -41,6 +41,7 @@ function s.initial_effect(c)
     e5:SetCountLimit(1)
 	c:RegisterEffect(e5)
 end
+s.listed_series={0x3e9}
 --Materiales multiples
 function s.ffilter(c,fc,sumtype,tp)
 	return c:IsRace(RACE_FIEND|RACE_PYRO,fc,sumtype,tp)

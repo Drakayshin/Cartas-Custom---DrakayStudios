@@ -55,6 +55,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 
 end
+s.listed_series={0x3ea}
 s.listed_names={89631139} --Nombre de Carta a convertir o usar
 	--No puede ser seleccionado ni Destruido por efectos de cartas del adversario
 function s.indval(e,re,tp)

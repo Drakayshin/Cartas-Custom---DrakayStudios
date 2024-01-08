@@ -69,6 +69,7 @@ function s.initial_effect(c)
 	e8:SetValue(s.tgval)
 	c:RegisterEffect(e8)
 end
+s.listed_series={0x3e9}
 --Se puede Invoca con Miracle fusion
 s.miracle_synchro_fusion=true
     --Debe ser primero Invocador por Fusion
