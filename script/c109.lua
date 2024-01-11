@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_UNRELEASABLE_NONSUM)
 	c:RegisterEffect(e3)
-	--Cannot be used as material for a Fusion/Synchro/Xyz/Link Summon
+	--No puede ser material de Fusion/Synchro/Xyz/Link
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
