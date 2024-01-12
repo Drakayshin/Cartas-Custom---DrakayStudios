@@ -48,7 +48,7 @@ end
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
-		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
     --Invocar de Modo Especial hasta 2 copias mano y/o Deck
 function s.filter(c,e,tp)
