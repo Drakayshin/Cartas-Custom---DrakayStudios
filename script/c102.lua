@@ -5,13 +5,13 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
-	--Must be special summoned by its own method
+	--Debe ser Invocado por su efecto
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
-	--Special summon procedure (from hand)
+	--Invocar de Modo Especial (desde tu mano)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	--Cannot be targeted by opponent's card effects
+	--No puede ser seleecionado por tu adversario
 	local e3=Effect.CreateEffect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -29,12 +29,12 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
-	--Cannot be destroyed by opponent's card effects
+	--No puede ser destruido por efectos de tu adversario
 	local e4=e3:Clone()
 	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e4:SetValue(s.indval)
 	c:RegisterEffect(e4)
-	--Name becomes "Blue-Eyes White Dragon" while on the field on in GY
+	--Es tratado como "Blue-Eyes White Dragon" en el Campo o Cementerio
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -46,7 +46,8 @@ function s.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,0))
 	e6:SetCategory(CATEGORY_DESTROY)
-	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetType(EFFECT_TYPE_QUICK_O)
+	e6:SetCode(EVENT_FREE_CHAIN)
 	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetCountLimit(1)
@@ -55,7 +56,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 
 end
-s.listed_series={0x3ea}
+s.listed_series={0xdd}
 s.listed_names={89631139} --Nombre de Carta a convertir o usar
 	--No puede ser seleccionado ni Destruido por efectos de cartas del adversario
 function s.indval(e,re,tp)
@@ -64,11 +65,11 @@ end
 	--Invocacíon por Sacrifición de un monstruo espeficico que controles (Eje. 89631139=Dragón Blanco de Ojos Azules)
 function s.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsCode,1,false,1,true,c,c:GetControler(),nil,false,nil,89631139)
+	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsSetCard,1,false,1,true,c,c:GetControler(),nil,false,e:GetHandler(),0xdd)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,false,true,true,c,nil,nil,false,nil,89631139)
+	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,false,true,true,c,nil,nil,false,e:GetHandler(),0xdd)
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)

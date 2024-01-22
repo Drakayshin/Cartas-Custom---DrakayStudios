@@ -16,16 +16,11 @@ function s.initial_effect(c)
 end
 s.listed_names={48179391}
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
     --Añadir 1 carta aleatoria de la mano
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0
-    and Duel.IsExistingMatchingCard(nil,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-    --No respuesta de monstruos del adversario
-    if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
-		Duel.SetChainLimit(function(e,ep,tp) return ep==tp or not e:IsActiveType(TYPE_MONSTER) end)
-	end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local g1=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
@@ -35,7 +30,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
     Duel.SendtoHand(ag1,tp,REASON_EFFECT)
 end
-    --Costo de no daño
+    --Costo de no batallar este turno
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -42,7 +42,7 @@ function s.initial_effect(c)
 end
 s.listed_names={id,48179391} --id=para la propia carta luego de la "," codigo de otra carta o arquetipo
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 	--Cambio de Posicion de Batalla por seleccion
 function s.filter(c)

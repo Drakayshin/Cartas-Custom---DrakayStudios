@@ -8,18 +8,20 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_MATERIAL)
 	e1:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TUPE_LINK))
 	c:RegisterEffect(e1)
-    --Invocar de Modo Especial desde la mano al no tener monstruos
+	--Buscar 1 carta especifica o una que la mencione
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCondition(s.spcon)
+	e2:SetCountLimit(1,id)
+	e2:SetCost(s.thcost)
+	e2:SetTarget(s.tg)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 	--Invocar de Modo Especial hasta 2 copias mano y/o Deck
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
@@ -27,28 +29,36 @@ function s.initial_effect(c)
     e3:SetCondition(s.oricalcon)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
-    e3:SetCountLimit(1)
+    e3:SetCountLimit(1,id)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
-    --No tomas daño de batalla por esta carta
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e5:SetValue(1)
-	c:RegisterEffect(e5)
-   
 end
 s.listed_names={id,48179391}
-function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+	--Buscar 1 carta especifica o una que la mencione
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+    local c=e:GetHandler()
+    if chk==0 then return c:IsDiscardable() end
+    Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
 end
-    --Invocar de Modo Especial desde la mano al no tener monstruos
-function s.spcon(e,c)
-	if c==nil then return true end
-	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
-		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+function s.afilter(c)
+	return (c:IsCode(48179391) or c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.afilter,tp,LOCATION_REMOVED+LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED+LOCATION_DECK)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.afilter,tp,LOCATION_REMOVED+LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
+end
+function s.oricalcon(e)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
     --Invocar de Modo Especial hasta 2 copias mano y/o Deck
 function s.filter(c,e,tp)

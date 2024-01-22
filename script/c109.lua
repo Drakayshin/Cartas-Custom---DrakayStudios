@@ -6,7 +6,7 @@ function s.initial_effect(c)
     c:SetUniqueOnField(1,0,id)
 	--Materiales de Fusion
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO+TYPE_FUSION),aux.FilterBoolFunctionEx(Card.IsType,TYPE_XYZ+TYPE_LINK))
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsSetCard,0x3e9),aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO+TYPE_FUSION),aux.FilterBoolFunctionEx(Card.IsType,TYPE_XYZ+TYPE_LINK))
     --Debe ser primero Invocador por Fusion
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

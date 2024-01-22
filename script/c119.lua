@@ -2,8 +2,6 @@
 --Batallador Oricaustro
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Solo 1 Boca arriba en tu campo
-    c:SetUniqueOnField(1,0,id)
 	--Invocar de Modo Especial
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -35,10 +33,16 @@ function s.initial_effect(c)
 	e4:SetValue(s.val)
 	e4:SetLabelObject(e1)
 	c:RegisterEffect(e4)
+	--Reduce el daño de batalla de tu adversario a la mitad
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	e5:SetValue(aux.ChangeBattleDamage(1,HALF_DAMAGE))
+	c:RegisterEffect(e5)
 end
 s.listed_names={48179391}
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
     --Invocar de Modo Especial
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
