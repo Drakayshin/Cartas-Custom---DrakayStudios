@@ -58,9 +58,6 @@ function s.ffilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_FUSION,fc,sumtype,tp)
 end
     --Destruccion por su Invocacion de Fusion
-function s.rmfilter(c,e)
-	return c:IsMonster() and c:IsAbleToRemove() and c:IsCanBeEffectTarget(e)
-end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())

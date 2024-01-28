@@ -24,10 +24,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e9}
-
     --Invocar desde la mano (efecto de activacion)
+function s.cfilter(c)
+	return c:IsFacedown() or not c:IsSetCard(0x3e9)
+end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	return not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
     --Proceso de Invocacion adicional por esta invocacion
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -6,7 +6,7 @@ function s.initial_effect(c)
     c:SetUniqueOnField(1,0,id)
 	--Materiales de Fusion
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,130,s.matfilter,s.matfilter2)
+	Fusion.AddProcMix(c,true,true,130,s.matfilter,s.matfilter2,s.matfilter3)
     --Debe ser Invocador por Fusion
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -99,6 +99,9 @@ function s.matfilter(c,fc,sumtype,tp)
 	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
 end
 function s.matfilter2(c,fc,sumtype,tp)
+	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
+end
+function s.matfilter3(c,fc,sumtype,tp)
 	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
 end
     --Inafectado excepto por cartas de arquetipos
