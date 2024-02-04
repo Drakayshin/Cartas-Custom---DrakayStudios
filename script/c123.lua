@@ -54,14 +54,14 @@ function s.initial_effect(c)
 	e7:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e7)
     --Efectos de monstruos Links Negados
-    local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_DISABLE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,LOCATION_GRAVE,LOCATION_MZONE,LOCATION_GRAVE)
-	e2:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1) end)
-	e2:SetTarget(function(e,c) return c:IsType(TYPE_LINK) and (c:IsType(TYPE_EFFECT) or c:IsOriginalType(TYPE_EFFECT)) end)
-	c:RegisterEffect(e2)
+    local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_FIELD)
+	e8:SetCode(EFFECT_DISABLE)
+	e8:SetRange(LOCATION_MZONE)
+	e8:SetTargetRange(LOCATION_MZONE,LOCATION_GRAVE,LOCATION_MZONE,LOCATION_GRAVE)
+	e8:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1) end)
+	e8:SetTarget(function(e,c) return c:IsType(TYPE_LINK) and (c:IsType(TYPE_EFFECT) or c:IsOriginalType(TYPE_EFFECT)) end)
+	c:RegisterEffect(e8)
 end
 s.listed_series={0x3e9}
 --Se puede Invoca con Miracle fusion

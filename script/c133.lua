@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetValue(s.funlimit)
 	c:RegisterEffect(e1)
-	--Invocar si es enviada al Cementerio
+	--Invocar si es desterrado
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
     --Invocar por Fusion 1 monstruo "Bestial" desterrando
-    local params = {fusfilter=s.fusfilter,matfilter=Card.IsAbleToRemove,extrafil=s.fextra,extraop=Fusion.BanishMaterial,stage2=s.stage2,extratg=s.extratg}
+    local params = {fusfilter=s.fusfilter,matfilter=Fusion.OnFieldMat(Card.IsAbleToRemove),extrafil=s.fextra,extraop=Fusion.BanishMaterial,stage2=s.stage2,extratg=s.extratg}
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
@@ -103,7 +103,7 @@ function s.fusfilter(c)
 end
 function s.fextra(e,tp,mg)
 	if not Duel.IsPlayerAffectedByEffect(tp,CARD_SPIRIT_ELIMINATION) then
-		return Duel.GetMatchingGroup(Fusion.IsMonsterFilter(Card.IsAbleToRemove),tp,LOCATION_GRAVE,0,nil)
+		return Duel.GetMatchingGroup(Fusion.IsMonsterFilter(Card.IsAbleToRemove),tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,nil)
 	end
 	return nil
 end
@@ -114,7 +114,7 @@ end
 function s.stage2(e,tc,tp,mg,chk)
 	if chk==2 then
 		local c=e:GetHandler()
-		--Cannot Special Summon from the Extra Deck, except Fusion Monsters
+		--Cannot Special Summon from the Extra Deck, except Fusion "Bestial"
 		local e2=Effect.CreateEffect(c)
 		e2:SetDescription(aux.Stringid(id,3))
 		e2:SetType(EFFECT_TYPE_FIELD)

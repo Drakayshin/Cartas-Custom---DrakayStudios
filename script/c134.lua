@@ -25,16 +25,10 @@ function s.initial_effect(c)
     -- Limitado por Material de Fusion
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	e3:SetCode(EFFECT_CANNOT_BE_MATERIAL)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetValue(s.funlimit)
 	c:RegisterEffect(e3)
-    --No puede ser material de Fusion/Synchro/Xyz/Link
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_CANNOT_BE_MATERIAL)
-	e4:SetValue(aux.cannotmatfilter(SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TUPE_LINK))
-	c:RegisterEffect(e4)
     --Si es Invocado por Fusion, barajea cartas de tu adversario
     local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
@@ -81,7 +75,7 @@ end
 function s.efilter(e,te)
 	return not te:GetOwner():IsSetCard(0x3e9)
 end
-    -- Limitado por Material de Fusion
+    -- Limitado por Material a Monstruos especificos
 function s.funlimit(e,c)
 	if not c then return false end
 	return not c:IsSetCard(0x3e9)
@@ -107,7 +101,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED)
 end
-    --Invocar si es desterrada
+    --Invocar si deja el Campo
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

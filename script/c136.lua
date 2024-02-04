@@ -36,7 +36,7 @@ function s.xyzlv(e,c,rc)
 end
 	--Material sustituto
 function s.subcon(e)
-	return e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE)
+	return e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED)
 end
 	--Monstruo especifico
 function s.subval(e,c)
