@@ -42,9 +42,12 @@ end
 function s.subval(e,c)
 	return c:IsSetCard(0x3e9)
 end
-    --Invocar si no controlas monstruos
+    --Invocar desde la mano (efecto de activacion)
+function s.cfilter(c)
+	return c:IsFacedown() or not c:IsSetCard(0x3e9)
+end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	return not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
     --Proceso de Invocacion adicional por esta invocacion
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -61,7 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)
+		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp)
 		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

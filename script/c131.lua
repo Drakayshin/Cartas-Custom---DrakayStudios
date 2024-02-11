@@ -48,10 +48,10 @@ function s.initial_effect(c)
 	e6:SetTargetRange(1,0)
 	e6:SetValue(s.rev)
 	c:RegisterEffect(e6)
-    --Refleja el daño por batalla
+    --No recibes daño por batalla que involucre a esta carta
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_REFLECT_BATTLE_DAMAGE)
+	e7:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e7:SetValue(1)
 	c:RegisterEffect(e7)
     --Limite de Invocar de Modo Normal y Especial
@@ -78,35 +78,48 @@ function s.initial_effect(c)
 	e11:SetTarget(s.destg)
 	e11:SetOperation(s.desop)
 	c:RegisterEffect(e11)
-    --ATK a la mitad
-	local e11=Effect.CreateEffect(c)
-	e11:SetType(EFFECT_TYPE_FIELD)
-	e11:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e11:SetRange(LOCATION_MZONE)
-	e11:SetTargetRange(0,LOCATION_MZONE)
-	e11:SetCondition(s.adcon)
-	e11:SetTarget(s.adtg)
-	e11:SetValue(s.atkval)
-	c:RegisterEffect(e11)
-	local e12=e11:Clone()
-	e12:SetCode(EFFECT_SET_DEFENSE_FINAL)
-	e12:SetValue(s.defval)
+	--ATK/DEF UP
+	local e12=Effect.CreateEffect(c)
+	e12:SetType(EFFECT_TYPE_SINGLE)
+	e12:SetCode(EFFECT_UPDATE_ATTACK)
+	e12:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e12:SetRange(LOCATION_MZONE)
+	e12:SetValue(s.atkval)
 	c:RegisterEffect(e12)
+	local e13=e12:Clone()
+	e13:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e13)
+	--Daño de penetracion
+	local e14=Effect.CreateEffect(c)
+	e14:SetType(EFFECT_TYPE_SINGLE)
+	e14:SetCode(EFFECT_PIERCE)
+	c:RegisterEffect(e14)
+	--Cambio de posicion de batalla
+	local e15=Effect.CreateEffect(c)
+	e15:SetDescription(aux.Stringid(id,1))
+	e15:SetCategory(CATEGORY_POSITION)
+	e15:SetType(EFFECT_TYPE_QUICK_O)
+	e15:SetCode(EVENT_FREE_CHAIN)
+	e15:SetRange(LOCATION_MZONE)
+	e15:SetCountLimit(1)
+	e15:SetTarget(s.destg)
+	e15:SetOperation(s.posop)
+	c:RegisterEffect(e15)
 end
 s.listed_series={0x3e9}
     --Materiales del Arquetipo con nombres diferentes
 function s.matfilter(c,fc,sumtype,tp)
-	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
+	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsSetCard(0x3e9,fc,sumtype,tp)
 end
 function s.matfilter2(c,fc,sumtype,tp)
-	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
+	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsSetCard(0x3e9,fc,sumtype,tp)
 end
 function s.matfilter3(c,fc,sumtype,tp)
-	return c:IsType(TYPE_FUSION,fc,sumtype,tp) and c:IsSetCard(0x3e9,fc,sumtype,tp)
+	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsSetCard(0x3e9,fc,sumtype,tp)
 end
     --Inafectado excepto por cartas de arquetipos
 function s.efilter(e,te)
-	return not te:GetOwner():IsSetCard(0x3e9)
+	return not te:GetOwner():IsSetCard(0x3e9) and te:GetOwner():GetBaseAttack()<=3500 and te:GetOwner():GetBaseAttack()>=0
 end
     --Conversion del daño
 function s.rev(e,re,r,rp,rc)
@@ -122,16 +135,17 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
-    --Convierte el ATK/DEF a la mitad que quien batalle contra esta carta
-function s.adcon(e)
-	return Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and e:GetHandler():GetBattleTarget()
-end
-function s.adtg(e,c)
-	return c==e:GetHandler():GetBattleTarget()
-end
+	--ATK/DEFK igual a tus LP
 function s.atkval(e,c)
-	return c:GetAttack()/2
+	return math.floor(Duel.GetLP(e:GetHandlerPlayer())/2)
 end
-function s.defval(e,c)
-	return c:GetDefense()/2
+	--Cambio de posicion de batalla
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return true end
+	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_MZONE,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,0,0)
+end
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil)
+	Duel.ChangePosition(g,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
 end

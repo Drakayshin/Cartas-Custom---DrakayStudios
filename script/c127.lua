@@ -16,14 +16,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
     --Cuando es Invocada
     local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetTarget(s.tg)
 	e2:SetOperation(s.op)
 	e2:SetCountLimit(1,{id,0})
-    e2:SetCondition(s.oricalcon)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
@@ -41,7 +40,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 	--Regresar a la mano 1 monstruo con seleccion
 	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,1))
+	e6:SetDescription(aux.Stringid(id,2))
 	e6:SetCategory(CATEGORY_TOHAND)
     e6:SetType(EFFECT_TYPE_QUICK_O)
 	e6:SetCode(EVENT_FREE_CHAIN)
@@ -58,19 +57,9 @@ s.listed_names={id,48179391}
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_EXTRA,0)==0
 end
-function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
-end
-    --Inafectada de monstruos Fusion/Sincronia/Xyz y Enlace del adversario
-function s.immval(e,te)
-	local tc=te:GetOwner()
-	return te:IsMonsterEffect() and te:IsActivated()
-		and te:GetOwnerPlayer()==1-e:GetHandlerPlayer()
-		and te:IsActiveType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
-end
     --Buscar carta que mencione algo
 function s.filter(c)
-	return (c:IsCode(48179391) or c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
+	return (c:IsCode(48179391) or c:ListsCode(48179391) and c:IsSpellTrap())  and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -83,6 +72,15 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
+end
+function s.oricalcon(e)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+end
+    --Inafectada de monstruos Fusion/Sincronia/Xyz y Enlace del adversario
+function s.immval(e,te)
+	local tc=te:GetOwner()
+	return te:IsMonsterEffect() and te:GetOwnerPlayer()==1-e:GetHandlerPlayer()
+		and te:IsActiveType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 end
     --Regresar a la mano 1 monstruo sin seleccion
 function s.thfilter(c)

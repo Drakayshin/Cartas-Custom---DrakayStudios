@@ -11,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_BATTLE_START)
 	e1:SetCountLimit(1,id)
-	e1:SetCondition(s.oricalcon)
 	e1:SetTarget(s.postg)
 	e1:SetOperation(s.posop)
 	c:RegisterEffect(e1)
@@ -40,10 +39,7 @@ function s.initial_effect(c)
 	e4:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e4)
 end
-s.listed_names={id,48179391} --id=para la propia carta luego de la "," codigo de otra carta o arquetipo
-function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
-end
+s.listed_names={id,48179391} --id=para la propia carta luego de la "," codigo de otra carta
 	--Cambio de Posicion de Batalla por seleccion
 function s.filter(c)
 	return c:IsFaceup() and c:IsCanChangePosition()
@@ -60,6 +56,9 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
+end
+function s.oricalcon(e)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
     --Invocar 1 Malevolencia Oricaustroen tu mano o Deck
 function s.spfilter(c,e,tp)

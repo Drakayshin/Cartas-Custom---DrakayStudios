@@ -30,9 +30,9 @@ function s.initial_effect(c)
     c:RegisterEffect(e2)
 end
 s.listed_series={0x3e9}
-    --Añadir 1 carta Magica/Trampa
+    --Añadir 1 carta Magica/Trampa "Bestial"
 function s.thfilter(c)
-	return c:IsSpellTrap() and c:IsAbleToHand()
+	return c:IsSpellTrap() and c:IsSetCard(0x3e9) and c:IsAbleToHand()
 end    
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
