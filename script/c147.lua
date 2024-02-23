@@ -9,9 +9,9 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_BE_BATTLE_TARGET)
     e1:SetCountLimit(1,{id,1})
-	e1:SetCondition(s.condition)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetCondition(s.nacon)
+	e1:SetTarget(s.natg)
+	e1:SetOperation(s.naop)
 	c:RegisterEffect(e1)
 	-- Incrementar ATK por DEF y ganar LP
     local e2=Effect.CreateEffect(c)
@@ -29,20 +29,19 @@ function s.initial_effect(c)
 end
 s.listed_series={0x3e9}
     --Negar ataque y causar daño
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.nacon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.GetAttacker():IsControler(tp)
 		and eg:GetFirst():IsControler(tp) and eg:GetFirst():IsFaceup()
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,eg:GetFirst():GetAttack())
+function s.natg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetAttacker():IsOnField() end
+	local dam=Duel.GetAttacker():GetAttack()
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if Duel.NegateAttack() and tc:IsRelateToBattle() then
-		local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-		Duel.Damage(p,tc:GetAttack(),REASON_EFFECT)
+function s.naop(e,tp,eg,ep,ev,re,r,rp)
+	local a=Duel.GetAttacker()
+	if Duel.NegateAttack() then
+		Duel.Damage(1-tp,a:GetAttack(),REASON_EFFECT)
 	end
 end
     --Incrementar ATK por DEF y Ganar LP
