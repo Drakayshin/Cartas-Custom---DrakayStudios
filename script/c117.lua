@@ -66,7 +66,7 @@ function s.oricalcon(e)
 end
 	--No respuesta de monstruos
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsSpellTrapEffect() and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetOwnerPlayer()==tp then
+	if re:IsSpellTrapEffect() and re:GetOwnerPlayer()==tp then
 		Duel.SetChainLimit(s.chainlm)
 	end
 end

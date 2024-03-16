@@ -74,10 +74,10 @@ function s.initial_effect(c)
 	--clock lizard
 	aux.addContinuousLizardCheck(c,LOCATION_FZONE)
 end
-s.listed_names={48179391}
+s.listed_names={48179391,153}
 function s.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_SZONE,5)
-	return tc and tc:IsFaceup() and tc:IsCode(48179391)
+	return tc and tc:IsFaceup() and {tc:IsCode(48179391) or tc:IsCode(153)}
 end
 function s.negdcon(e,tp,eg,ep,ev,re,r,rp)
 	return re==e:GetLabelObject() and re:IsHasType(EFFECT_TYPE_ACTIVATE)

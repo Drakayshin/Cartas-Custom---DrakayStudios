@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.negtg)
 	e1:SetOperation(s.negop)
 	c:RegisterEffect(e1)
-	-- Replace destruction
+	-- Replasar destruccion
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
@@ -24,12 +24,12 @@ function s.initial_effect(c)
 	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
     --Puedes activar desde la mano
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(s.handcon)
-	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e3:SetCondition(s.handcon)
+	c:RegisterEffect(e3)
 end
 s.listed_names={132}
 s.listed_series={0x3e9}
@@ -40,8 +40,8 @@ end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetPossibleOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
+	if re:GetHandler():IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
 	end
 end
 function s.vsfilter(c)
@@ -50,8 +50,8 @@ end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re)
 		and Duel.IsExistingMatchingCard(s.vsfilter,tp,LOCATION_GRAVE,0,1,nil)
-		and re:GetHandler():IsDestructable() and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-		Duel.BreakEffect()
+		and re:GetHandler():IsDestructable() 
+		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.SendtoDeck(eg,1,1,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	end
 end

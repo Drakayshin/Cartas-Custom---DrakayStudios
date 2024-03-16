@@ -1,8 +1,8 @@
---Number 5: Doom Chimera Dragon
---Scripted by ahtelel
+--Murugan, El Azote Bestial
+--Murugan, El Azote Bestial
 local s,id=GetID()
 function s.initial_effect(c)
-	--xyz summon
+	--Invocacion Xyz
 	Xyz.AddProcedure(c,nil,5,3,nil,nil,99)
 	c:EnableReviveLimit()
 	--Al se Invocado por Xyz

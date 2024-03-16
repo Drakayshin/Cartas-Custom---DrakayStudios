@@ -1,8 +1,8 @@
---Hipogrifo Celestial
---Hipogrifo Celestial
+--Krinthor Celestial
+--Krinthor Celestial
 local s,id=GetID()
 function s.initial_effect(c)
-	--synchro summon
+	--Invocar Sincronía
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsRace,RACE_WINGEDBEAST),1,1)
 	c:EnableReviveLimit()
 	--Special Summon 1 Level 4 or lower monster from your GY

@@ -47,6 +47,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 s.listed_series={0x3e9}
+
 function s.funlimit(e,c)
 	if not c then return false end
 	return not c:IsSetCard(0x3e9)
