@@ -67,8 +67,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_PZONE)
-    e1:SetCondition(s.oricalcon)
-	e1:SetCondition(s.negcon)
+    e1:SetCondition(s.negcon)
 	e1:SetTarget(s.negtg)
 	e1:SetOperation(s.negop)
 	c:RegisterEffect(e1)
@@ -131,7 +130,9 @@ end
     -- Efecto de Péndulo
     -- Negar y destruir
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev) and s.type_list[tp]&re:GetActiveType()==0
+	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
+	and Duel.IsChainNegatable(ev) and s.type_list[tp]&re:GetActiveType()==0
+	and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
