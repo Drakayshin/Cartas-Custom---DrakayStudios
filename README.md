@@ -1,5 +1,12 @@
 # Cartas-Custom---DrakayStudios
-Un repositorio para cartas personalizadas creadas por DrakayStudios
+Un repositorio para cartas personalizadas creadas por DrakayStudios.
+Enfrenta a poderosos jugadas con los antiguos Poderes del Oricalcos, o adentra a tu adversario en los peligrosos mundos de los Bestials.
+Arquetipo Finalizado (Edición 19/03/2024)
+Oricalcos/Oricaustro – Control/Rogue
+14/14 Cartas
+Bestial – Meta/Spanw
+24/24 Cartas
+
 
 ![earth_s_fire_2_by_0zerokelvin_dgiljtu](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/assets/96027721/ca05c573-fd7b-4faf-a3c2-76174558bf4d)
 
