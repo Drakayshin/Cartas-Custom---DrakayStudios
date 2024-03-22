@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 end
-s.listed_series={3eb}
+s.listed_series={0x3eb}
 function s.spfilter(c,e,tp)
 	return c:IsLevelBelow(2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

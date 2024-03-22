@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.naop)
 	c:RegisterEffect(e4)
 end
-s.listed_series={3eb}
+s.listed_series={0x3eb}
 function s.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
