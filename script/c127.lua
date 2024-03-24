@@ -36,6 +36,7 @@ function s.initial_effect(c)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
+	e5:SetCondition(s.oricalcon)
 	e5:SetValue(s.immval)
 	c:RegisterEffect(e5)
 	--Regresar a la mano 1 monstruo con seleccion

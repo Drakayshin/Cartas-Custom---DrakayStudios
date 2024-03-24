@@ -79,8 +79,8 @@ function s.val(e,c)
 	end
 end
 	--Efectos Adicionales por Material
-	function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_FUSION and eg:IsExists(Card.IsSetCard,1,nil,0x3e9)
+function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
+return r==REASON_FUSION and eg:IsExists(Card.IsSetCard,1,nil,0x3e9)
 end
 function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 	for rc in eg:Iter() do
@@ -97,7 +97,7 @@ function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 			rc:RegisterEffect(e1,true)
 			rc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1)
 
-			--Inafectado por Efectos de monstruos de tu adversario
+			--Cambio de Daño
 			local e2=Effect.CreateEffect(e:GetHandler())
 			e2:SetDescription(3910)
 			e2:SetType(EFFECT_TYPE_FIELD)
@@ -106,13 +106,17 @@ function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetTargetRange(1,0)
 			e2:SetCode(EFFECT_REVERSE_DAMAGE)
 			e2:SetReset(RESET_EVENT|RESETS_STANDARD)
-			e2:SetValue(1)
+			e2:SetValue(s.rev)
 			rc:RegisterEffect(e2,true)
 			rc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1)
 		end
 	end
 end
-	--Inafectado por efectos
+	--Inafectado por efectos de monstruos
 function s.efilter(e,te)
 	return te:IsMonsterEffect() and te:GetOwnerPlayer()==1-e:GetHandlerPlayer()
+end
+    --Conversion del daño
+function s.rev(e,re,r,rp,rc)
+	return (r&REASON_EFFECT)~=0
 end
