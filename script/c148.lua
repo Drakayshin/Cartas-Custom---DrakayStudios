@@ -53,7 +53,7 @@ end
 s.listed_series={0x3e9}
     --No seleccionar por efectos de tu adversario
 function s.target(e,c)
-	return c:IsSetCard(0x3e9) and not c:IsType(TYPE_FUSION)
+	return c:IsSetCard(0x3e9) and not c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ)
 end
     ----Invocar sin sacrificio
 function s.ntcon(e,c,minc)
