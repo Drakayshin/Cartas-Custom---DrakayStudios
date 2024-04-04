@@ -48,11 +48,13 @@ function s.vsfilter(c)
 	return c:IsCode(132)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
+	local ec=re:GetHandler()
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re)
 		and Duel.IsExistingMatchingCard(s.vsfilter,tp,LOCATION_GRAVE,0,1,nil)
 		and re:GetHandler():IsDestructable() 
 		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-		Duel.SendtoDeck(eg,1,1,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		ec:CancelToGrave()
+		Duel.SendtoDeck(ec,1,1,REASON_EFFECT)
 	end
 end
     --Evitar destruccion
