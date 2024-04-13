@@ -2,67 +2,30 @@
 --Resurgido de Ra
 local s,id=GetID()
 function s.initial_effect(c)
-	--Limitado para Sacrificio
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_UNRELEASABLE_NONSUM)
-	e1:SetValue(1)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_UNRELEASABLE_SUM)
-	e2:SetValue(s.sumval)
-	c:RegisterEffect(e2)
-    --Añadir 1 monstruo Bestia Divina
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
-	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e4)
-    local e5=e3:Clone()
-	e5:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	c:RegisterEffect(e5)
     --Buscar 1 carta
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,1))
-	e6:SetType(EFFECT_TYPE_IGNITION)
-	e6:SetRange(LOCATION_MZONE)
-	e6:SetCountLimit(1,{id,2})
-	e6:SetCost(s.cost)
-	e6:SetTarget(s.bstg)
-	e6:SetOperation(s.bsop)
-	c:RegisterEffect(e6)
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetCost(s.cost)
+	e1:SetTarget(s.bstg)
+	e1:SetOperation(s.bsop)
+	c:RegisterEffect(e1)
+	--Invocar de Modo Especial
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,{id,2})
+	e2:SetCost(s.spcost)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
+	c:RegisterEffect(e2)
 end
 s.listed_names={10000010}
-    --Limite para ser Sacrificado
-function s.sumval(e,c)
-	return not c:IsRace(RACE_DIVINE)
-end
-    --Añadir 1 monstruo desde el Deck a tu mano
-function s.thfilter(c)
-	return c:IsRace(RACE_DIVINE) and c:IsAbleToHand()
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
-end
+
     --Bucar 1 carta que mencione
 function s.cfilter(c)
 	return c:IsCode(10000010) and not c:IsPublic()
@@ -89,4 +52,36 @@ function s.bsop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
+end
+	--Invocar de Modo Especial
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
+end
+function s.filter(c,e,tp)
+	return c:IsCode(CARD_RA) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
+	if chk==0 then return ft>0 and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,true,false,POS_FACEUP) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK)
+		e1:SetValue(2000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_SET_DEFENSE)
+		tc:RegisterEffect(e2)
+	end
+	Duel.SpecialSummonComplete()
 end

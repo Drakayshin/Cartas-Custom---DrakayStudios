@@ -55,8 +55,10 @@ function s.initial_effect(c)
 end
 s.listed_names={id,48179391}
     --No tener cartas en el Deck Extra
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_EXTRA,0)==0
+function s.spcon(e,c,tp,eg,ep,ev,re,r,rp)
+	if c==nil then return true end
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_EXTRA,0)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
     --Buscar carta que mencione algo
 function s.filter(c)
