@@ -1,12 +1,12 @@
---オレイカルコス・シュノロス (Anime)
---Orichalcos Shunoros (Anime)
+--Defensor de Oricalcos
+--Defensor de Oricalcos
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
+	c:EnableUnsummonable()
 	--Debe ser Invocada de forma especifica
 	local e1=Effect.CreateEffect(c)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
@@ -52,8 +52,7 @@ end
 s.listed_names={120,48179391}
 --Debe ser Invocada de forma especifica
 function s.splimit(e,se,sp,st)
-	local code=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_CODE)
-	return se:GetHandler():IsCode(120) or code==120
+	return se:GetHandler():ListsCode(48179391)
 end
     --No hay daño por batalla
 function s.rdcon(e,tp,eg,ep,ev,re,r,rp)
