@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
     -- Materiales
-	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTunerEx(s.sfilter),1,1)
+	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(nil),1,1)
 	c:EnableReviveLimit()
 	-- Pendulum attributes
 	Pendulum.AddProcedure(c,false)
@@ -63,9 +63,6 @@ function s.initial_effect(c)
 	e5:SetTarget(s.pentg)
 	e5:SetOperation(s.penop)
 	c:RegisterEffect(e5)
-end
-function s.sfilter(c,val,scard,sumtype,tp)
-	return c:IsType(TYPE_SYNCHRO,scard,sumtype,tp)
 end
     -- Pendulo Efecto
     --Cambio de ATK
