@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	c:RegisterEffect(e2)
-    --Immune effects monsters
+    --Immune efectosv de Monstruos
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -31,12 +31,11 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_IMMUNE_EFFECT)
 	e3:SetValue(s.efilter)
 	c:RegisterEffect(e3)
-	--Cambiar la pocision de un monstruo al batallar
+	--Cambiar la Posicion de batalla
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
 	e4:SetCategory(CATEGORY_POSITION)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetTarget(s.postg)
 	e4:SetOperation(s.posop)
@@ -58,7 +57,7 @@ function s.initial_effect(c)
 	e6:SetValue(function(e,c) return Duel.GetMatchingGroupCount(Card.IsType,c:GetControler(),LOCATION_GRAVE,0,nil,TYPE_NORMAL)*200 end)
 	c:RegisterEffect(e6)
 end
---Special Summon this card
+-- invocar por su efecto
 function s.cfilter(c,tp)
 	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and (c:GetPreviousTypeOnField()&TYPE_NORMAL)~=0 and c:IsPreviousControler(tp)
 end
@@ -77,24 +76,19 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:CompleteProcedure()
 	end
 end
---Inmune effects monsters
+-- Inmune efectos de Monstruos
 function s.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
---Cambio de pocision al atacar
-function s.filter(c)
-	return c:IsFaceup() and c:IsCanChangePosition()
-end
+-- Cambio de posicion al atacar
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
+	local d=Duel.GetAttackTarget()
+	if chk==0 then return d and d:IsControler(1-tp) and d:IsCanChangePosition() end
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,d,1,0,0)
 end
 function s.posop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,0,POS_FACEUP_ATTACK,0)
+	local d=Duel.GetAttackTarget()
+	if d and d:IsRelateToBattle() then
+		Duel.ChangePosition(d,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end

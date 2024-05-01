@@ -16,7 +16,7 @@ function s.initial_effect(c)
 end
 s.listed_names={48179391}
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
     --Añadir 1 carta aleatoria de la mano
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)

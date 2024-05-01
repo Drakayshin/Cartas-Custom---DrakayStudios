@@ -49,16 +49,16 @@ end
     --Enviar al Cementerio cartas en la Zona de monstruos o Zona de Magicas Trampa
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,1,nil,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,nil)
+	local sg=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,1,nil)
 	if #sg==0 then return end
 	local b1=sg:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE)
 	local b2=sg:IsExists(Card.IsLocation,1,nil,LOCATION_STZONE)
 	local op=Duel.SelectEffect(tp,{b1,1002},{b2,1003})
 	local bg=sg:Filter(Card.IsLocation,nil,op==1 and LOCATION_MZONE or LOCATION_STZONE)
-	Duel.SendtoGrave(bg,POS_FACEUP,REASON_EFFECT)
+	Duel.SendtoGrave(bg,1,0,REASON_EFFECT)
 	--No usar el proximo turno
     local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
