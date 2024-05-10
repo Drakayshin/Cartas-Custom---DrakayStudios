@@ -75,7 +75,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e7:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
 		tc:RegisterEffect(e7)
 		--Cannot be used as Link material
-		local e8=e6:Clone()
+		local e8=e7:Clone()
 		e8:SetDescription(3311)
 		e8:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
 		tc:RegisterEffect(e8)

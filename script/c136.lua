@@ -32,7 +32,7 @@ end
 s.listed_series={0x3e9}
     --Nivel tratado como
 function s.xyzlv(e,c,rc)
-    return 5,7,8,e:GetHandler():GetLevel()
+    return 3,7,e:GetHandler():GetLevel()
 end
 	--Material sustituto
 function s.subcon(e)
@@ -71,25 +71,20 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			local sg=g:Select(tp,1,2,nil)
 			local tc=sg:GetFirst()
 			if tc then
-				Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-                local e1=Effect.CreateEffect(e:GetHandler())
-                e1:SetDescription(aux.Stringid(id,2))
-                e1:SetType(EFFECT_TYPE_FIELD)
-                e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-                e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-                e1:SetTargetRange(1,0)
-                e1:SetTarget(s.splimit)
-                e1:SetReset(RESET_PHASE+PHASE_END)
-                Duel.RegisterEffect(e1,tp)
-                
-	            aux.addTempLizardCheck(e:GetHandler(),tp,s.lizfilter)
+				Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)                
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_CHANGE_DAMAGE)
+				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+				e1:SetTargetRange(0,1)
+				e1:SetValue(s.damval)
+				e1:SetReset(RESET_PHASE+PHASE_END)
+				Duel.RegisterEffect(e1,tp)
+				aux.RegisterClientHint(e:GetHandler(),nil,tp,1,0,aux.Stringid(id,1),nil)
 			end
 		end
 	end
 end
-function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsSetCard(0x3e9) and c:IsLocation(LOCATION_EXTRA)
-end
-function s.lizfilter(e,c)
-	return not c:IsOriginalSetCard(0x3e9)
+function s.damval(e,re,val,r,rp,rc)
+	return math.floor(val/2)
 end

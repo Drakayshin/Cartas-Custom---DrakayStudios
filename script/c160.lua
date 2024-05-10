@@ -1,5 +1,5 @@
---Liberación de Oricalcos
---Liberación de Oricalcos
+--Surgimiento de Oricalcos
+--Surgimiento de Oricalcos
 local s,id=GetID()
 function s.initial_effect(c)
 	--Negar efecto de monstruo/Activar e invocar
@@ -36,7 +36,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
     --Negar y activar Carta Magica de Campo
 function s.filter(c,tp)
-	return c:IsCode(48179391,105,125) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
+	return c:IsCode(48179391,105,125) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.filter1(c,e,tp)
 	return c:IsCode(156) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
