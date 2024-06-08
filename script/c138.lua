@@ -2,17 +2,19 @@
 --Daedalios, Dragotiranico Bestial
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
+	-- Solo 1 bajo tu control
+    c:SetUniqueOnField(1,0,id)
 	-- Metodo alternativo de Invocacion
 	Xyz.AddProcedure(c,nil,7,3,s.ovfilter,aux.Stringid(id,0))
-    --Debe ser primero Invocador por Xyz
+	c:EnableReviveLimit()
+    -- Debe ser primero Invocador por Xyz
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
-    --Envio al Cementerio por su Invocación Xyz
+    -- Envio al Cementerio por su Invocación Xyz
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOGRAVE)
@@ -23,7 +25,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sgtg)
 	e2:SetOperation(s.sgop)
 	c:RegisterEffect(e2)
-    --Reducir ATK
+    -- Reducir ATK
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -34,7 +36,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.target)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3,false,REGISTER_FLAG_DETACH_XMAT)
-    --Inafectado por efectos de monstruos de tu adversario
+    -- Inafectado por efectos de monstruos de tu adversario
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -43,7 +45,7 @@ function s.initial_effect(c)
 	e4:SetCondition(s.econ)
 	e4:SetValue(s.efilter)
 	c:RegisterEffect(e4)
-	--Ataque Multiple
+	-- Ataque Multiple
 	local e5=e4:Clone()
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_ATTACK_ALL)
@@ -72,6 +74,7 @@ function s.sgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
+
     --Reducir ATK por Seleccion
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -90,12 +93,17 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local atk=tc:GetAttack()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-2000)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
+		if atk~=0 and tc:IsAttack(0) then 
+			Duel.BreakEffect()
+			Duel.Destroy(tc,REASON_EFFECT) 
+		end
 	end
 end
     --Si tiene como material

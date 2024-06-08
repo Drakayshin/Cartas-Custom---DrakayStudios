@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetValue(s.funlimit)
 	c:RegisterEffect(e1)
-	--Invocar si es desterrado
+	-- Invocar si es desterrado
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
-	--Al ser Invocado: Enviar al Cementerio 1 monstruo especifico
+	-- Al ser Invocado: Enviar al Cementerio 1 monstruo especifico
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOGRAVE)
@@ -33,7 +33,7 @@ function s.initial_effect(c)
     local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
-    --Invocar por Fusion 1 monstruo "Bestial" desterrando
+    -- Invocar por Fusion 1 monstruo "Bestial" desterrando
     local params = {fusfilter=s.fusfilter,matfilter=Fusion.OnFieldMat(Card.IsAbleToRemove),extrafil=s.fextra,extraop=Fusion.BanishMaterial,stage2=s.stage2,extratg=s.extratg}
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
@@ -47,12 +47,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 s.listed_series={0x3e9}
-
+--	Limite de material
 function s.funlimit(e,c)
 	if not c then return false end
 	return not c:IsSetCard(0x3e9)
 end
---Invocar si es desterrada
+-- Invocar si es desterrada
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -122,11 +122,11 @@ function s.stage2(e,tc,tp,mg,chk)
 		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 		e2:SetTargetRange(1,0)
-		e2:SetTarget(s.splimit)
+		e2:SetTarget(s.splimit1)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e2,tp)
 	end
 end
-function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+function s.splimit1(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x3e9) and c:IsLocation(LOCATION_EXTRA)
 end
