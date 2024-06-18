@@ -2,7 +2,7 @@
 --Rashumon, El Fulgurante Bestial
 local s,id=GetID()
 function s.initial_effect(c)
-	--Invocar por Destierro
+	-- Invocar por Destierro
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-    --Busqueda por descarte
+    -- Busqueda por descarte
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e9}
-    --Invocar por Destierro
+    -- Invocar por Destierro
 function s.rmcfilter(c,tp)
 	return c:IsSetCard(0x3e9) and c:IsMonster() and c:IsAbleToRemoveAsCost()
 end
@@ -47,9 +47,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-    --Busqueda especifica
+    -- Busqueda especifica
 function s.costfilter(c)
-	return c:IsSetCard(0x3e9) and c:IsMonster() and c:IsDiscardable()
+	return c:IsMonster() and c:IsDiscardable()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil) end

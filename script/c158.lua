@@ -7,12 +7,12 @@ function s.initial_effect(c)
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsType,TYPE_FUSION),s.matfilter,s.matfilter2,s.matfilter3)
 	-- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	--Debe ser Invocador por Fusion
+	--Debe ser primero Invocador por Fusion
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.fuslimit)
+	e1:SetValue(s.splimit)
 	c:RegisterEffect(e1)
 	-- Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
 	local e2=Effect.CreateEffect(c)
@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_MZONE)
-    e3:SetCountLimit(1,{id,2})
+    e3:SetCountLimit(3,{id,2})
     e3:SetCost(s.negcost)
 	e3:SetCondition(s.negcon)
 	e3:SetTarget(s.negtg)
@@ -60,6 +60,10 @@ end
 function s.matfilter3(c,fc,sumtype,tp)
 	return c:IsOnField() and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
 end
+    -- Debe ser primero Invocador por Fusion
+function s.splimit(e,se,sp,st)
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
+end
     -- Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
 function s.setfilter(c)
 	return (c:IsSpell() or c:IsTrap()) and c:IsSSetable()
@@ -77,7 +81,6 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
     -- Negar y destruir
-	-- Costo
 function s.cfilter(c,rtype)
 	return (not c:IsOnField() or c:IsFaceup()) and c:IsType(rtype) and c:IsAbleToRemoveAsCost()
 end
@@ -88,9 +91,9 @@ function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,rtype)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
-
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev) and s.type_list[tp]&re:GetActiveType()==0
+	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
+	and Duel.IsChainNegatable(ev) and s.type_list[tp]&re:GetActiveType()==0
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

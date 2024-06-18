@@ -33,9 +33,12 @@ function s.initial_effect(c)
 end
 s.listed_names={132}
 s.listed_series={0x3e9}
+function s.cfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x3e9)
+end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsMonsterEffect()) and Duel.IsChainNegatable(ev)
-		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x3e9),tp,LOCATION_MZONE,0,1,nil)
+	if not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
+	return Duel.IsChainNegatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -50,7 +53,7 @@ end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=re:GetHandler()
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re)
-		and Duel.IsExistingMatchingCard(s.vsfilter,tp,LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.vsfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,0,1,nil)
 		and re:GetHandler():IsDestructable() 
 		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		ec:CancelToGrave()
