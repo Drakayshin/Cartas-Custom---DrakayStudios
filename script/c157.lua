@@ -1,98 +1,76 @@
 --Cabalkiria Neo-Genesis
---Cabalkiria Neo-Genesis
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Materiales
-	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(nil),1,1)
 	c:EnableReviveLimit()
-	-- Pendulum attributes
 	Pendulum.AddProcedure(c,false)
-    -- Solo 1 Boca arriba en tu campo
+	-- Materiales de Sincronía
+	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(nil),1,1)
     c:SetUniqueOnField(1,0,id)
-	--Cambio de ATK
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_PZONE)
-	e1:SetCountLimit(2,id)
-	e1:SetTarget(s.atktarget)
-	e1:SetOperation(s.atkoperation)
-	c:RegisterEffect(e1)
-    --Ganar ATK
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
-	e2:SetCondition(s.atkcon)
-    e2:SetCountLimit(1,id)
-	e2:SetCost(s.atkcost)
-	e2:SetTarget(s.atktg)
-	e2:SetOperation(s.atkop)
-	c:RegisterEffect(e2)
 	-- Limitar Ataques
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e3:SetTarget(s.tglimit)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetRange(LOCATION_MZONE)
+	e0:SetTargetRange(LOCATION_MZONE,0)
+	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e0:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e0:SetTarget(s.tglimit)
+	e0:SetValue(1)
+	c:RegisterEffect(e0)
+    --Ganar ATK
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
+	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.atkcon)
+	e1:SetTarget(s.atktg)
+	e1:SetOperation(s.atkop)
+	c:RegisterEffect(e1)
 	-- Destruccion por Efecto
+	local e2=Effect.CreateEffect(c)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_DESTROYED)
+	e2:SetCondition(s.descon)
+	e2:SetOperation(s.desop)
+	c:RegisterEffect(e2)
+    -- Poner en Zona de Pendulo
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_DESTROYED)
+	e3:SetCondition(s.pencon)
+	e3:SetTarget(s.pentg)
+	e3:SetOperation(s.penop)
+	c:RegisterEffect(e3)
+	-- Efecto de Pendulo
+	-- Cambio de ATK
 	local e4=Effect.CreateEffect(c)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_DESTROYED)
-	e4:SetCondition(s.descon)
-	e4:SetOperation(s.desop)
+	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetCategory(CATEGORY_ATKCHANGE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_PZONE)
+	e4:SetCountLimit(2,id)
+	e4:SetTarget(s.atktarget)
+	e4:SetOperation(s.atkoperation)
 	c:RegisterEffect(e4)
-    --Poner en Zona de Pendulo
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,2))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCode(EVENT_DESTROYED)
-	e5:SetCondition(s.pencon)
-	e5:SetTarget(s.pentg)
-	e5:SetOperation(s.penop)
-	c:RegisterEffect(e5)
 end
-    -- Pendulo Efecto
-    --Cambio de ATK
-function s.atktarget(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
-end
-function s.atkoperation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(math.ceil(tc:GetBaseAttack()/2))
-		tc:RegisterEffect(e1)
-	end
+    -- Limite de ataques
+function s.tglimit(e,c)
+    return c~=e:GetHandler()
 end
     -- Ganar ATK
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
     local ph=Duel.GetCurrentPhase()
     return Duel.GetTurnPlayer()~=tp and ph>=0x08 and ph<=0x20
         and (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
-end
-function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
-    Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
@@ -112,10 +90,6 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
         end
         e:GetHandler():RegisterFlagEffect(id,RESET_PHASE+PHASE_END,0,1)
     end
-end
-    -- Limite de ataques
-function s.tglimit(e,c)
-    return c~=e:GetHandler()
 end
     -- Destruccion por costo
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
@@ -139,5 +113,25 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+	end
+end
+    -- Efecto de Péndulo
+    -- Cambio de ATK
+function s.atktarget(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
+end
+function s.atkoperation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetValue(math.ceil(tc:GetBaseAttack()/2))
+		tc:RegisterEffect(e1)
 	end
 end
