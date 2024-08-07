@@ -137,7 +137,7 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 end
     -- No daño por Batalla
 function s.efilter(e,c)
-	return c:IsType(TYPE_NORMAL) and c:IsType(TYPE_EFFECT)
+	return c:IsType(TYPE_NORMAL) or c:IsType(TYPE_EFFECT)
 end
     -- Invocar en Zona de Péndulo
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
