@@ -2,11 +2,12 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Invocación por Fusión
+	-- Invocación por Fusión
 	c:EnableReviveLimit()
-    c:SetSPSummonOnce(id)
 	Fusion.AddProcMix(c,true,true,111,150)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
+	-- Invocación 1 vez por turno
+	c:SetSPSummonOnce(id)
     -- Ningún monstruo es destruido por batalla
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)

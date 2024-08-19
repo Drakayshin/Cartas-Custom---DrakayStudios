@@ -1,10 +1,10 @@
---カオス・アンヘル－混沌の双翼
+--Dragón Flamante Celestino
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
     Pendulum.AddProcedure(c,false)
 	-- Invocación por Sincronía
+	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO),1,1,Synchro.NonTunerEx(Card.IsType,TYPE_SYNCHRO),1,99,s.exmatfilter)
     -- Sin daño de batalla de esta carta
 	local e0=Effect.CreateEffect(c)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DIRECT_ATTACK)
 	c:RegisterEffect(e1)
-     -- Cambiar su Posición de Batalla Luego de atacar
+    -- Cambiar su Posición de Batalla Luego de atacar
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
