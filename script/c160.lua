@@ -1,28 +1,28 @@
 --Surgimiento de Oricalcos
---Surgimiento de Oricalcos
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Negar efecto de monstruo/Activar e invocar
+	-- Negar efecto de monstruo/Activar e invocar
+	local e0=Effect.CreateEffect(c)
+	e0:SetCategory(CATEGORY_NEGATE)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetCountLimit(1,{id,1})
+	e0:SetCondition(s.condition)
+	e0:SetCost(s.cost)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.activate)
+	c:RegisterEffect(e0)
+	-- Puedes activar desde la mano
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_NEGATE)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_CHAINING)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetCondition(s.condition)
-	e1:SetCost(s.cost)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e1:SetCondition(s.handcon)
 	c:RegisterEffect(e1)
-	--Puedes activar desde la mano
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(s.handcon)
-	c:RegisterEffect(e2)
 end
 s.listed_names={id,48179391}
-    --Costo Mitad de LP
+    -- Costo Mitad de LP
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
@@ -34,7 +34,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
-    --Negar y activar Carta Magica de Campo
+    -- Negar y activar Carta Magica de Campo
 function s.filter(c,tp)
 	return c:IsCode(48179391,105,125) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end

@@ -1,5 +1,5 @@
 --Moloch, El Aventurado bestial
---Moloch, El Aventurado bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     -- Limitado por Material de Fusion
@@ -10,49 +10,49 @@ function s.initial_effect(c)
 	e1:SetValue(s.funlimit)
 	c:RegisterEffect(e1)
 	-- Invocar si es desterrado
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_REMOVE)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
-	c:RegisterEffect(e2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_REMOVE)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
+	c:RegisterEffect(e1)
 	-- Al ser Invocado: Enviar al Cementerio 1 monstruo especifico
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_TOGRAVE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-    e3:SetCountLimit(1,{id,2})
-	e3:SetTarget(s.target2)
-	e3:SetOperation(s.operation2)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_TOGRAVE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+    e2:SetCountLimit(1,{id,2})
+	e2:SetTarget(s.target2)
+	e2:SetOperation(s.operation2)
+	c:RegisterEffect(e2)
+    local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-    local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e4)
     -- Invocar por Fusion 1 monstruo "Bestial" desterrando
     local params = {fusfilter=s.fusfilter,matfilter=Fusion.OnFieldMat(Card.IsAbleToRemove),extrafil=s.fextra,extraop=Fusion.BanishMaterial,stage2=s.stage2,extratg=s.extratg}
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,2))
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,{id,3})
-    e5:SetCondition(function() return Duel.IsMainPhase() end)
-	e5:SetTarget(Fusion.SummonEffTG(params))
-	e5:SetOperation(Fusion.SummonEffOP(params))
-	c:RegisterEffect(e5)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,{id,3})
+    e4:SetCondition(function() return Duel.IsMainPhase() end)
+	e4:SetTarget(Fusion.SummonEffTG(params))
+	e4:SetOperation(Fusion.SummonEffOP(params))
+	c:RegisterEffect(e4)
 end
 s.listed_series={0x3e9}
---	Limite de material
+	-- Limite de material
 function s.funlimit(e,c)
 	if not c then return false end
 	return not c:IsSetCard(0x3e9)
 end
--- Invocar si es desterrada
+	-- Invocar si es desterrada
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -63,7 +63,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 or not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-        --No pueden Invocar monstruo del destierro por este turno
+        -- No pueden Invocar monstruo del destierro por este turno
 		local e1=Effect.CreateEffect(e:GetHandler())
         e1:SetType(EFFECT_TYPE_FIELD)
         e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -83,7 +83,7 @@ end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp)
 	return c:IsLocation(LOCATION_REMOVED)
 end
-    --Enviar al Cementerio 1 monstruo especifico
+    -- Enviar al Cementerio 1 monstruo especifico
 function s.tgfilter(c)
 	return c:IsMonster() and c:IsSetCard(0x3e9) and c:IsAbleToGrave()
 end
@@ -98,7 +98,7 @@ function s.operation2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-    --Invocar por Fusion Desterrando
+    -- Invocar por Fusion Desterrando
 function s.fusfilter(c)
 	return c:IsSetCard(0x3e9)
 end
@@ -115,7 +115,7 @@ end
 function s.stage2(e,tc,tp,mg,chk)
 	if chk==2 then
 		local c=e:GetHandler()
-		--Cannot Special Summon from the Extra Deck, except Fusion "Bestial"
+		-- Cannot Special Summon from the Extra Deck, except Fusion "Bestial"
 		local e2=Effect.CreateEffect(c)
 		e2:SetDescription(aux.Stringid(id,3))
 		e2:SetType(EFFECT_TYPE_FIELD)

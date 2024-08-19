@@ -1,5 +1,5 @@
 --Astralaus, El dragón Azabache
---Astralaus, El dragón Azabache
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Materiales
@@ -8,37 +8,37 @@ function s.initial_effect(c)
 	-- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
 	--Debe ser primero Invocador por Fusion
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(s.splimit)
-	c:RegisterEffect(e1)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(s.splimit)
+	c:RegisterEffect(e0)
 	-- Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+    e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetTarget(s.settg)
+	e1:SetOperation(s.setop)
+	c:RegisterEffect(e1)
+    -- Negate the activation of an opponent's card or effect
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.settg)
-	e2:SetOperation(s.setop)
-	c:RegisterEffect(e2)
-    --Negate the activation of an opponent's card or effect
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetRange(LOCATION_MZONE)
-    e3:SetCountLimit(3,{id,2})
-    e3:SetCost(s.negcost)
-	e3:SetCondition(s.negcon)
-	e3:SetTarget(s.negtg)
-	e3:SetOperation(s.negop)
-    c:RegisterEffect(e3)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetRange(LOCATION_MZONE)
+    e2:SetCountLimit(3,{id,2})
+    e2:SetCost(s.negcost)
+	e2:SetCondition(s.negcon)
+	e2:SetTarget(s.negtg)
+	e2:SetOperation(s.negop)
+    c:RegisterEffect(e2)
 	--Registro de Tipos
 	aux.GlobalCheck(s,function()
 		s.type_list={}
@@ -84,7 +84,7 @@ end
 function s.cfilter(c,rtype)
 	return (not c:IsOnField() or c:IsFaceup()) and c:IsType(rtype) and c:IsAbleToRemoveAsCost()
 end
-	--Desterrar el mismo tipo de carta en tu Cementerio
+	-- Desterrar el mismo tipo de carta en tu Cementerio
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rtype=(re:GetActiveType()&0x7)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil,rtype) end

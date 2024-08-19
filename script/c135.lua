@@ -1,5 +1,5 @@
 --Formidable Balhamut Bestial
---Formidable Balhamut Bestial
+--DrakayStudio
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Solo 1 bajo tu control
@@ -8,50 +8,50 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,130,128,s.ffilter,s.matfilter2)
     -- Debe ser primero Invocador por Fusion
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(s.splimit)
+	c:RegisterEffect(e0)
+    -- Indestructible por efectos
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(s.splimit)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
-    -- Indestructible por efectos
+	-- Inafectada por efectos
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(1)
+	e2:SetCode(EFFECT_IMMUNE_EFFECT)
+	e2:SetValue(s.efilter)
 	c:RegisterEffect(e2)
-	-- Inafectada por efectos
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_IMMUNE_EFFECT)
-	e3:SetValue(s.efilter)
-	c:RegisterEffect(e3)
     -- Cambiar posiciones de batalla por su invocacion de Fusion
-    local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_POSITION)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-	e4:SetTarget(s.destg)
-	e4:SetOperation(s.desop)
-	c:RegisterEffect(e4)
+    local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_POSITION)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
+	c:RegisterEffect(e3)
     -- Ataca a todos los monstruos una vez cada uno
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_ATTACK_ALL)
+	e4:SetValue(1)
+	c:RegisterEffect(e4)
+    -- Ataque en Modo de Defensa
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_ATTACK_ALL)
-	e5:SetValue(1)
+	e5:SetCode(EFFECT_DEFENSE_ATTACK)
 	c:RegisterEffect(e5)
-    -- Ataque en Modo de Defensa
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_DEFENSE_ATTACK)
-	c:RegisterEffect(e6)
 end
 s.listed_series={0x3e9}
     -- Debe ser primero Invocador por Fusion
@@ -81,7 +81,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		local og=Duel.GetOperatedGroup()
 		local tc=og:GetFirst()
 		for tc in aux.Next(og) do
-			--Cannot change their battle positions
+			-- Cannot change their battle positions
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetDescription(3313)
 			e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)

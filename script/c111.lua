@@ -1,17 +1,24 @@
---Legionario Bestial de Asalto
+--Legionario Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Fusion procedure
+	-- Invocación por Fusión
     c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,69247929,s.ffilter)
-    --Debe ser primero Invocador por Fusion
+    -- Debe ser primero Invocador por Fusion
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(s.splimit)
+	c:RegisterEffect(e0)
+	-- Refleja el daño por batalla
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(s.splimit)
+	e1:SetCode(EFFECT_REFLECT_BATTLE_DAMAGE)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
-    --Daño igual a su defensa actual
+    -- Daño igual a su defensa actual
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(6602300,0))
 	e2:SetCategory(CATEGORY_DAMAGE)
@@ -22,35 +29,29 @@ function s.initial_effect(c)
 	e2:SetTarget(s.damtg)
 	e2:SetOperation(s.damop)
 	c:RegisterEffect(e2)
-    --Refleja el daño por batalla
+	-- Invocar de modo especial a todos sus materiales
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_REFLECT_BATTLE_DAMAGE)
-	e3:SetValue(1)
+	e3:SetDescription(aux.Stringid(35952884,1))
+	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCode(EVENT_BATTLE_DESTROYED)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.sumcon)
+	e3:SetTarget(s.sumtg)
+	e3:SetOperation(s.sumop)
 	c:RegisterEffect(e3)
-	--Invocar de modo especial a todos sus materiales
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(35952884,1))
-	e5:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetCode(EVENT_BATTLE_DESTROYED)
-	e5:SetCondition(s.sumcon)
-	e5:SetTarget(s.sumtg)
-	e5:SetOperation(s.sumop)
-    e5:SetCountLimit(1)
-	c:RegisterEffect(e5)
 end
 s.listed_series={0x3e9}
---Materiales multiples
+	-- Materiales multiples
 function s.ffilter(c,fc,sumtype,tp)
 	return c:IsRace(RACE_FIEND|RACE_PYRO,fc,sumtype,tp)
 end
-    --Debe ser primero Invocador por Fusion
+    -- Debe ser primero Invocador por Fusion
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
 end
-    --Daño /ATK
+    -- Daño por DEF
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
@@ -60,7 +61,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.Damage(p,e:GetHandler():GetDefense()/2,REASON_EFFECT)
 end
-    --Invocar de modo especial a todos sus materiales
+    -- Invocar de modo especial a todos sus materiales
 function s.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end

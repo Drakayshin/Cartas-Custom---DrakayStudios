@@ -1,17 +1,17 @@
 --Doble Fuerza Subterror
---Doble Fuerza Subterror
--- Codigo a petición de Hugo Castro
+--DrakayStudios
+--Codigo a petición de Hugo Castro
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Activar + añadir/colocar
-	local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
-	e1:SetTarget(s.thsettg)
-	e1:SetOperation(s.thsetop)
-	c:RegisterEffect(e1)
+	local e0=Effect.CreateEffect(c)
+    e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetCountLimit(1,id)
+	e0:SetTarget(s.thsettg)
+	e0:SetOperation(s.thsetop)
+	c:RegisterEffect(e0)
 	-- Material Xyz
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -21,12 +21,12 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	c:RegisterEffect(e2)
     --Limite de Material
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetValue(s.synlimit)
-	c:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetValue(s.synlimit)
+	c:RegisterEffect(e3)
 end
 s.listed_names={5697558}
 s.listed_series={0xed}

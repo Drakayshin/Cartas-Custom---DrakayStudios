@@ -1,38 +1,39 @@
 --Custodia del Infra-Soberano
---Custodia del Infra-Soberano
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Negar Activacion
+	-- Negar Activacion
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_NEGATE+CATEGORY_TODECK)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetCountLimit(1,{id,1})
+	e0:SetCondition(s.negcon)
+	e0:SetTarget(s.negtg)
+	e0:SetOperation(s.negop)
+	c:RegisterEffect(e0)
+	-- Traslado de destruccion
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_TODECK)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_CHAINING)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetCondition(s.negcon)
-	e1:SetTarget(s.negtg)
-	e1:SetOperation(s.negop)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EFFECT_DESTROY_REPLACE)
+	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,{id,2})
+	e1:SetTarget(s.reptg)
+	e1:SetValue(s.repval)
+	e1:SetOperation(s.repop)
 	c:RegisterEffect(e1)
-	-- Reemplasar destruccion
+    -- Puedes activar desde la mano
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EFFECT_DESTROY_REPLACE)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1,{id,2})
-	e2:SetTarget(s.reptg)
-	e2:SetValue(s.repval)
-	e2:SetOperation(s.repop)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e2:SetCondition(s.handcon)
 	c:RegisterEffect(e2)
-    --Puedes activar desde la mano
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e3:SetCondition(s.handcon)
-	c:RegisterEffect(e3)
 end
 s.listed_names={132}
 s.listed_series={0x3e9}
+	-- Negar
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e9)
 end
@@ -60,7 +61,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoDeck(ec,1,1,REASON_EFFECT)
 	end
 end
-    --Evitar destruccion
+    -- Evitar destruccion
 function s.repfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x3e9) and c:IsControler(tp) and not c:IsReason(REASON_REPLACE)
 		and (c:IsReason(REASON_BATTLE) or (c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp))
@@ -76,7 +77,7 @@ end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end
-    --Activar desde la mano
+    -- Activar desde la mano
 function s.handcon(e)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,132),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end

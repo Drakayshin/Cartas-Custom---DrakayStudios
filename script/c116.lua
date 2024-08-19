@@ -1,22 +1,22 @@
 --Luz y Taquígrafo
---Luz y Taquígrafo
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    --No se activan cartas o efectos por tu adversario por la Invocación
-    local e1=Ritual.AddProcGreaterCode(c,10,nil,115)
-    e1:SetTarget(s.target(e1))
-	--Recuperar y robar 1 carta
-    local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1,id)
-	e2:SetTarget(s.tdtg)
-	e2:SetOperation(s.tdop)
-	c:RegisterEffect(e2)
+    -- No se activan cartas o efectos por tu adversario por la Invocación
+    local e0=Ritual.AddProcGreaterCode(c,10,nil,115)
+    e0:SetTarget(s.target(e0))
+	-- Recuperar y robar 1 carta
+    local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_GRAVE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,id)
+	e1:SetTarget(s.tdtg)
+	e1:SetOperation(s.tdop)
+	c:RegisterEffect(e1)
 end
-    --No se activan cartas o efectos por tu adversario
+    -- No se activan cartas o efectos por tu adversario
 function s.target(eff)
 	local tg = eff:GetTarget()
 	return function(e,...)
@@ -30,7 +30,7 @@ end
 function s.chlimit(e,ep,tp)
 	return tp==ep
 end
-    --Recuperar y robar 1 carta
+    -- Recuperar y robar 1 carta
 s.listed_names={115}
 function s.costfilter(c)
 	return c:IsCode(115) and c:IsAbleToDeck()

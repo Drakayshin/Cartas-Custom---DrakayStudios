@@ -1,37 +1,38 @@
 --Templo del Alma Sellada
---Templo del Alma Sellada
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     -- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	--Activación
+	-- Activación
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetOperation(s.activate)
+	c:RegisterEffect(e0)
+    -- Invocar desde tu Cementerio
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(s.activate)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-    --Invocar desde tu Cementerio
+	-- Evitar destruccion una vez por turno Zona Magia & Trampa
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetTargetRange(LOCATION_SZONE,0)
+	e2:SetTarget(function(_,c) return c:GetSequence()<5 end)
+	e2:SetValue(function(_,_,r) return (r&REASON_EFFECT==REASON_EFFECT) and 1 or 0 end)
 	c:RegisterEffect(e2)
-	--Evitar destruccion una vez por turno Zona Magia & Trampa
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e3:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(LOCATION_SZONE,0)
-	e3:SetTarget(function(_,c) return c:GetSequence()<5 end)
-	e3:SetValue(function(_,_,r) return (r&REASON_EFFECT==REASON_EFFECT) and 1 or 0 end)
-	c:RegisterEffect(e3)
 end
-s.listed_names={48179391}
+s.listed_names={48179391,105,125}
+	-- Activar 1 "El Sello de Oricalcos"
 function s.filter(c,tp)
 	return c:IsCode(48179391,105,125) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
@@ -52,7 +53,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-    --Invocar desde tu Cementerio
+    -- Invocar desde tu Cementerio
 function s.spfilter(c,e,tp)
 	return (c:ListsCode(48179391)) and c:IsLevelBelow(9) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

@@ -1,34 +1,34 @@
--- Cisura Bestial
--- Cisura Bestial
+--Cisura Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Negar ataque y causar daño
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DAMAGE)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_BE_BATTLE_TARGET)
-    e1:SetCountLimit(1,{id,1})
-	e1:SetCondition(s.nacon)
-	e1:SetTarget(s.natg)
-	e1:SetOperation(s.naop)
-	c:RegisterEffect(e1)
+	-- Negar ataque y causar daño
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_DAMAGE)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_BE_BATTLE_TARGET)
+    e0:SetCountLimit(1,{id,1})
+	e0:SetCondition(s.nacon)
+	e0:SetTarget(s.natg)
+	e0:SetOperation(s.naop)
+	c:RegisterEffect(e0)
 	-- Incrementar ATK por DEF y ganar LP
-    local e2=Effect.CreateEffect(c)
-    e2:SetDescription(aux.Stringid(id,1))
-    e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_RECOVER)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
-    e2:SetCountLimit(1,{id,2})
-	e2:SetCondition(s.condition1)
-	e2:SetTarget(s.target1)
-	e2:SetOperation(s.activate1)
-	c:RegisterEffect(e2)
+    local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,1))
+    e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_RECOVER)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
+    e1:SetCountLimit(1,{id,2})
+	e1:SetCondition(s.condition1)
+	e1:SetTarget(s.target1)
+	e1:SetOperation(s.activate1)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0x3e9}
-    --Negar ataque y causar daño
+    -- Negar ataque y causar daño
 function s.nacon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.GetAttacker():IsControler(tp)
 		and eg:GetFirst():IsControler(tp) and eg:GetFirst():IsFaceup()
@@ -44,7 +44,7 @@ function s.naop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Damage(1-tp,a:GetAttack(),REASON_EFFECT)
 	end
 end
-    --Incrementar ATK por DEF y Ganar LP
+    -- Incrementar ATK por DEF y Ganar LP
 function s.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end

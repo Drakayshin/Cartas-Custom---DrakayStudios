@@ -1,5 +1,5 @@
 --Sagaz del Ciber-Estilo
---Sagaz del Ciber-Estilo
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Fusion.CreateSummonEff(c,aux.FilterBoolFunction(Card.ListsArchetypeAsMaterial,0x1093),nil,s.fextra,nil,nil,nil,nil,nil,nil,nil,nil,nil,s.extratg,s.stage2)

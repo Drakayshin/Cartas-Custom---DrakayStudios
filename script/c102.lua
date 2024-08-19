@@ -1,68 +1,65 @@
 --Dragón Flamante de Ojos Azules
---Dragón Flamante de Ojos Azules
-
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Must be properly summoned before reviving
 	c:EnableReviveLimit()
-	--Debe ser Invocado por su efecto
+	-- Debe ser Invocado por su efecto
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	c:RegisterEffect(e0)
+	-- Invocar de Modo Especial (desde tu mano)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Invocar de Modo Especial (desde tu mano)
+	-- No puede ser seleecionado por tu adversario
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCondition(s.spcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	--No puede ser seleecionado por tu adversario
-	local e3=Effect.CreateEffect(c)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetValue(aux.tgoval)
+	-- No puede ser destruido por efectos de tu adversario
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
-	--No puede ser destruido por efectos de tu adversario
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e4:SetValue(s.indval)
+	-- Es tratado como "Blue-Eyes White Dragon" en el Campo o Cementerio
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetCode(EFFECT_CHANGE_CODE)
+	e4:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+	e4:SetValue(CARD_BLUEEYES_W_DRAGON)
 	c:RegisterEffect(e4)
-	--Es tratado como "Blue-Eyes White Dragon" en el Campo o Cementerio
+	-- Destruir 1 monstruo
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCode(EFFECT_CHANGE_CODE)
-	e5:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
-	e5:SetValue(CARD_BLUEEYES_W_DRAGON)
+	e5:SetDescription(aux.Stringid(id,0))
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.operation)
 	c:RegisterEffect(e5)
-	--Destroy
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,0))
-	e6:SetCategory(CATEGORY_DESTROY)
-	e6:SetType(EFFECT_TYPE_QUICK_O)
-	e6:SetCode(EVENT_FREE_CHAIN)
-	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e6:SetRange(LOCATION_MZONE)
-	e6:SetCountLimit(1)
-	e6:SetTarget(s.target)
-	e6:SetOperation(s.operation)
-	c:RegisterEffect(e6)
-
 end
 s.listed_series={0xdd}
 s.listed_names={89631139} --Nombre de Carta a convertir o usar
-	--No puede ser seleccionado ni Destruido por efectos de cartas del adversario
+	-- No puede ser seleccionado ni Destruido por efectos de cartas del adversario
 function s.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
 end
-	--Invocacíon por Sacrifición de un monstruo espeficico que controles (Eje. 89631139=Dragón Blanco de Ojos Azules)
+	-- Invocacíon por Sacrifición de un monstruo espeficico que controles (Eje. 89631139=Dragón Blanco de Ojos Azules)
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsSetCard,1,false,1,true,c,c:GetControler(),nil,false,e:GetHandler(),0xdd)
@@ -83,7 +80,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_COST)
 	g:DeleteGroup()
 end
-	--Destrucción por selección en el Campo del Adversario
+	-- Destruir 1 monstruo por selección
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end

@@ -1,77 +1,77 @@
 --Muisak, Infra-Soberano Bestial
---Muisak, Infra-Soberano Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Solo 1 bajo tu control
+	-- Solo 1 bajo tu control
     c:SetUniqueOnField(1,0,id)
-	--Materiales de Fusion
+	-- Materiales de Fusion
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,132,133,130)
-    --Debe ser primero Invocador por Fusion
+    -- Debe ser primero Invocador por Fusion
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(s.splimit)
+	c:RegisterEffect(e0)
+    --Inafectado, con excepcion
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(s.splimit)
+	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
-    --Inafectado, con excepcion
+    -- Limitado como Material
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_IMMUNE_EFFECT)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(s.efilter)
+	e2:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetValue(s.funlimit)
 	c:RegisterEffect(e2)
-    -- Limitado por Material de Fusion
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_CANNOT_BE_MATERIAL)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetValue(s.funlimit)
+    -- Si es Invocado por Fusion, barajea cartas de tu adversario
+    local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_TODECK)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+    e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
+    e3:SetCountLimit(1,id)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
-    --Si es Invocado por Fusion, barajea cartas de tu adversario
-    local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,0))
-	e5:SetCategory(CATEGORY_TODECK)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-    e5:SetCountLimit(1,id)
-	e5:SetTarget(s.destg)
-	e5:SetOperation(s.desop)
-	c:RegisterEffect(e5)
-    --Invocar por Fusion 1 monstruo Barajeando
+    -- Invocar por Fusion 1 monstruo Barajeando
     local params = {matfilter=Fusion.OnFieldMat(Card.IsAbleToDeck),extrafil=s.fextra,extraop=Fusion.ShuffleMaterial,extratg=s.extratg}
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,1))
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-    e6:SetType(EFFECT_TYPE_QUICK_O)
-	e6:SetCode(EVENT_FREE_CHAIN)
-	e6:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_BATTLE_START)
-	e6:SetRange(LOCATION_MZONE)
-	e6:SetCountLimit(1,id)
-	e6:SetTarget(Fusion.SummonEffTG(params))
-	e6:SetOperation(Fusion.SummonEffOP(params))
-	c:RegisterEffect(e6)
-    --Si deja el Campo
-	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(id,2))
-	e7:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e7:SetProperty(EFFECT_FLAG_DELAY)
-	e7:SetCode(EVENT_LEAVE_FIELD)
-	e7:SetCountLimit(1,{id,1})
-	e7:SetTarget(s.target)
-	e7:SetOperation(s.operation)
-	c:RegisterEffect(e7)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
+    e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E+TIMING_BATTLE_START)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,id)
+	e4:SetTarget(Fusion.SummonEffTG(params))
+	e4:SetOperation(Fusion.SummonEffOP(params))
+	c:RegisterEffect(e4)
+    -- Si deja el Campo
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,2))
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCountLimit(1,{id,1})
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.operation)
+	c:RegisterEffect(e5)
 end
 s.listed_series={0x3e9}
-    --Debe ser primero Invocador por Fusion
+    -- Debe ser primero Invocador por Fusion
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
 end
-    --Inafectado excepto por cartas de arquetipos
+    -- Inafectado excepto por cartas de arquetipos
 function s.efilter(e,te)
 	return not te:GetOwner():IsSetCard(0x3e9)
 end
@@ -80,7 +80,7 @@ function s.funlimit(e,c)
 	if not c then return false end
 	return not c:IsSetCard(0x3e9)
 end
-    --Barajear por su Invocacion de Fusion todas las demas cartas en el Campo
+    -- Barajear por su Invocacion de Fusion todas las demas cartas en el Campo
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
     local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,e:GetHandler())
@@ -90,7 +90,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,e:GetHandler())
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
-    --Barajear del Campo y Cementerio
+    -- Barajear del Campo y Cementerio
 function s.fusfilter(c)
 	return not c:IsCode(id)
 end
@@ -101,7 +101,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED)
 end
-    --Invocar si deja el Campo
+    -- Invocar si deja el Campo
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

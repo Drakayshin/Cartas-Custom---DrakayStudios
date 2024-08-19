@@ -1,8 +1,8 @@
 --Ondina Bestial
---Ondina Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Invocacion Xyz
+	-- Invocacion Xyz
 	Xyz.AddProcedure(c,nil,5,2,nil,nil,99)
     c:EnableReviveLimit()
 	--Inafectado por efectos de otros monstruos
@@ -40,7 +40,7 @@ s.listed_series={0x3e9}
 function s.efilter(e,re)
 	return re:IsMonsterEffect() and re:GetOwner()~=e:GetOwner()
 end
-    --Negar La activacion de un efecto que incluya invocar de Modo Especial
+    -- Negar La activacion de un efecto que incluya invocar de Modo Especial
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not Duel.IsChainNegatable(ev) then return false end
 	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end

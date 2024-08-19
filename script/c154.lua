@@ -1,36 +1,36 @@
 --Designio de Represalia
---Designio de Represalia
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	-- Activación
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e0)
+	-- Reducir a la mitad del daño
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e1:SetCountLimit(2)
+	e1:SetOperation(s.rdop)
 	c:RegisterEffect(e1)
-	--Reducir a la mitad del daño
+	-- Destierro
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_COIN+CATEGORY_DAMAGE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e2:SetCountLimit(2)
-	e2:SetOperation(s.rdop)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
-	--Destierro
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_REMOVE+CATEGORY_COIN+CATEGORY_DAMAGE)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.desop)
-	c:RegisterEffect(e3)
 end
 s.toss_coin=true
-	--Daño por batalla a la mitad
+	-- Daño por batalla a la mitad
 function s.rdop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.Hint(HINT_CARD,1-tp,id)
@@ -38,7 +38,7 @@ function s.rdop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	end
 end
-	--Destierro por lanzamiento de moneda
+	-- Destierro por lanzamiento de moneda
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_MZONE,0,1,nil)

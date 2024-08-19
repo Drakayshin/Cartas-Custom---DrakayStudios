@@ -1,5 +1,5 @@
 --Dartz, Regente del Oricalcos
---Dartz, Regente del Oricalcos
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	Pendulum.AddProcedure(c)

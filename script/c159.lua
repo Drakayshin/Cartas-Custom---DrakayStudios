@@ -1,10 +1,10 @@
 --Enviado del Cielo
---Enviado del Cielo
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     -- Inegable
     local EFFECT_FLAG_CANNOT_NEGATE_ACTIV_EFF=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE
-	--Activate/Buscar 1 carta
+	-- Activate/Buscar 1 carta
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-    --Inafectado
+    -- Inafectado
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={10000020}
-	--Buscar 1 carta
+	-- Buscar 1 carta
 function s.thfilter(c)
 	return c:IsCode(10000020) and c:IsAbleToHand()
 end

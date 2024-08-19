@@ -1,21 +1,31 @@
 --Preseptor de Oricalcos
---Preseptor de Oricalcos
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     -- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
 	--Buscar 1 carta de Campo en tu Deck
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetRange(LOCATION_HAND)
+	e0:SetCountLimit(1,{id,0})
+	e0:SetCost(s.thcost)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.operation)
+	c:RegisterEffect(e0)
+	-- Tu adversario no seleccina por efectos tus cartas
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,{id,0})
-	e1:SetCost(s.thcost)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetTargetRange(LOCATION_ONFIELD,0)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e1:SetCondition(s.oricalcon)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
-    --Invocar 1 monstruo que mencione El Sello de Oricalcos
+    -- Invocar 1 monstruo que mencione El Sello de Oricalcos
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,1))
     e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -29,7 +39,7 @@ function s.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	--Invocar a "Defensor de Oricalcos"
+	-- Invocar a "Defensor de Oricalcos"
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -38,19 +48,9 @@ function s.initial_effect(c)
 	e4:SetTarget(s.target1)
 	e4:SetOperation(s.operation1)
 	c:RegisterEffect(e4)
-    --Tu adversario no seleccina por efectos tus cartas
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetTargetRange(LOCATION_ONFIELD,0)
-	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e5:SetCondition(s.oricalcon)
-	e5:SetValue(aux.tgoval)
-	c:RegisterEffect(e5)
 end
 s.listed_names={48179391,141}
-    ----Buscar 1 carta de Campo
+    -- Buscar 1 carta de Campo
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
     if chk==0 then return c:IsDiscardable() end
@@ -71,7 +71,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-    --Invocar 1 monstruo que mencione El Sello de Oricalcos
+    -- Invocar 1 monstruo que mencione El Sello de Oricalcos
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
@@ -90,7 +90,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-	--Invocar "Defensor de Oricalcos"
+	-- Invocar "Defensor de Oricalcos"
 function s.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end

@@ -1,5 +1,5 @@
 --Aprehesión del Alma Sellada
---Aprehesión del Alma Sellada
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	--Añadir 1 carta aleatoria de la mano

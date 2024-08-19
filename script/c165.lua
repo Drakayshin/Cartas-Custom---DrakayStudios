@@ -1,28 +1,28 @@
 --Raikiri Bestial
---Raikiri Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- No encadenar
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetOperation(s.acop)
-	c:RegisterEffect(e1)
+	-- No crear cadena de cartas
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetCountLimit(1,{id,1})
+	e0:SetOperation(s.acop)
+	c:RegisterEffect(e0)
 	-- Destruir durante la End Phase
-    local e2=Effect.CreateEffect(c)
-    e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_FIELD)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1,{id,2})
-	e2:SetCondition(s.decon)
-	e2:SetTarget(s.destg)
-	e2:SetOperation(s.desop)
-	c:RegisterEffect(e2)
+    local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_FIELD)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetProperty(EFFECT_FLAG_REPEAT)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCountLimit(1,{id,2})
+	e1:SetCondition(s.decon)
+	e1:SetTarget(s.destg)
+	e1:SetOperation(s.desop)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0x3e9}
     -- No encadenar

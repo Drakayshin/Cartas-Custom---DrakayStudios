@@ -1,55 +1,56 @@
 --Taumaturgo de Ojos Azules
---Taumaturgo de Ojos Azules
-
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Invocar de Modo Especial desde la mano al no tener monstruos
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(s.spcon)
-	c:RegisterEffect(e1)
+	-- Invocar de Modo Especial desde la mano al no tener monstruos
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e0:SetRange(LOCATION_HAND)
+	e0:SetCondition(s.spcon)
+	c:RegisterEffect(e0)
 	-- Invocar de Modo Especial 1 monstruo normal de nivel 6 o menor de tu mano o Deck
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1,id)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
-	c:RegisterEffect(e2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCountLimit(1,id)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+	c:RegisterEffect(e1)
 	-- Invocar de Modo Especial 1 monstruo "Blue-Eyes"
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetCondition(s.thcon)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetCondition(s.thcon)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	local e4=e2:Clone()
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_BE_BATTLE_TARGET)
+	e4:SetCondition(s.thcon2)
 	c:RegisterEffect(e4)
-	local e5=e3:Clone()
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_BE_BATTLE_TARGET)
-	e5:SetCondition(s.thcon2)
-	c:RegisterEffect(e5)
 end
+s.listed_names={id}
+s.listed_series={0xdd}
 	-- Invocacion Especial si no controlas monstruos
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-	--Invocar de Modo Especial 1 monstruo de nivel 6 o menor en tu mano o Deck
+	-- Invocar de Modo Especial 1 monstruo de nivel 6 o menor en tu mano o Deck
 function s.spfilter(c,ft)
 	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAbleToRemoveAsCost() and (ft>0 or c:GetSequence()<5)
 end
@@ -76,9 +77,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-	-- Special Summon 1 "Blue-Eyes" monster
-s.listed_names={id}
-s.listed_series={0xdd}
+	-- Invocar 1 Ojos Azules
 	--Condition from Summon your opponent
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsSummonPlayer,1,nil,1-tp)

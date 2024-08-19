@@ -1,29 +1,29 @@
 --Rashumon, El Fulgurante Bestial
---Rashumon, El Fulgurante Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Invocar por Destierro
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetRange(LOCATION_HAND)
+	e0:SetCountLimit(1,{id,1})
+	e0:SetCost(s.spcost)
+	e0:SetTarget(s.sptg)
+	e0:SetOperation(s.spop)
+	c:RegisterEffect(e0)
+    -- Busqueda por descarte
+    local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetCost(s.spcost)
-	e1:SetTarget(s.sptg)
-	e1:SetOperation(s.spop)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,{id,2})
+	e1:SetCost(s.thcost)
+	e1:SetTarget(s.thtg)
+	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-    -- Busqueda por descarte
-    local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,{id,2})
-	e2:SetCost(s.thcost)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e9}
     -- Invocar por Destierro

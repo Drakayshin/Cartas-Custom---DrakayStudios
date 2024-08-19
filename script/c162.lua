@@ -1,9 +1,9 @@
 --Bel, Orgullo Inmemorial
---Bel, Orgullo Inmemorial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	--Search
+	-- Busqueda
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TODECK)
 	e0:SetType(EFFECT_TYPE_IGNITION)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-    --Special Summon 1 "Yubel" from your hand/Deck/GY/banished cards
+    -- Invocar 1 Yubel
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)

@@ -1,45 +1,44 @@
 --Zubacra, Inusitado Bestial
---Zubacra, Inusitado Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     --Buscar 1 carta al se Invocado
-    local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-    e1:SetCountLimit(1,{id,1})
-	e1:SetTarget(s.thtg)
-	e1:SetOperation(s.thop)
+    local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e0:SetCode(EVENT_SUMMON_SUCCESS)
+	e0:SetProperty(EFFECT_FLAG_DELAY)
+    e0:SetCountLimit(1,{id,1})
+	e0:SetTarget(s.thtg)
+	e0:SetOperation(s.thop)
+	c:RegisterEffect(e0)
+	local e1=e0:Clone()
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+    -- Reducir ATK/DEF
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetHintTiming(0,TIMING_MAIN_END)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,{id,2})
+	e2:SetOperation(s.adop)
 	c:RegisterEffect(e2)
-    --Reducir ATK/DEF
+	-- Efecto Adicinal por Material
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetHintTiming(0,TIMING_MAIN_END)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetOperation(s.adop)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_EVENT_PLAYER+EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EVENT_BE_MATERIAL)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(s.mtcon)
+	e3:SetOperation(s.mtop)
 	c:RegisterEffect(e3)
-	--Efecto Adicinal por Material
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_EVENT_PLAYER+EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_BE_MATERIAL)
-	e4:SetCountLimit(1,id)
-	e4:SetCondition(s.mtcon)
-	e4:SetOperation(s.mtop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={0x3e9}
-
-    --Buscar pór invocacion
+    -- Buscar pór invocacion
 function s.thfilter(c)
 	return c:IsSetCard(0x3e9) and c:IsAbleToHand()
 end
@@ -55,7 +54,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-    --Disminuir ATK/DEF Nivel/Rango
+    -- Disminuir ATK/DEF Nivel/Rango
 function s.adop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
@@ -78,14 +77,14 @@ function s.val(e,c)
 		return c:GetLevel()*-200
 	end
 end
-	--Efectos Adicionales por Material
+	-- Efectos Adicionales por Material
 function s.mtcon(e,tp,eg,ep,ev,re,r,rp)
 return r==REASON_FUSION and eg:IsExists(Card.IsSetCard,1,nil,0x3e9)
 end
 function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 	for rc in eg:Iter() do
 		if rc:GetFlagEffect(id)==0 then
-			--Inafectado por Efectos de monstruos de tu adversario
+			-- Inafectado por Efectos de monstruos de tu adversario
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetDescription(3101)
 			e1:SetType(EFFECT_TYPE_SINGLE)
@@ -97,7 +96,7 @@ function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 			rc:RegisterEffect(e1,true)
 			rc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1)
 
-			--Cambio de Daño
+			-- Cambio de Daño
 			local e2=Effect.CreateEffect(e:GetHandler())
 			e2:SetDescription(3910)
 			e2:SetType(EFFECT_TYPE_FIELD)
@@ -112,11 +111,11 @@ function s.mtop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-	--Inafectado por efectos de monstruos
+	-- Inafectado por efectos de monstruos
 function s.efilter(e,te)
 	return te:IsMonsterEffect() and te:GetOwnerPlayer()==1-e:GetHandlerPlayer()
 end
-    --Conversion del daño
+    -- Conversion del daño
 function s.rev(e,re,r,rp,rc)
 	return (r&REASON_EFFECT)~=0
 end

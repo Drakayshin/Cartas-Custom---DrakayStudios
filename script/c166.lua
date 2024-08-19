@@ -1,5 +1,5 @@
 --Avance del Sheol Bestial
---Avance del Sheol Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     -- Activar desde la mano

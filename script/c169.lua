@@ -1,36 +1,36 @@
 --Valkiria Némesis Subterror
---Valkiria Némesis Subterror
--- Codigo a petición de Hugo Castro
+--DrakayStudios
+--Codigo a petición de Hugo Castro
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Invocación Xyz
 	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0xed),4,2)
 	c:EnableReviveLimit()
 	-- Colocar 1 carta
+	local e0=Effect.CreateEffect(c)
+	e0:SetCategory(CATEGORY_SEARCH)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e0:SetRange(LOCATION_MZONE)
+	e0:SetCountLimit(1,id)
+	e0:SetCost(s.cost)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.operation)
+	c:RegisterEffect(e0,false,REGISTER_FLAG_DETACH_XMAT)
+    -- Al ser destruida
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SEARCH)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,id)
-	e1:SetCost(s.cost)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
-	c:RegisterEffect(e1,false,REGISTER_FLAG_DETACH_XMAT)
-    -- Al ser destruida/
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCountLimit(1,{id,1})
-    e2:SetCondition(s.spcon)
-    e2:SetCost(s.drcost)
-	e2:SetTarget(s.drtg)
-	e2:SetOperation(s.drop)
-	c:RegisterEffect(e2)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_DRAW)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(1,{id,1})
+    e1:SetCondition(s.spcon)
+    e1:SetCost(s.drcost)
+	e1:SetTarget(s.drtg)
+	e1:SetOperation(s.drop)
+	c:RegisterEffect(e1)
 end
 s.listed_series={0xed}
     -- Colocar 1 carta

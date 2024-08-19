@@ -1,5 +1,5 @@
 --Yu, La Angustia Encarnada
---Yu, La Angustia Encarnada
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	-- No puede ser destruido por batalla

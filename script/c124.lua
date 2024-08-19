@@ -1,42 +1,42 @@
 --Soldado Oricaustro
---Soldado Oricaustro
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-     --No puede ser material de Fusion/Synchro/Xyz/Link
+     -- No puede ser material de Fusion/Synchro/Xyz/Link
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_CANNOT_BE_MATERIAL)
+	e0:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
+	c:RegisterEffect(e0)
+	-- Buscar 1 carta especifica o una que la mencione
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_BE_MATERIAL)
-	e1:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TUPE_LINK))
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,id)
+	e1:SetCost(s.thcost)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
-	--Buscar 1 carta especifica o una que la mencione
+	-- Invocar de Modo Especial hasta 2 copias mano y/o Deck
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCountLimit(1,id)
-	e2:SetCost(s.thcost)
-	e2:SetTarget(s.tg)
-	e2:SetOperation(s.op)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+    e2:SetCondition(s.oricalcon)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
+    e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	--Invocar de Modo Especial hasta 2 copias mano y/o Deck
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-    e3:SetCondition(s.oricalcon)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
-    e3:SetCountLimit(1,id)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e4)
 end
 s.listed_names={id,48179391}
-	--Buscar 1 carta especifica o una que la mencione
+	-- Buscar 1 carta especifica o una que la mencione
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
     if chk==0 then return c:IsDiscardable() end
@@ -60,7 +60,7 @@ end
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,105,125),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
-    --Invocar de Modo Especial hasta 2 copias mano y/o Deck
+    -- Invocar de Modo Especial hasta 2 copias mano y/o Deck
 function s.filter(c,e,tp)
 	return c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

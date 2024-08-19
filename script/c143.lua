@@ -1,5 +1,5 @@
 --Llama Estigma Bestial
---Llama Estigma Bestial
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0x3e9}
 s.listed_names={132}
-    --Invocar por Fusión metodo alternativo
+    -- Invocar por Fusión metodo alternativo
 function s.fcheck(tp,sg,fc)
 	return sg:FilterCount(Card.IsLocation,nil,LOCATION_DECK)<=2
 end
@@ -35,17 +35,17 @@ end
 function s.exfilter(c)
 	return c:IsSetCard(0x3e9) and c:IsAbleToGrave()
 end
-	--Colocar por barajear
+	-- Colocar por barajear
 function s.setfilter(c)
 	return c:IsMonster() and c:IsSetCard(0x3e9) and c:IsAbleToDeck()
 end
-	--Activation legalidad
+	-- Activation por selección
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable()
 		and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
-	--Barajear una carta Bestial, colocar esta carta
+	-- Barajear una carta Bestial, colocar esta carta
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
