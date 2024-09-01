@@ -5,10 +5,10 @@ local s,id=GetID()
 function s.initial_effect(c)
 	-- Solo 1 Boca arriba en tu campo
 	c:SetUniqueOnField(1,0,id)
-	--Fusion Materials
+	-- Fusion Materials
     c:EnableReviveLimit()
     Fusion.AddProcMix(c,true,true,198,s.ffilter)
-    --Debe ser primero Invocador por Fusion
+    -- Debe ser primero Invocador por Fusion
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -26,6 +26,12 @@ function s.initial_effect(c)
 	e1:SetTarget(s.destg1)
 	e1:SetOperation(s.desop1)
 	c:RegisterEffect(e1)
+	-- Mutiple ataque
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_ATTACK_ALL)
+	e2:SetValue(1)
+	c:RegisterEffect(e2)
 end
 s.listed_series={0x3ed}
 	-- Materiales multiples
@@ -56,7 +62,7 @@ function s.desop1(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
-		e1:SetValue(ct*200)
+		e1:SetValue(ct*100)
 		c:RegisterEffect(e1)
 	end
 end

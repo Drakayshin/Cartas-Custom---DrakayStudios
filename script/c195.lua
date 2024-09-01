@@ -30,7 +30,7 @@ function s.ccon(e)
 end
     -- Añadir 1 carta
 function s.thfilter(c)
-	return c:IsCode(196,201) and c:IsAbleToHand()
+	return c:IsCode(196,201,213) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
