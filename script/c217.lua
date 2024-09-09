@@ -2,6 +2,8 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	-- 1 bajo control
+	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	-- Condición de Invoación
 	local e0=Effect.CreateEffect(c)
@@ -101,13 +103,13 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=e:GetHandlerPlayer()
 	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,e:GetHandler())
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #rg>2 and aux.SelectUnselectGroup(rg,e,tp,3,3,nil,0)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #rg>1 and aux.SelectUnselectGroup(rg,e,tp,2,2,nil,0)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
 	local c=e:GetHandler()
 	local g=nil
 	local rg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,c)
-	local g=aux.SelectUnselectGroup(rg,e,tp,3,3,nil,1,tp,HINTMSG_TOGRAVE,nil,nil,true)
+	local g=aux.SelectUnselectGroup(rg,e,tp,2,2,nil,1,tp,HINTMSG_TOGRAVE,nil,nil,true)
 	if #g>0 then
 		g:KeepAlive()
 		e:SetLabelObject(g)
@@ -133,13 +135,13 @@ function s.defval(e,c)
 	local g=c:GetEquipGroup():Match(s.eqgfilter,nil):Match(function(c) return c:GetTextDefense()>0 end,nil)
 	return g:GetSum(Card.GetTextDefense)
 end
-    -- Equipas hasta 3 monstruos "Ciber Dragón"
+    -- Equipas monstruos "Ciber Dragón"
 function s.eqsfilter(c,tp,ec)
 	return c:IsFaceup() and c:IsSetCard(4243)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-	and Duel.IsExistingMatchingCard(s.eqsfilter,tp,LOCATION_GRAVE,0,1,nil,tp,e:GetHandler()) end
+	and Duel.GetMatchingGroupCount(s.eqsfilter,tp,LOCATION_GRAVE,0,1,nil,tp,e:GetHandler()) end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,0,LOCATION_GRAVE)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
@@ -147,7 +149,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	local g=Duel.GetMatchingGroup(s.eqsfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,e:GetHandler(),Duel.GetTurnCount())
+	local g=Duel.GetMatchingGroup(s.eqsfilter,tp,LOCATION_GRAVE,0,nil,e:GetHandler())
 	if #g==0 then return end
 	if #g>ft then return end
 	for tc in g:Iter() do
@@ -173,19 +175,19 @@ function s.damcon3(e)
 	local c=e:GetHandler()
 	return c:GetEquipCount()>=3
 end
-function s.spfilter1(c)
+function s.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and s.spfilter1(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	if chkc then return chkc:IsOnField() and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,s.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=tg:spfilter1(Card.IsRelateToEffect,nil,e)
+	local sg=tg:Filter(Card.IsRelateToEffect,nil,e)
 	Duel.Destroy(sg,REASON_EFFECT)
 end
     -- Efecto 4+ - Evitar efectos de monstruos en Battle Phase
