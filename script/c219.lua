@@ -18,7 +18,7 @@ end
 s.listed_series={0x3ea}
 
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsCode(177,178,189,180)
+	return c:IsFaceup() and c:IsCode(177,178,179,180)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tgfilter(chkc) end
