@@ -2,11 +2,14 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	-- Invocar 1 por turno
+	c:SetSPSummonOnce(id)
 	-- Material de Fusión
-    c:SetSPSummonOnce(id)
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
+	--Alt. Invocación Especial
+
     -- Destruida
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
@@ -24,7 +27,7 @@ function s.matfilter2(c,fc,sumtype,tp)
 	return c:IsRace(RACE_INSECT,fc,sumtype,tp) and c:IsLevelBelow(3)
 end
 function s.splimit(e,se,sp,st)
-	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function s.contactfil(tp)
 	return Duel.GetReleaseGroup(tp)
@@ -32,6 +35,7 @@ end
 function s.contactop(g)
 	Duel.Release(g,REASON_COST+REASON_MATERIAL)
 end
+
     -- Al ser destruida
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
