@@ -68,7 +68,7 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.lvfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp)
 	local lvs={}
-	if c:IsLevelAbove(4) and aux.SelectUnselectGroup(g,e,tp,1,ft,s.lvrescon(3),0) then table.insert(lvs,3) end
+	if c:IsLevelAbove(5) and aux.SelectUnselectGroup(g,e,tp,1,ft,s.lvrescon(3),0) then table.insert(lvs,3) end
 	if c:IsLevelAbove(6) and aux.SelectUnselectGroup(g,e,tp,1,ft,s.lvrescon(5),0) then table.insert(lvs,5) end
 	if #lvs<1 then return end
 	local lv=Duel.AnnounceNumber(tp,table.unpack(lvs))
