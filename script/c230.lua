@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_CHAINING)
-    e0:SetCountLimit(1,id)
+    e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e0)
     -- Puedes activar desde la mano
     local e1=Effect.CreateEffect(c)
