@@ -102,7 +102,7 @@ function s.thcfilter(c,tp)
 	return c:IsPreviousControler(tp) and c:IsRace(RACE_DINOSAUR|RACE_REPTILE) and c:GetReasonPlayer()==1-tp
 end
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.thcfilter,1,e:GetHandler(),tp)
+	return eg and eg:IsExists(s.thcfilter,1,e:GetHandler(),tp)
 end
 function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckPendulumZones(tp) end
