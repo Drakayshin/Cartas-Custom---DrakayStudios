@@ -43,7 +43,7 @@ function s.filter1(c,e,tp)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_HAND,0,nil,tp)
+		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,nil,tp)
         if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
             Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
             local tc=g:Select(tp,1,1,nil):GetFirst()
@@ -59,7 +59,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         end
         if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-        local tc=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
+        local tc=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
         if tc then
             Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
         end

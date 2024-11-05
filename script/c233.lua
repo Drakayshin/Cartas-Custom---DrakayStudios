@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	Pendulum.AddProcedure(c)
 	-- Ganar ATK
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetProperty(EFFECT_FLAG_CARD_TARGET)
