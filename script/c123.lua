@@ -58,11 +58,11 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
-    -- Invocar 1 Malevolencia Oricaustroen tu mano o Deck
+    -- Invocar 1 Malevolencia Oricalcos tu mano o Deck
 function s.spfilter(c,e,tp)
-    return c:IsCode(id) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND|LOCATION_DECK)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+    return c:IsCode(id) and c:IsLocation(LOCATION_HAND|LOCATION_DECK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
