@@ -1,72 +1,80 @@
---Designio de Represalia
+--Ente de Disformidad 
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación
+	-- Solo 1 Boca arriba en tu campo
+    c:SetUniqueOnField(1,0,id)
+    c:EnableCounterPermit(COUNTER_SPELL)
+	c:SetCounterLimit(COUNTER_SPELL,5)
+    -- Activate/Buscar 1 carta
 	local e0=Effect.CreateEffect(c)
+	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetTarget(s.thtg)
+	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-	-- Reducir a la mitad del daño
+    -- Limite de ataque directos
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e1:SetTargetRange(1,0)
-	e1:SetCountLimit(2)
-	e1:SetOperation(s.rdop)
+	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetTarget(s.atktarget)
 	c:RegisterEffect(e1)
-	-- Destierro
+	-- Reducir ATK por contador
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_COIN+CATEGORY_DAMAGE)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,{id,1})
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.desop)
+	e2:SetTargetRange(0,LOCATION_ONFIELD)
+	e2:SetTarget(s.iatarget)
+	e2:SetValue(s.iavalue)
 	c:RegisterEffect(e2)
+	-- Colocar contadores
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_COUNTER)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(s.condition)
+	e3:SetOperation(s.ctop)
+	c:RegisterEffect(e3)
 end
-s.toss_coin=true
-	-- Daño por batalla a la mitad
-function s.rdop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
-		Duel.Hint(HINT_CARD,1-tp,id)
-		Duel.ChangeBattleDamage(tp,math.floor(ev/2))
-		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	end
+	-- Buscar 1 carta
+function s.thfilter(c)
+	return c:IsLevelAbove(9) and c:IsAbleToHand()
 end
-	-- Destierro por lanzamiento de moneda
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(612115,0))
-	local g1=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(612115,0))
-	local g2=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,1,nil)
-	e:SetLabelObject(g1:GetFirst())
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,1,0,0)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc1=e:GetLabelObject()
-	local g=Duel.GetTargetCards(e)
-	if #g<=1 then return end
-	local tc2=g:GetFirst()
-	if tc1==tc2 then tc2=g:GetNext() end
-	if Duel.CallCoin(tp) then
-		if Duel.Remove(tc2,POS_FACEUP,REASON_EFFECT)>0 then
-			Duel.Damage(1-tp,tc2:GetBaseAttack(),REASON_EFFECT)
-		end
-	else
-		if Duel.Remove(tc1,POS_FACEUP,REASON_EFFECT)>0 then
-			Duel.Damage(tp,tc1:GetBaseAttack(),REASON_EFFECT)
-		end
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK,0,nil)
+	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
 	end
+end
+    -- Limite de ataques directos
+function s.atktarget(e,c)
+	return c:IsAttackBelow(2000)
+end
+	-- Reducir ATK por contador
+function s.iatarget(e,c)
+	return c:IsMonster()
+end
+function s.iavalue(e,c)
+	return e:GetHandler():GetCounter(COUNTER_SPELL)*-400
+end
+	-- Colocar contadores
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+end
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():AddCounter(COUNTER_SPELL,1)
 end

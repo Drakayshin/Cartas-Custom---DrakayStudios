@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	 -- Solo 1 Boca arriba en tu campo
+	-- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
 	-- Invocar por 3 Sacrificios
 	local e0=aux.AddNormalSummonProcedure(c,true,true,3,3,SUMMON_TYPE_TRIBUTE+1,aux.Stringid(id,0))

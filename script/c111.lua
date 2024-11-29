@@ -8,9 +8,9 @@ function s.initial_effect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e0:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e0:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e0:SetRange(LOCATION_HAND)
-	e0:SetCode(EVENT_DESTROYED)
+	e0:SetCode(EVENT_LEAVE_FIELD)
 	e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e0:SetCondition(s.spcon)
 	e0:SetTarget(s.sptg)
@@ -58,11 +58,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 	-- invocar por su efecto
-function s.cfilter(c,tp)
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and (c:GetPreviousTypeOnField()&TYPE_NORMAL)~=0 and c:IsPreviousControler(tp)
+function s.spcfilter(c,tp)
+	return c:IsPreviousControler(tp) and c:IsType(TYPE_NORMAL) and c:IsLevelBelow(12) and c:GetReasonPlayer()==1-tp
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	return eg:IsExists(s.spcfilter,1,e:GetHandler(),tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

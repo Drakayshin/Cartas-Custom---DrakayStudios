@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
     -- No se activan cartas o efectos por tu adversario por la Invocación
-    local e0=Ritual.AddProcGreaterCode(c,10,nil,115)
+    local e0=Ritual.AddProcGreaterCode(c,10,nil,147)
     e0:SetTarget(s.target(e0))
 	-- Recuperar y robar 1 carta
     local e1=Effect.CreateEffect(c)

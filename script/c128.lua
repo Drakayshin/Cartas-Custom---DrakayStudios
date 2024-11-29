@@ -4,10 +4,9 @@ local s,id=GetID()
 function s.initial_effect(c)
     -- Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Buscar 1 carta de Campo en tu Deck
+	-- Activar 1 carta de Campo desde tu Deck
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_HAND)
 	e0:SetCountLimit(1,{id,0})
@@ -53,26 +52,23 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_names={48179391,141}
-    -- Buscar 1 carta de Campo
+    -- Activar 1 carta de Campo
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
     if chk==0 then return c:IsDiscardable() end
     Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
 end
-function s.filter(c)
-	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+function s.filter(c,tp)
+	return c:IsFieldSpell() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,tp) end
+	if not Duel.CheckPhaseActivity() then Duel.RegisterFlagEffect(tp,CARD_MAGICAL_MIDBREAKER,RESET_CHAIN,0,1) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
+	Duel.ActivateFieldSpell(tc,e,tp,eg,ep,ev,re,r,rp)
 end
     -- Invocar 1 monstruo que mencione El Sello de Oricalcos
 function s.oricalcon(e)
