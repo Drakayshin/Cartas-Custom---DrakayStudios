@@ -4,9 +4,6 @@ Enfrenta a poderosos jugadas con los antiguos Poderes del Oricalcos, o adentra a
 
 Arquetipo Finalizado (Edición 21/04/2024)
 Oricalcos/Oricaustro – Control/Rogue
-15/15 Cartas
-Bestial – Meta/Spanw
-24/24 Cartas
 
 
 ![earth_s_fire_2_by_0zerokelvin_dgiljtu](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/assets/96027721/ca05c573-fd7b-4faf-a3c2-76174558bf4d)
