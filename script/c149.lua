@@ -6,6 +6,7 @@ function s.initial_effect(c)
 	local e0=Ritual.CreateProc({handler=c,lvtype=RITPROC_EQUAL,location=LOCATION_GRAVE|LOCATION_REMOVED,matfilter=s.mfilter})
 	e0:SetCountLimit(1,id)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e0:SetCost(s.thcost)
 	c:RegisterEffect(e0)
 	-- Evitar Destrucción
 	local e1=Effect.CreateEffect(c)
@@ -17,6 +18,10 @@ function s.initial_effect(c)
 	e1:SetValue(s.repval)
 	e1:SetOperation(s.repop)
 	c:RegisterEffect(e1)
+end
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.PayLPCost(tp,1000)
 end
 function s.mfilter(c)
 	return c:IsLocation(LOCATION_MZONE)

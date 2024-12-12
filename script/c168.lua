@@ -1,83 +1,94 @@
---Martirio Cibernético
+--Antiware Avaster
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar por Fusión
+	c:SetUniqueOnField(1,0,id)
+    -- Activar desde la mano
 	local e0=Effect.CreateEffect(c)
-	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e0:SetType(EFFECT_TYPE_ACTIVATE)
-	e0:SetCode(EVENT_FREE_CHAIN)
-	e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-    e0:SetCondition(s.condition)
-    e0:SetCost(s.cost)
-	e0:SetTarget(s.target)
-	e0:SetOperation(s.activate)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e0:SetCountLimit(1,id)
+	e0:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>0 end)
 	c:RegisterEffect(e0)
-    -- Ganar LP
-    local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,0))
-    e1:SetCategory(CATEGORY_RECOVER)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	-- Activación
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-    e1:SetRange(LOCATION_GRAVE)
-	e1:SetHintTiming(TIMING_DAMAGE_STEP)
-    e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-    e1:SetCost(aux.bfgcost)
-	e1:SetTarget(s.target1)
-	e1:SetOperation(s.activate1)
 	c:RegisterEffect(e1)
+	-- Limite de Invocación del Deck Extra
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(1,0)
+	e2:SetTarget(s.splimit)
+	c:RegisterEffect(e2)
+	-- Invocar desde el Deck o destierro
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetHintTiming(0,TIMING_END_PHASE)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
+	c:RegisterEffect(e3)
+	-- Recuperar de 3 a 5 cartas
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetTarget(s.drtg)
+	e4:SetOperation(s.drop)
+	c:RegisterEffect(e4)
 end
-s.listed_names={1546123}
-s.listed_series={147}
-    -- Invocar por Fusión
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetLP(tp)<=4000
+	-- Limite de Invocación del Deck Extra
+function s.splimit(e,c)
+	return c:IsLocation(LOCATION_EXTRA) and not c:IsRace(RACE_CYBERSE)
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,5) and 
-	Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>5 end
-	Duel.DiscardDeck(tp,5,REASON_COST)
+	-- Invocar desde el Deck o destierro
+function s.spfilter(c,e,tp)
+	return ((c:IsAttack(1950) or c:IsAttack(1700)) and c:IsRace(RACE_CYBERSE) or c:IsFaceup())
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.filter(c,e,tp)
-    return c:IsType(TYPE_FUSION) and c:IsSetCard(147) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
-    and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK|LOCATION_REMOVED)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if not tc then return end
-	tc:SetMaterial(nil)
-	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		-- ATK UP
-		local e1=Effect.CreateEffect(e:GetHandler())
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetCode(EFFECT_UPDATE_ATTACK)
-        e1:SetValue(tc:GetBaseAttack())
-        e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-        tc:RegisterEffect(e1,true)
-		tc:CompleteProcedure()
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK|LOCATION_REMOVED,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-    -- Ganar LP
-function s.filter1(c)
-	return c:HasNonZeroAttack() and (c:IsSetCard(SET_CYBER_DRAGON) or c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_MACHINE))
+
+function s.filter(c)
+	return c:IsRace(RACE_CYBERSE) and c:IsMonster() and c:IsAbleToDeck()
 end
-function s.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter1(chkc) and chkc:IsControler(tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter1,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.filter1,tp,LOCATION_MZONE,0,1,1,nil)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,5,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,3,5,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function s.activate1(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local atk=tc:GetAttack()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and atk>0 then
-		Duel.Recover(tp,tc:GetAttack(),REASON_EFFECT)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetTargetCards(e)
+	if #tg>0 then
+		Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end
