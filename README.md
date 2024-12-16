@@ -1,25 +1,25 @@
-# Cartas-Custom---DrakayStudios
-Un repositorio para cartas personalizadas creadas por DrakayStudios.
-Enfrenta a poderosos jugadas con los antiguos Poderes del Oricalcos, o adentra a tu adversario en los peligrosos mundos de los Bestials.
-
-Arquetipo Finalizado (Edición 21/04/2024)
-Oricalcos/Oricaustro – Control/Rogue
-
-
-![earth_s_fire_2_by_0zerokelvin_dgiljtu](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/assets/96027721/ca05c573-fd7b-4faf-a3c2-76174558bf4d)
-
-
-
-Metodo de Montaje
-
+# Cartas Custom - DrakayStudios
+Este repositorio tiene como finalidad, la recolección de cartas personalizadas (Custom Cards), creada por DrakayStudios y nexo para la población interesada en la creación de las mismas de manera pública sin fines de lucro, para el Emulador "Project Ignis - EDOPro" del juego de cartas coleccionables "Yu-Gi-Oh! - Trading Card Game"  
 
 descarga este archivo:
 
 [configs.json](https://github.com/user-attachments/files/17980073/configs.json)
 
+Método de Implementación del repositorio
 
+Para PC, Lapto
 
-Luego pegalo y reemplazar el archivo que tiene el mismo nomber en la carpeta de "config" donde tienes el EDOPRO; que casi siempre esta en DiscoLocal(c)/ProjectIgnis. Y para montarlo a un Teléfono o dispositivo similar: el procedimiento que igual; descargar el Archivo, y sobrescribes el del Edopro en tu Telefeno.
-una vez hecho eso, habres el EDOPRO y esperas a que carguen el repositorio al 100%
+Nota:	Debes de estar conectada a Internet la primera vez para descargar el contenido del repositorio.
+1°	Descargar el archivo "configs.json" de esta página. 
+2°	Posteriormente Cortar o Copiar el archivo "configs.json" en la carpeta "config" del "Project Ignis - EDOPro" y reemplazar el ya existente de esa carpeta.
 
-![image](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios/assets/96027721/75c02c67-0404-45c5-a8cf-e755249c5b4f)
+![image](https://github.com/user-attachments/assets/b6961840-1597-4df1-b12d-7aa8f5956664)
+
+3°	Abrir el "Project Ignis - EDOPro" y verificar en la barra superior del programa haciendo Clic derecho en Repositorios, este siguiente nombre Cartas Custom – DrakayStudios al 100% (debes de esperar a que la carga llegue a 100 sin que salga en un recuadro pequeño Error o Advertencia).
+
+![image](https://github.com/user-attachments/assets/1a56706f-a1b1-488e-bb5b-d778753acfa0)
+
+4°	Una vez el repositorio estando al 100% haz Clic derecho en Decks, y habilita la opción de "Formatos Alternativos", luego haz clic en la opción de limitación y, luego dirígete a la última que llamada "Custom".
+5°	Verifica que todas las cartas que se muestres en la opción Custom tengan imágenes y, ya podrás usarlas.
+
+![image](https://github.com/user-attachments/assets/26b1943b-7805-4c9a-8d7c-4b4362c1bd3f)
