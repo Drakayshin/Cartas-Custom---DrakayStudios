@@ -17,7 +17,7 @@ Para PC, Lapto
 1°	Descargar el archivo "configs.json" de esta página. 
 2°	Posteriormente Cortar o Copiar el archivo "configs.json" en la carpeta "config" del "Project Ignis - EDOPro" y reemplazar el ya existente de esa carpeta.
 
-<h3 aligh="center">![image](https://github.com/user-attachments/assets/b6961840-1597-4df1-b12d-7aa8f5956664)<h3>
+![image](https://github.com/user-attachments/assets/b6961840-1597-4df1-b12d-7aa8f5956664)
 
 3°	Abrir el "Project Ignis - EDOPro" y verificar en la barra superior del programa haciendo Clic derecho en Repositorios, este siguiente nombre Cartas Custom – DrakayStudios al 100% (debes de esperar a que la carga llegue a 100 sin que salga en un recuadro pequeño Error o Advertencia).
 
