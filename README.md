@@ -1,4 +1,8 @@
 # Cartas Custom - DrakayStudios
+
+![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
+
+
 Este repositorio tiene como finalidad, la recolección de cartas personalizadas (Custom Cards), creada por DrakayStudios y nexo para la población interesada en la creación de las mismas de manera pública sin fines de lucro, para el Emulador "Project Ignis - EDOPro" del juego de cartas coleccionables "Yu-Gi-Oh! - Trading Card Game"  
 
 descarga este archivo:
