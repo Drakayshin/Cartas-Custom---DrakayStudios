@@ -15,10 +15,10 @@ function s.initial_effect(c)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
 end
-s.listed_series={0x3ea}
+s.listed_series={0x3ea,65601601}
 
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ea)
+	return c:IsFaceup() and c:IsSetCard(65601601)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tgfilter(chkc) end
