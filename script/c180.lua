@@ -78,17 +78,29 @@ function s.initial_effect(c)
 
     -- Efecto Péndulo
 
-	-- Invocar y cambiar ataque
+	-- Regresar esta carta a tu mano con otra que controles
 	local e9=Effect.CreateEffect(c)
-	e9:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e9:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e9:SetDescription(aux.Stringid(id,0))
+	e9:SetCategory(CATEGORY_TOHAND)
+	e9:SetType(EFFECT_TYPE_IGNITION)
+	e9:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e9:SetRange(LOCATION_PZONE)
-    e9:SetCountLimit(1,{id,2})
-	e9:SetCondition(s.sumcon)
-	e9:SetTarget(s.sptg)
-	e9:SetOperation(s.spop)
+	e9:SetCountLimit(1,{id,2})
+	e9:SetTarget(s.sthtg)
+	e9:SetOperation(s.sthop)
 	c:RegisterEffect(e9)
+
+	-- Invocar y cambiar ataque
+	local e10=Effect.CreateEffect(c)
+	e10:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e10:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e10:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e10:SetRange(LOCATION_PZONE)
+    e10:SetCountLimit(1,{id,3})
+	e10:SetCondition(s.sumcon)
+	e10:SetTarget(s.sptg)
+	e10:SetOperation(s.spop)
+	c:RegisterEffect(e10)
 end
 s.listed_names={48179391,120,125,130}
 
@@ -149,6 +161,25 @@ end
     -- ATK/DEF UP
 function s.val(e,c)
 	return Duel.GetLP(c:GetControler(1,e))
+end
+	-- Regresar cartas a tu mano
+function s.sthfilter(c)
+	return c:IsFaceup() and c:ListsCode(48179391) and c:IsAbleToHand()
+end
+function s.sthtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
+	if chkc then return chkc:IsControler(tp) and chkc:IsOnField() and chkc~=c and s.thfilter(chkc) end
+	if chk==0 then return c:IsAbleToHand() and Duel.IsExistingTarget(s.sthfilter,tp,LOCATION_ONFIELD,0,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectTarget(tp,s.sthfilter,tp,LOCATION_ONFIELD,0,1,1,c)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g+c,2,0,0)
+end
+function s.sthop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(Group.FromCards(c,tc),nil,REASON_EFFECT)
+	end
 end
     -- Invocar y cambiar ataque
 function s.sumcon(e,tp,eg,ep,ev,re,r,rp)
