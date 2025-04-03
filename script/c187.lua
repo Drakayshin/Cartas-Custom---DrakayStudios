@@ -40,7 +40,7 @@ function s.matfilter1(c,fc,sumtype,tp)
 	return c:IsSetCard(0x10cf)
 end
 function s.matfilter2(c,fc,sumtype,tp)
-	return (c:IsRace(RACE_DRAGON,fc,sumtype,tp) or c:IsRace(RACE_WYRM,fc,sumtype,tp)) and (c:IsLevelAbove(8) or c:IsRank(8))
+	return (c:IsRace(RACE_DRAGON,fc,sumtype,tp) or c:IsRace(RACE_WYRM,fc,sumtype,tp)) and (c:IsLevelAbove(8) or c:IsRankAbove(8))
 end
 function s.splimit(e,se,sp,st)
 	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():GetLocation()~=LOCATION_EXTRA
@@ -69,7 +69,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
     -- Invocar de Modo Especial
 function s.filter(c,e,tp)
-	return (c:IsRace(RACE_WARRIOR) or c:IsRace(RACE_DRAGON) or c:IsRace(RACE_WYRM)) and (c:IsLevelAbove(7) or c:IsRank(7)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return (c:IsRace(RACE_WARRIOR) or c:IsRace(RACE_DRAGON) or c:IsRace(RACE_WYRM)) and (c:IsLevelAbove(7) or c:IsRankAbove(7)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
