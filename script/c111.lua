@@ -59,7 +59,7 @@ function s.initial_effect(c)
 end
 	-- invocar por su efecto
 function s.spcfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:IsType(TYPE_NORMAL) and c:IsLevelBelow(12) and c:GetReasonPlayer()==1-tp
+	return c:IsPreviousControler(tp) and c:IsType(TYPE_NORMAL) and c:GetReasonPlayer()==1-tp
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spcfilter,1,e:GetHandler(),tp)
