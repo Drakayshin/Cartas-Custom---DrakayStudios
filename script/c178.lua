@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Invocación por Xyz
-	Xyz.AddProcedure(c,s.mfilter,6,3,s.ovfilter,aux.Stringid(id,0),99,s.xyzop)
+	Xyz.AddProcedure(c,s.mfilter,6,3,s.ovfilter,aux.Stringid(id,0),Xyz.InfiniteMats,s.xyzop)
 	c:EnableReviveLimit()
 	-- Evitar Destrucción
 	local e0=Effect.CreateEffect(c)
