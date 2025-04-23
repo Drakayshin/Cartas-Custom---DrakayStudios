@@ -9,7 +9,7 @@ function s.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_HAND)
     e0:SetCountLimit(1,id)
-	e0:SetCost(s.cost)
+	e0:SetCost(Cost.SelfDiscard)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
@@ -38,10 +38,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
     -- Buscar 1 monstruo
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-end
 function s.thfilter(c)
 	return c:IsRace(RACE_PLANT) and c:IsAbleToHand() and not c:IsCode(id)
 end

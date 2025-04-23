@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:SetRange(LOCATION_HAND)	
 	e0:SetCountLimit(1,id)
-    e0:SetCost(s.cost)
+    e0:SetCost(Cost.SelfDiscard)
 	e0:SetCondition(s.condition)
     e0:SetOperation(s.operation)
 	e0:SetTargetRange(1,0)
@@ -47,10 +47,6 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 	-- Prevencion de colocar
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsDiscardable() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
-end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase() < PHASE_END
 end

@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_HAND)
 	e0:SetCountLimit(1,{id,0})
-	e0:SetCost(s.thcost)
+	e0:SetCost(Cost.SelfDiscard)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
@@ -53,11 +53,6 @@ function s.initial_effect(c)
 end
 s.listed_names={48179391,141}
     -- Activar 1 carta de Campo
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    if chk==0 then return c:IsDiscardable() end
-    Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
-end
 function s.filter(c,tp)
 	return c:IsFieldSpell() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end

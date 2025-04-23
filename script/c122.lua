@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
-	e1:SetCost(s.thcost)
+	e1:SetCost(Cost.SelfDiscard)
 	e1:SetTarget(s.tg)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
@@ -37,11 +37,6 @@ function s.initial_effect(c)
 end
 s.listed_names={id,48179391}
 	-- Buscar 1 carta especifica o una que la mencione
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    if chk==0 then return c:IsDiscardable() end
-    Duel.SendtoGrave(c,REASON_COST|REASON_DISCARD)
-end
 function s.afilter(c)
 	return (c:IsCode(48179391) or c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
 end
