@@ -8,16 +8,24 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
     Fusion.AddProcMixN(c,true,true,s.ffilter,3)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit)
-    -- Invocar 1 Monstruo Fusión
+	-- Inafectado
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_IMMUNE_EFFECT)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetRange(LOCATION_MZONE)
-	e0:SetCountLimit(1)
-	e0:SetTarget(s.esptg)
-	e0:SetOperation(s.espop)
+	e0:SetValue(s.efilter)
 	c:RegisterEffect(e0)
+    -- Invocar 1 Monstruo Fusión
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
+	e1:SetTarget(s.esptg)
+	e1:SetOperation(s.espop)
+	c:RegisterEffect(e1)
     -- Regresa al Deck Extra al final de turno
 	aux.EnableNeosReturn(c,nil,nil,nil)
 end
@@ -41,6 +49,10 @@ function s.contactop(g,tp)
 end
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
+end
+	-- Inafectado
+function s.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
     -- Invocar 1 Monstruo Fusión
 function s.spfilter(c,e,tp)
