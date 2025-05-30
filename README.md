@@ -7,6 +7,8 @@ Este repositorio tiene como finalidad, la recolección de cartas personalizadas 
 
 descarga este archivo:
 
+[configs.json](https://github.com/user-attachments/files/20527143/configs.json)
+
 ## Método de Implementación del repositorio
 
 Para PC, Lapto
