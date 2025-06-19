@@ -37,7 +37,10 @@ Para PC, Lapto
 
 3°	Posteriormente Cortar el archivo "configs.json" descargado en la carpeta "config" del "EDORPO" y, sigue los pagos 3°, 4° y 5° de la parte anterior.
 
-
+## Pack de texturas para el EDOPRO PC
+Procedimiento en el siguiente video
 
 https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
 
+enlace de descarga
+https://drive.google.com/file/d/1ab4WthnojzI-AKtS5Ci1UmhV60vppOOD/view?usp=sharing
