@@ -36,3 +36,8 @@ Para PC, Lapto
 2°	Dirígete con el "Gestor de Archivos" de tu dispositivo a la carpeta " EDOPRO" del "Project Ignis - EDOPro" y, entra en la carpeta Config y borra el archivo Configs.json.
 
 3°	Posteriormente Cortar el archivo "configs.json" descargado en la carpeta "config" del "EDORPO" y, sigue los pagos 3°, 4° y 5° de la parte anterior.
+
+
+
+https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
+
