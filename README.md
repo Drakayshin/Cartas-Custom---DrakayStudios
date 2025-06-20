@@ -44,3 +44,52 @@ https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
 
 enlace de descarga
 https://drive.google.com/file/d/1ab4WthnojzI-AKtS5Ci1UmhV60vppOOD/view?usp=sharing
+
+## Estructure Decks
+
+[Uploading C - Estructura Terranigma.ydk…]#created by Terranigma
+#main
+33212663
+89
+100
+106
+55878039
+97
+96
+128
+95
+94
+138
+26914168
+93
+92
+59438931
+102
+91
+91
+90
+116
+88
+182
+185
+674561
+86
+87
+181
+24224830
+85
+120
+84
+101
+10045474
+15693423
+54974237
+57728570
+98954106
+83
+169
+77610503
+#extra
+!side
+()
+
