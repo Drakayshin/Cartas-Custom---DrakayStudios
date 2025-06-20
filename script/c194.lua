@@ -4,10 +4,10 @@ local s,id=GetID()
 function s.initial_effect(c)
     -- Puedes activar desde la mano
     local e0=Effect.CreateEffect(c)
-    e0:SetDescription(aux.Stringid(id,0))
+	e0:SetDescription(aux.Stringid(id,1))
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e0:SetCondition(s.condition)
+	e0:SetCondition(s.handcon)
 	c:RegisterEffect(e0)
     -- Activar 1 carta de Campo
 	local e1=Effect.CreateEffect(c)
@@ -27,15 +27,15 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
     e2:SetCode(EVENT_FREE_CHAIN)
-    e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e2:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
 end
 s.listed_names={48179391,125,130}
 	-- Activar desde la mano
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_EXTRA,0)==0
+function s.handcon(e)
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0
 end
     -- Activar 1 carta de Campo
 function s.acfilter(c,tp)

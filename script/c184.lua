@@ -34,13 +34,13 @@ function s.initial_effect(c)
 	e2:SetOperation(s.atkop)
 	c:RegisterEffect(e2)
 end
-s.listed_names={id,48179391,125,130,132}
+s.listed_names={id,48179391,130,132}
     -- Activar desde la mano
 function s.hfilter0(c)
-	return c:IsFaceup() and c:IsCode(48179391,125,130)
+	return c:IsFaceup() and c:IsCode(130)
 end
 function s.handcon(e)
-	return Duel.IsExistingMatchingCard(s.hfilter0,e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(s.hfilter0,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 	-- Negar efectos
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -66,16 +66,6 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(RESET_TURN_SET)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		--Your opponent cannot activate monster effects this turn
-		local e3=Effect.CreateEffect(e:GetHandler())
-		e3:SetDescription(aux.Stringid(id,2))
-		e3:SetType(EFFECT_TYPE_FIELD)
-		e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e3:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e3:SetTargetRange(0,1)
-		e3:SetValue(function(e,re,rp) return re:IsMonsterEffect() end)
-		e3:SetReset(RESET_PHASE|PHASE_END)
-		Duel.RegisterEffect(e3,tp)
 	end
 end
 	-- Ganar LP y cambiar ATK
