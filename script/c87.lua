@@ -50,7 +50,7 @@ function s.drwop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(p,d,REASON_EFFECT)==d then
 		Duel.ShuffleHand(p)
 		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
-		local g=Duel.SelectMatchingCard(p,Card.IsAbleToDeck,p,LOCATION_HAND,0,1,2,nil)
+		local g=Duel.SelectMatchingCard(p,Card.IsAbleToDeck,p,LOCATION_HAND,0,2,2,nil)
 		if #g>0 then
 			Duel.BreakEffect()
 			Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_EFFECT)

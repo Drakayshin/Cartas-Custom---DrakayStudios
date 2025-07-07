@@ -18,8 +18,9 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetTarget(s.extg)
 	c:RegisterEffect(e1)
-    -- Descarte, Robo y destierro
-    local e2=Effect.CreateEffect(c)
+    -- Desterrar y robar
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_SZONE)
@@ -31,7 +32,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	-- ATK UP
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetDescription(aux.Stringid(id,3))
 	e3:SetCategory(CATEGORY_ATKCHANGE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -71,7 +72,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if Duel.Draw(p,d,REASON_EFFECT)~=0 then
 		local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			local sg=g:Select(tp,1,1,nil)
