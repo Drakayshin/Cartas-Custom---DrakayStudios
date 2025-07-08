@@ -83,7 +83,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 	--	Efecto 0° (Limite de activación y efecto)
 function s.aclimit(e,re,tp)
-	return not re:GetHandler():IsSetCard(SET_BUJIN)
+	return not re:GetHandler():IsSetCard(0x3e7)
 end
     --	Efecto 1° (1°, 2° y 3° Invocar de Modo Normal)
 function s.nscon(e,tp,eg,ep,ev,re,r,rp)
