@@ -64,7 +64,7 @@ end
 s.listed_names={146}
     -- Inafectada porartas Magicas/Trampa del adversario
 function s.efilter(e,te)
-	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
+	return te:IsSpellTrapEffect() and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
     -- Inafectada de monstruos Fusion/Sincronia/Xyz y Enlace del adversario
 function s.immval(e,te)
