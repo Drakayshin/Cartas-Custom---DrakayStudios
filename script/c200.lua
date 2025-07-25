@@ -1,110 +1,100 @@
---オルターガイスト・プロトコル
---Altergeist Protocol
+--Umbral Empíreo
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	--  0° Activación
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
-	e0:SetCondition(aux.StatChangeDamageStepCondition)
     c:RegisterEffect(e0)
-    --  1° Destruir esta carta si recibes daño por batalla
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_SZONE)
-	e1:SetCode(EVENT_DAMAGE)
-	e1:SetCondition(s.dscon)
-	e1:SetTarget(s.dstg)
-	e1:SetOperation(s.dsop)
+    --  1° Ganan 100 ATK/DEF x su Nivel
+    local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetRange(LOCATION_FZONE)
+	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x3eb))
+	e1:SetValue(s.val1)
 	c:RegisterEffect(e1)
-    --  2° Evitar la negación de la activación o los efectos de cartas "Empíreo"
-    local e2a=Effect.CreateEffect(c)
-	e2a:SetType(EFFECT_TYPE_FIELD)
-	e2a:SetCode(EFFECT_CANNOT_DISABLE)
-	e2a:SetRange(LOCATION_SZONE)
-	e2a:SetTargetRange(LOCATION_ONFIELD,0)
-	e2a:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-    e2a:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x3eb))
-	c:RegisterEffect(e2a)
-    local e2b=Effect.CreateEffect(c)
-	e2b:SetType(EFFECT_TYPE_FIELD)
-	e2b:SetCode(EFFECT_CANNOT_INACTIVATE)
-	e2b:SetRange(LOCATION_SZONE)
-	e2b:SetValue(s.effectfilter)
-	c:RegisterEffect(e2b)
-	local e2c=e2b:Clone()
-	e2c:SetCode(EFFECT_CANNOT_DISEFFECT)
-	c:RegisterEffect(e2c)
-	--  3° Negación y destruir
-	local e3a=Effect.CreateEffect(c)
-	e3a:SetDescription(aux.Stringid(id,1))
-	e3a:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e3a:SetType(EFFECT_TYPE_ACTIVATE)
-	e3a:SetCode(EVENT_CHAINING)
-	e3a:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e3a:SetCountLimit(1,{id,1})
-	e3a:SetCondition(s.discon)
-	e3a:SetCost(s.discost)
-	e3a:SetTarget(s.distg)
-	e3a:SetOperation(s.disop)
-	c:RegisterEffect(e3a)
-	local e3b=e3a:Clone()
-	e3b:SetType(EFFECT_TYPE_QUICK_O)
-	e3b:SetRange(LOCATION_SZONE)
-    c:RegisterEffect(e3b)
-    --  4° Activar desde la mano con tu adversario tiene 3 o mas cartas en su Campo
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,3))
-	e4:SetType(EFFECT_TYPE_SINGLE)
-    e4:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-    e4:SetCountLimit(1,{id,2})
-	e4:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>2 end)
-	c:RegisterEffect(e4)
+	local e1a=e1:Clone()
+	e1a:SetCode(EFFECT_UPDATE_DEFENSE)
+	e1a:SetValue(s.val1)
+	c:RegisterEffect(e1a)
+	--  1° Invocar de Modo Especial
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+    e2:SetCode(EVENT_DESTROYED)
+    e2:SetRange(LOCATION_FZONE)
+	e2:SetCountLimit(1,{id,0})
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
+    c:RegisterEffect(e2)
+    --  3° Barajear y recuperar
+    local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetCountLimit(1,{id,1})
+	e3:SetTarget(s.tdtg)
+	e3:SetOperation(s.tdop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={0x3eb}
-	--	*Efecto 1°
-function s.dscon(e,tp,eg,ep,ev,re,r,rp)
-	return r&REASON_BATTLE==REASON_BATTLE and ep==tp
+    --  *Efecto 1°
+function s.val1(e,c)
+	return c:GetLevel()*100
 end
-function s.dstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,tp,LOCATION_SZONE)
+    --  *Efecto 22°
+function s.cfilter(c,e,tp)
+	return c:IsSetCard(0x3eb) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_BATTLE|REASON_EFFECT) and c:HasLevel() and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetLevel())
 end
-function s.dsop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+function s.spfilter(c,e,tp,lv)
+	return c:IsLevelBelow(lv) and c:IsSetCard(0x3eb) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,e,tp)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	Duel.SetTargetCard(eg)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local dg=eg:Filter(s.cfilter,nil,e,tp):Match(Card.IsRelateToEffect,nil,e)
+	if #dg==0 then return end
+	local _,lv=dg:GetMaxGroup(Card.GetOriginalLevel)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,lv)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-    --  *Efecto 2°
-function s.effectfilter(e,ct)
-	local p=e:GetHandler():GetControler()
-	local te,tp,loc=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER,CHAININFO_TRIGGERING_LOCATION)
-    return p==tp and te:GetHandler():IsSetCard(0x3eb) and loc&LOCATION_HAND|LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED~=0
 end
     --  *Efecto 3°
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3eb) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x3eb) and c:IsAbleToDeck() and c:IsFaceup()
 end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==1-tp and (re:IsMonsterEffect() or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
+function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,4,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,tp,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND|LOCATION_MZONE|LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND|LOCATION_MZONE|LOCATION_GRAVE,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
-end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-	end
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
+	local tg=Duel.GetTargetCards(e)
+	if #tg==0 or Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)==0 then return end
+	local g=Duel.GetOperatedGroup()
+	if not g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK|LOCATION_EXTRA) then return end
+	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
+	Duel.BreakEffect()
+	Duel.Draw(tp,1,REASON_EFFECT)
 end
