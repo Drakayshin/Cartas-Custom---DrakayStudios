@@ -46,7 +46,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={0x3e7}
-	--	1° Invocar por Sacrificio usando 1 monstruo del adversario
+	--	*Efecto 1°
 function s.sumcon(e,c,minc,zone,relzone,exeff)
 	if c==nil then return true end
 	local tp=c:GetControler()
@@ -70,7 +70,7 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp,c,minc,zone,relzone,exeff)
 	c:SetMaterial(mc)
 	Duel.Release(mc,REASON_SUMMON|REASON_MATERIAL)
 end
-    --	2° Negar efectos de monstruos que no sean de Oscuridad con ATK/DEF igual o menor al ATK/DEF de esta carta
+    --	*EFecto 2°
 function s.filter(c)
 	return c:IsSetCard(0x3e7) and c:IsFaceup() and not c:IsCode(id)
 end
@@ -82,15 +82,15 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DISABLE)
-	e1:SetTargetRange(LOCATION_HAND|LOCATION_MZONE|LOCATION_GRAVE|LOCATION_REMOVED,LOCATION_HAND|LOCATION_GRAVE|LOCATION_MZONE|LOCATION_REMOVED)
-	e1:SetTarget(s.disable)
+	e1:SetTargetRange(LOCATION_ALL,LOCATION_ALL)
+	e1:SetTarget(function(e,c) return c:IsMonster() and not c:IsOriginalAttribute(ATTRIBUTE_DARK) and c~=e:GetHandler() end)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	c:RegisterEffect(e2,tp)
 end
-function s.disable(e,c)
-	return c~=e:GetHandler() and not c:IsOriginalAttribute(ATTRIBUTE_DARK) and ((c:IsType(TYPE_EFFECT) or (c:GetOriginalType()&TYPE_EFFECT)==TYPE_EFFECT))
-end
-    --	3° Reducir 500 ATK/DEF de todos los monstros que controle tu adversario por cada monstruos de Oscuridad en el Campo
+    --	*Efecto 3°
 function s.stattg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) 
 		and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAttribute,ATTRIBUTE_DARK),tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
