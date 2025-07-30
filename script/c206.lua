@@ -62,7 +62,7 @@ function s.chcon(e,tp,eg,ep,ev,re,r,rp)
     return rp==1-tp and re:IsMonsterEffect()
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAbleToRemove),rp,0,LOCATION_MZONE|LOCATION_GRAVE,1,nil) end
+    if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAbleToRemove),rp,LOCATION_MZONE|LOCATION_GRAVE,0,1,nil) end
 end
 function s.chop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.CreateGroup()
