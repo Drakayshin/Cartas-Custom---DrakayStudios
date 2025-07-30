@@ -6,7 +6,7 @@ function s.initial_effect(c)
     c:SetUniqueOnField(1,0,id)
     c:EnableCounterPermit(COUNTER_SPELL)
 	c:SetCounterLimit(COUNTER_SPELL,5)
-    -- Activate/Buscar 1 carta
+    --	0° Activate/Buscar 1 carta
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-    -- Limite de ataque directos
+    --	1° Limite de ataque directos
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetTarget(s.atktarget)
 	c:RegisterEffect(e1)
-	-- Reducir ATK por contador
+	--	2° Reducir ATK por contador
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.iatarget)
 	e2:SetValue(s.iavalue)
 	c:RegisterEffect(e2)
-	-- Colocar contadores
+	--	3° Colocar contadores
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_COUNTER)
@@ -42,7 +42,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.ctop)
 	c:RegisterEffect(e3)
 end
-	-- Buscar 1 carta
+	--	*EFECTO 0°
 function s.thfilter(c)
 	return c:IsLevelAbove(9) and c:IsAbleToHand()
 end
@@ -60,18 +60,18 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-    -- Limite de ataques directos
+    --	*EFECTO 1°
 function s.atktarget(e,c)
 	return c:IsAttackBelow(2000)
 end
-	-- Reducir ATK por contador
+	--	*EFECTO 2°
 function s.iatarget(e,c)
 	return c:IsMonster()
 end
 function s.iavalue(e,c)
 	return e:GetHandler():GetCounter(COUNTER_SPELL)*-400
 end
-	-- Colocar contadores
+	-- 	*EFECTO 3°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end

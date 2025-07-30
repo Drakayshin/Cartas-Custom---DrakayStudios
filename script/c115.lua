@@ -3,13 +3,13 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	-- Debe ser Invocado por su efecto
+	-- 	0° Debe ser Invocado por su efecto
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e0)
-	-- Invocar de Modo Especial (desde tu mano)
+	-- 	1° Invocar de Modo Especial (desde tu mano)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- No puede ser seleecionado por tu adversario
+	-- 	2° No puede ser seleecionado por tu adversario
 	local e2=Effect.CreateEffect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -27,12 +27,12 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	-- No puede ser destruido por efectos de tu adversario
+	-- 	3° No puede ser destruido por efectos de tu adversario
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e3:SetValue(s.indval)
 	c:RegisterEffect(e3)
-	-- Es tratado como "Blue-Eyes White Dragon" en el Campo o Cementerio
+	-- 	4° Es tratado como "Blue-Eyes White Dragon" en el Campo o Cementerio
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -40,7 +40,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e4:SetValue(CARD_BLUEEYES_W_DRAGON)
 	c:RegisterEffect(e4)
-	-- Destruir 1 monstruo
+	-- 	5° Destruir 1 carta en el Campo de tu adversario
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,0))
 	e5:SetCategory(CATEGORY_DESTROY)
@@ -55,11 +55,7 @@ function s.initial_effect(c)
 end
 s.listed_series={0xdd}
 s.listed_names={89631139} --Nombre de Carta a convertir o usar
-	-- No puede ser seleccionado ni Destruido por efectos de cartas del adversario
-function s.indval(e,re,tp)
-	return tp~=e:GetHandlerPlayer()
-end
-	-- Invocacíon por Sacrifición de un monstruo espeficico que controles (Eje. 89631139=Dragón Blanco de Ojos Azules)
+	-- 	*EFECTO 1°
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsSetCard,1,false,1,true,c,c:GetControler(),nil,false,e:GetHandler(),0xdd)
@@ -80,7 +76,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_COST)
 	g:DeleteGroup()
 end
-	-- Destruir 1 monstruo por selección
+	-- 	*EFECTO 3°
+function s.indval(e,re,tp)
+	return tp~=e:GetHandlerPlayer()
+end
+	-- 	*EFECTO 5°
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end

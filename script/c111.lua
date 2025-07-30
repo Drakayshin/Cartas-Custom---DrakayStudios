@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	-- Invocar primero por su efecto
+	-- 	0° Invocar primero por su efecto
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -16,14 +16,14 @@ function s.initial_effect(c)
 	e0:SetTarget(s.sptg)
 	e0:SetOperation(s.spop)
 	c:RegisterEffect(e0)
-    -- No puede atacar directamente
+    -- 	1° No puede atacar directamente
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	c:RegisterEffect(e1)
-    -- Immune efectos de Monstruos
+    -- 	2° Immune a los efectos de Monstruos
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetValue(s.efilter)
 	c:RegisterEffect(e2)
-	-- Cambiar la Posicion de batalla
+	-- 	3° Cambiar la Posicion de batalla
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_POSITION)
@@ -40,7 +40,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.postg)
 	e3:SetOperation(s.posop)
 	c:RegisterEffect(e3)
-	-- ATK UP
+	-- 	4° Gana ATK por cada monstruo Normal en tu Cementerio
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -48,7 +48,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetValue(function(e,c) return Duel.GetMatchingGroupCount(Card.IsType,c:GetControler(),LOCATION_GRAVE,0,nil,TYPE_NORMAL)*200 end)
 	c:RegisterEffect(e4)
-	-- DEF UP
+	-- 5° Gana DEF por cada monstruo Normal en tu Cementerio
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -57,7 +57,7 @@ function s.initial_effect(c)
 	e5:SetValue(function(e,c) return Duel.GetMatchingGroupCount(Card.IsType,c:GetControler(),LOCATION_GRAVE,0,nil,TYPE_NORMAL)*200 end)
 	c:RegisterEffect(e5)
 end
-	-- invocar por su efecto
+	--	*EFECTO 0°
 function s.spcfilter(c,tp)
 	return c:IsPreviousControler(tp) and c:IsType(TYPE_NORMAL) and c:GetReasonPlayer()==1-tp
 end
@@ -76,11 +76,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:CompleteProcedure()
 	end
 end
-	-- Inmune efectos de Monstruos
+	--	*EFECTO 2°
 function s.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
-	-- Cambio de posicion al atacar
+	--	*EFECTO 3°
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local d=Duel.GetAttackTarget()
 	if chk==0 then return d and d:IsControler(1-tp) and d:IsCanChangePosition() end

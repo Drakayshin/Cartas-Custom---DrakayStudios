@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Inafectado por Mágica/Trampa del adversario
+	-- 	0° Inafectado por Mágica/Trampa del adversario
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -10,28 +10,29 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetValue(s.efilter)
 	c:RegisterEffect(e0)
-    -- Invocación Especial
+    -- 	1° Invocación Especial
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
     e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-    local e2=e1:Clone()
-	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
+    local e1a=e1:Clone()
+	e1a:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e1a)
+	local e1b=e1:Clone()
+	e1b:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e1b)
 end
-    -- Inafectado por Mágica/Trampa del adversario
+    --	*EFECTO 0°
 function s.efilter(e,te)
     return te:IsActiveType(TYPE_SPELL+TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
-    -- Invocación Especial
+    --	*EFECTO 1°
 function s.filter(c,e,tp)
 	return c:IsRace(RACE_CYBERSE) and c:IsDefenseBelow(1950) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

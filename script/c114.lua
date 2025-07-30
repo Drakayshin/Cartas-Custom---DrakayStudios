@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar de Modo Especial desde la mano al no tener monstruos
+	--	0° Invocar de Modo Especial desde la mano al no tener monstruos
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_FIELD)
@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_HAND)
 	e0:SetCondition(s.spcon)
 	c:RegisterEffect(e0)
-	-- Invocar de Modo Especial 1 monstruo normal de nivel 6 o menor de tu mano o Deck
+	-- 	1° Invocar de Modo Especial 1 monstruo normal de nivel 6 o menor de tu mano o Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- Invocar de Modo Especial 1 monstruo "Blue-Eyes"
+	-- 	2° Invocar de Modo Especial 1 monstruo "Blue-Eyes" si es Invocado un monstruo al Campo de tu adversario
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -33,24 +33,25 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
-	local e4=e2:Clone()
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_BE_BATTLE_TARGET)
-	e4:SetCondition(s.thcon2)
-	c:RegisterEffect(e4)
+	local e2a=e2:Clone()
+	e2a:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e2a)
+	--	<- declarar un ataque a esta carta
+	local e2b=e2:Clone()
+	e2b:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2b:SetCode(EVENT_BE_BATTLE_TARGET)
+	e2b:SetCondition(s.thcon2)
+	c:RegisterEffect(e2b)
 end
 s.listed_names={id}
 s.listed_series={0xdd}
-	-- Invocacion Especial si no controlas monstruos
+	--	*EFECTO 0°
 function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-	-- Invocar de Modo Especial 1 monstruo de nivel 6 o menor en tu mano o Deck
+	--	*EFECTO 1°
 function s.spfilter(c,ft)
 	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAbleToRemoveAsCost() and (ft>0 or c:GetSequence()<5)
 end
@@ -77,12 +78,10 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-	-- Invocar 1 Ojos Azules
-	--Condition from Summon your opponent
+	--	*EFECTO 2°
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsSummonPlayer,1,nil,1-tp)
 end
-	--Condition from target attack your opponent
 function s.thcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattleTarget():IsControler(1-tp)
 end

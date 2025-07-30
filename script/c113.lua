@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
     -- Inegable
     local EFFECT_FLAG_CANNOT_NEGATE_ACTIV_EFF=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_CANNOT_INACTIVATE
-	-- Activate/Buscar 1 carta
+	-- 	0° Activación/añadir a tu mano 1 "Slifer El Dragón del Cielo", desde el Deck o Cementerio
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-    -- Inafectado
+    -- 	1° "Slifer El Dragón del Cielo" es Inafectado por efectos de cartas de tu adversario
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.etarget)
 	e1:SetValue(s.efilter)
     c:RegisterEffect(e1)
-    -- Robar cartas
+    -- 	2° Robar cartas hasta que tengas 4 en tu mano
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={10000020}
-	-- Buscar 1 carta
+	--	*EFECTO 0°
 function s.thfilter(c)
 	return c:IsCode(10000020) and c:IsAbleToHand()
 end
@@ -54,14 +54,14 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-    -- Inafectado
+	--	*EFECTO 1°
 function s.etarget(e,c)
 	return c:IsCode(10000020)
 end
 function s.efilter(e,re)
 	return re:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
-    -- Robar cartas
+	--	*EFECTO 2°
 function s.drcfilter(c)
 	return c:IsFaceup() and c:IsCode(10000020)
 end

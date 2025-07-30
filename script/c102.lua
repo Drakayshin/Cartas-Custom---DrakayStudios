@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Prevencion de colocar
+    --	0° Prevencion de colocar
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetCode(EVENT_FREE_CHAIN)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
     e0:SetOperation(s.operation)
 	e0:SetTargetRange(1,0)
 	c:RegisterEffect(e0)
-	-- Invocar de Modo Especial
+	--	1° Invocar de Modo Especial
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-    	--Check for single Set
+    --	validación efecto
 	aux.GlobalCheck(s,function()
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -35,6 +35,7 @@ function s.initial_effect(c)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
+    --	validación efecto
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED) then
 		local g=eg:Filter(Card.IsPreviousLocation,nil,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
@@ -46,7 +47,7 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-	-- Prevencion de colocar
+	-- 	*EFecto 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase() < PHASE_END
 end
@@ -78,7 +79,7 @@ end
 function s.settg(e,c)
 	return c:IsLocation(LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
 end
-	-- Invocar de Modo Especial
+	--	*EFecto 1°
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

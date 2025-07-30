@@ -2,18 +2,18 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
-	c:RegisterEffect(e1)
+	--	0° Negar efectos y limitar su uso en Invocación de monstruos
+	local e0=Effect.CreateEffect(c)
+	e0:SetCategory(CATEGORY_DISABLE)
+	e0:SetType(EFFECT_TYPE_ACTIVATE)
+	e0:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.activate)
+	c:RegisterEffect(e0)
 end
-	-- Selección 1 monstruo del adversario
+	--	*Efecto 0
 function s.filter(c,e,tp)
 	return c:IsFaceup()
 end
@@ -79,7 +79,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e7)
 		--Cannot be used as Link material
 		local e8=e7:Clone()
-		e8:SetDescription(3311)
+		e8:SetDescription(3312)
 		e8:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
 		tc:RegisterEffect(e8)
 	end
