@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Cambio de Posicion de Batalla por seleccion
+	-- 	0° Cambio de Posicion de Batalla por selección
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_POSITION)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.postg)
 	e0:SetOperation(s.posop)
 	c:RegisterEffect(e0)
-    -- Invocar 1 Malevolencia Oricalcos tu mano o Deck
+    --	1° Invocar 1 Malevolencia Oricalcos tu mano o Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-    -- Reduccion ATK/DEF
+    -- 	2° Reducir 500 ATK/DEF a los monstruos de tu adversario
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -35,12 +35,12 @@ function s.initial_effect(c)
 	e2:SetCondition(s.oricalcon)
 	e2:SetValue(-500)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e3)
+	local e2a=e2:Clone()
+	e2a:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e2a)
 end
-s.listed_names={id,48179391} --id=para la propia carta luego de la "," codigo de otra carta
-	-- Cambio de Posicion de Batalla por seleccion
+s.listed_names={id,48179391} -- ID= para la propia carta luego de la "," codigo de otra carta
+	--	*EFECTO 0°
 function s.filter(c)
 	return c:IsFaceup() and c:IsCanChangePosition()
 end
@@ -57,10 +57,11 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end
+	--	*Condición general de los siguientes efectos
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD|LOCATION_GRAVE,0,1,nil)
 end
-    -- Invocar 1 Malevolencia Oricalcos tu mano o Deck
+	--	*EFECTO 1°
 function s.spfilter(c,e,tp)
     return c:IsCode(id) and c:IsLocation(LOCATION_HAND|LOCATION_DECK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar por Fusión
+	-- 	0° Invocar de Modo Especial 1 Monstruo Fusión "Ciber" desde tu Deck Extra. (Esto es tratado como una Invocación por Fusión)
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-    -- Ganar LP
+    -- 	1° Ganar LP igual al ATK de un monstruo Máquina de Luz o "Ciber Dragón" en tu Campo
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,0))
     e1:SetCategory(CATEGORY_RECOVER)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 end
 s.listed_names={1546123}
 s.listed_series={147}
-    -- Invocar por Fusión
+    --	*EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetLP(tp)<=4000
 end
@@ -54,7 +54,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	tc:SetMaterial(nil)
 	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		-- ATK UP
+		--	*Aumentar el ATK igual a su ataque original
 		local e1=Effect.CreateEffect(e:GetHandler())
         e1:SetType(EFFECT_TYPE_SINGLE)
         e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -64,7 +64,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
-    -- Ganar LP
+    -- 	*EFECTO 1°
 function s.filter1(c)
 	return c:HasNonZeroAttack() and (c:IsSetCard(SET_CYBER_DRAGON) or c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_MACHINE))
 end

@@ -2,16 +2,17 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	--	*Solo puedes controlar 1 en tu Campo
     c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
-	-- Limite de Invocación
+	-- 	0° Debe ser Invocada de Modo Especial por un efecto
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.FALSE)
 	c:RegisterEffect(e0)
-	-- No selecionable por adversario
+	-- 	1° No puede ser seleccionado por efectos de cartas de tu adversario
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
@@ -19,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
-    -- Gana ATK
+    -- 2° Gana 500 ATK por cada monstruo "LV" con nombres diferentes en tu Cementerio
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -27,7 +28,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
-    -- Negar y destruir
+    -- 3° Negar la activación o efectos de cartas Mágicas/de Trampa
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
@@ -44,7 +45,7 @@ end
 s.listed_names={158}
 s.LVnum=9
 s.LVset=0x3ea
-    -- ATK
+    -- 	*EFECTO 2°
 function s.filter(c)
 	return c:IsSetCard(0x41) and c:IsMonster()
 end
@@ -53,7 +54,7 @@ function s.atkval(e,c)
 	local ct=g:GetClassCount(Card.GetCode)
 	return ct*500
 end
-    -- Negar y destruir
+    -- 	*EFECTO 3°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
     and re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and Duel.IsChainNegatable(ev)

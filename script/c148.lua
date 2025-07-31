@@ -2,6 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	--	0° Invocar de Modo Especial 1 monstruo "Señoroscuro" desde tu mano
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,7 +14,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 end
 s.listed_series={0xef}
-    -- Costo
+	--	*EFecto 0°
 function s.costfilter(c)
 	return c:IsSetCard(0xef) and c:IsDiscardable()
 end
@@ -21,7 +22,6 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,s.costfilter,1,1,REASON_COST+REASON_DISCARD,nil)
 end
-    -- Invocasión
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xef) and c:IsCanBeSpecialSummoned(e,0,tp,true,false,POS_FACEUP)
 end

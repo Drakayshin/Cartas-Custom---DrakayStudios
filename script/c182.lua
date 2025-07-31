@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Robar 2 cartas y regresar 2 al tope del Deck
+	-- 	0° Robar 2 cartas y regresar 2 al tope del Deck
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
 	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	-- añadir 1 cartas del Cementerio
+	-- 	1° añadir 1 cartas del Cementerio
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_names={id,48179391,125,130}
-	-- Robar 3 cartas y regresar 2 al tope del Deck
+	-- 	*EFECTO 0°
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -67,7 +67,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-	-- añadir 1 cartas del Cementerio
+	-- 	*EFECTO 1°
 function s.gythfilter(c)
 	return c:ListsCode(48179391) and c:IsSpellTrap() and not c:IsCode(id) and c:IsAbleToHand()
 end

@@ -2,13 +2,13 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-     -- No puede ser material de Fusion/Synchro/Xyz/Link
+    --	0° No puede ser material de Fusion/Synchro/Xyz/Link
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_CANNOT_BE_MATERIAL)
 	e0:SetValue(aux.cannotmatfilter(SUMMON_TYPE_FUSION,SUMMON_TYPE_SYNCHRO,SUMMON_TYPE_XYZ,SUMMON_TYPE_LINK))
 	c:RegisterEffect(e0)
-	-- Buscar 1 carta especifica o una que la mencione
+	-- 	1° Buscar 1 carta especifica o una que la mencione
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.tg)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
-	-- Invocar de Modo Especial hasta 2 copias
+	-- 	2° Invocar de Modo Especial hasta 2 copias de esta carta
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -31,12 +31,12 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation)
     e2:SetCountLimit(1,id)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
+	local e2a=e2:Clone()
+	e2a:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e2a)
 end
 s.listed_names={id,48179391}
-	-- Buscar 1 carta especifica o una que la mencione
+	--	*EFECTO 1°
 function s.afilter(c)
 	return (c:IsCode(48179391) or c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
 end
@@ -52,10 +52,11 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
+	--	*Condición general de los siguientes efectos
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
-    -- Invocar de Modo Especial hasta 2 copias mano y/o Deck
+	--	*EFECTO 2°
 function s.filter(c,e,tp)
 	return c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

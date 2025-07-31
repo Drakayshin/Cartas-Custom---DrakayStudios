@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar y Destruir
+	-- 	0° Invocar de Modo Especial y Destruir el monstruo que declaro un ataque
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
-    -- Regresar a la mano
+    -- 	1° Regresar a la mano desde el Cementerio si un monstruo "LV" deja tu Campo
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x41}
-    -- Invocar y Destruir
+    -- 	*EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttacker()
 	return at:GetControler()==1-tp and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x41),tp,LOCATION_MZONE,0,1,nil)
@@ -51,7 +51,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
         end
 	end
 end
-    -- Añadir a la mano
+    -- 	*EFECTP 1°
 function s.addtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToHand() end

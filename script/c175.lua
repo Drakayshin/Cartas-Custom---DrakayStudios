@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar por Fusión 1 monstruo Ciber
+	-- 	0° Invocar por Fusión 1 monstruo "Ciber"
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-    -- Invocar por Fusión 1 Monstruo de Fusión Máquina
+    -- 	1° Invocar por Fusión 1 Monstruo de Fusión Máquina
     local e1=Fusion.CreateSummonEff(c,s.ffilter,Fusion.OnFieldMat(Card.IsAbleToRemove),s.fextra,Fusion.BanishMaterial,nil,s.stage2,nil,nil,nil,nil,nil,nil,nil,s.extratg)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
     e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
@@ -24,7 +24,7 @@ function s.initial_effect(c)
     e1:SetCondition(s.spcon)
     c:RegisterEffect(e1)
 end
-	-- Invocar por Fusión 1 monstruo Ciber
+	-- 	*EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
@@ -48,7 +48,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	tc:SetMaterial(nil)
 	if Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)~=0 then
-		--Cannot attack
+		--	*No puede atacar directamente
         local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetDescription(aux.Stringid(id,0))
@@ -59,7 +59,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         tc:CompleteProcedure()
 	end
 end
-    -- Invocar por Fusión 1 Monstruo de Fusión Máquina
+    -- 	*EFECTO 1°
 function s.cfilter(c,tp)
 	return c:IsType(TYPE_FUSION) and (c:IsRace(RACE_MACHINE) or c:IsRace(RACE_CYBERSE)) 
 	and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp) and c:GetReasonPlayer()==1-tp

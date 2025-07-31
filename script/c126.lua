@@ -2,15 +2,15 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Solo 1 Boca arriba en tu campo
+    -- 	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Activación
+	-- 	0° Activación/puedes activar 1 "El Sello de Oricalcos" directamente desde tu Deck
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-    -- Invocar desde tu Cementerio
+    -- 	1° Invocar desde tu Cementerio
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	-- Evitar destruccion una vez por turno Zona Magia & Trampa
+	-- 	2° Evitar destruccion una vez por turno en Zona de Magia & Trampa
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={48179391,125,130}
-	-- Activar 1 "El Sello de Oricalcos"
+	-- 	*EFECTO 0°
 function s.filter(c,tp)
 	return c:IsCode(48179391,125,130) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
@@ -53,7 +53,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-    -- Invocar desde tu Cementerio
+	-- 	*EFECTO 1°
 function s.spfilter(c,e,tp)
 	return (c:ListsCode(48179391)) and c:IsLevelBelow(7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

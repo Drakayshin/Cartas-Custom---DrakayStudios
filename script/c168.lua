@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
-    -- Activar desde la mano
+    -- 	0° Activar desde la mano
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -11,21 +11,21 @@ function s.initial_effect(c)
 	e0:SetCountLimit(1,id)
 	e0:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>0 end)
 	c:RegisterEffect(e0)
-	-- Activación
+	-- 	1° Activación
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	-- Limite de Invocación del Deck Extra
+	-- 	2° Limite de Invocación del Deck Extra
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(1,0)
-	e2:SetTarget(s.splimit)
+	e2:SetTarget(function(e,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsRace(RACE_CYBERSE) end)
 	c:RegisterEffect(e2)
-	-- Invocar desde el Deck o destierro
+	-- 	3° Invocar de Modo Especial desde el Deck o destierro 1 monstruo Ciberso con 1950 o 1700 ATK
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -37,7 +37,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-	-- Recuperar de 2 a 4 cartas
+	-- 4° Recuperar de 2 a 4 cartas
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
@@ -50,11 +50,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.drop)
 	c:RegisterEffect(e4)
 end
-	-- Limite de Invocación del Deck Extra
-function s.splimit(e,c)
-	return c:IsLocation(LOCATION_EXTRA) and not c:IsRace(RACE_CYBERSE)
-end
-	-- Invocar desde el Deck o destierro
+	-- 	*EFECTO 3°
 function s.spfilter(c,e,tp)
 	return ((c:IsAttack(1950) or c:IsAttack(1700)) and c:IsRace(RACE_CYBERSE) or c:IsFaceup())
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -73,7 +69,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
+	--	*EFECTO 4°
 function s.filter(c)
 	return c:IsRace(RACE_CYBERSE) and c:IsMonster() and c:IsAbleToDeck()
 end

@@ -2,14 +2,14 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Solo 1 Boca arriba en tu campo
+    -- 	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Activación
+	-- 	0° Activación
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
-    -- Añadir a la mano 
+    -- 	1° Añadir a la mano 
     local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_TODECK)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.thtg)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
-    -- Ordenar cartas del Deck
+    -- 	2° Ordenar las primeras 3 cartas del tope de tu Deck
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
     e2:SetCategory(CATEGORY_TODECK)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.excavtg)
 	e2:SetOperation(s.excavop)
 	c:RegisterEffect(e2)
-    -- Robar y regresar
+    -- 	3° Robar 3 cartas y regresar 1 carta en tu mano al fondo del Deck
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,3))
 	e3:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
@@ -44,18 +44,18 @@ function s.initial_effect(c)
 	e3:SetOperation(s.drwop)
 	c:RegisterEffect(e3)
 end
-    -- Añadir a la mano 
+    -- *EFECTO 1°
 function s.thfilter(c)
 	return c:IsOriginalRace(RACE_DIVINE) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE|LOCATION_REMOVED)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_HAND)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil)
 	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleHand(tp)
@@ -80,7 +80,7 @@ end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA)
 end
-    -- Ordenar cartas del Deck
+    -- *EFECTO 2°
 function s.costfilter(c)
 	return c:IsOriginalRace(RACE_DIVINE) and c:IsDiscardable()
 end
@@ -110,7 +110,7 @@ end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA)
 end
-    -- Robar y regresar
+    -- *EFECTO 3°
 function s.cfilter(c)
 	return c:IsOriginalRace(RACE_DIVINE) and not c:IsPublic()
 end

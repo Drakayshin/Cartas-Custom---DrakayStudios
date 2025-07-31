@@ -2,10 +2,10 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocación por Xyz
+	-- 	*Invocación por Xyz
 	Xyz.AddProcedure(c,s.mfilter,6,3,s.ovfilter,aux.Stringid(id,0),Xyz.InfiniteMats,s.xyzop)
 	c:EnableReviveLimit()
-	-- Evitar Destrucción
+	-- 	0° Evitar Destrucción
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -13,52 +13,52 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetTarget(s.reptg)
 	c:RegisterEffect(e0)
-    -- Equipar 1 Dragon o Máquina de cualquier Cementerio a esta carta
+    -- 	1° Equipar 1 Dragon o Máquina de cualquier Cementerio a esta carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetTarget(Cyberdark.EquipTarget(aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON+RACE_MACHINE),true,true))
-	e1:SetOperation(Cyberdark.EquipOperation(aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON+RACE_MACHINE),s.equipop,true))
+	e1:SetTarget(Cyberdark.EquipTarget(aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON|RACE_MACHINE),true,true))
+	e1:SetOperation(Cyberdark.EquipOperation(aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON|RACE_MACHINE),s.equipop,true))
 	c:RegisterEffect(e1)
 	aux.AddEREquipLimit(c,nil,s.eqval,s.equipop,e1)
-    -- Ataque directo
+    -- 	2° Ataque directo
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_DIRECT_ATTACK)
+    e2:SetCondition(s.indcon)
+	c:RegisterEffect(e2)
+	-- 	3° Cambio de ATK por Ataque directo
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetCondition(s.atkcon)
+	e3:SetOperation(s.atkop)
+	c:RegisterEffect(e3)
+    -- 	4° Penetración
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_DIRECT_ATTACK)
+	e4:SetCode(EFFECT_PIERCE)
     e4:SetCondition(s.indcon)
 	c:RegisterEffect(e4)
-	-- Cambio de ATK por Ataque directo
+    -- 	5° Daño por efecto
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCondition(s.atkcon)
-	e5:SetOperation(s.atkop)
+	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetCategory(CATEGORY_DAMAGE)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetCode(EVENT_BATTLE_DESTROYING)
+	e5:SetCondition(s.indcon)
+	e5:SetTarget(s.damtg)
+	e5:SetOperation(s.damop)
 	c:RegisterEffect(e5)
-    -- Penetración
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_PIERCE)
-    e6:SetCondition(s.indcon)
-	c:RegisterEffect(e6)
-    -- Daño por efecto
-	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(id,1))
-	e7:SetCategory(CATEGORY_DAMAGE)
-	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e7:SetCode(EVENT_BATTLE_DESTROYING)
-	e7:SetCondition(s.indcon)
-	e7:SetTarget(s.damtg)
-	e7:SetOperation(s.damop)
-	c:RegisterEffect(e7)
 end
 s.listed_series={SET_CYBER,SET_CYBERDARK}
-	-- Invocación Sobre Xyz
+	-- 	*Filtro de materiales
 function s.mfilter(c,xyz,sumtype,tp)
 	return c:IsRace(RACE_MACHINE,xyz,sumtype,tp)
 end
@@ -70,13 +70,13 @@ function s.xyzop(e,tp,chk)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	return true
 end
-	-- Evitar Destrucción
+	-- 	*EFECTO 0°
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
 	return Duel.SelectEffectYesNo(tp,c,96) and c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)>0
 end
-    -- Equipar 1 Dragon o Máquina en tu Cementerio a esta carta
+    -- 	*EFECTO 1°
 function s.eqval(ec,c,tp)
 	return ec:IsControler(tp) and ec:IsRace(RACE_DRAGON+RACE_MACHINE)
 end
@@ -92,11 +92,11 @@ function s.equipop(c,e,tp,tc)
 	e2:SetValue(atk)
 	tc:RegisterEffect(e2)
 end
-	-- Condición general (Materiales especificos)
+	-- 	*Condición general (Materiales especificos)
 function s.indcon(e)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,2,nil,0x4093)
 end
-    -- Cambio de ATK por Ataque directo
+    -- 	*EFECTO 3°
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttackTarget()==nil and e:GetHandler():IsHasEffect(EFFECT_DIRECT_ATTACK)
 		and Duel.IsExistingMatchingCard(aux.NOT(Card.IsHasEffect),tp,0,LOCATION_MZONE,1,nil,EFFECT_IGNORE_BATTLE_TARGET)
@@ -120,7 +120,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-    -- Causar daño
+-- 	*EFECTO 5°
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)

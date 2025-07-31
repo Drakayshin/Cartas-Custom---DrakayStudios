@@ -2,14 +2,14 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Activar desde la mano
+    -- 	0° Activar desde la mano
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e0:SetCondition(s.handcon)
+	e0:SetCondition(function(e) return Duel.IsExistingMatchingCard(s.hfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil) end)
 	c:RegisterEffect(e0)
-	-- Invocar y cambiar ataque
+	-- 	1° Invocar de Modo Especial 1 "Defensor de Oricalcos" y cambiar ataque declarado
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-    -- Añadir a la mano 1 monstruo del cementerio
+    -- 	2° Añadir a la mano 1 monstruo del cementerio que mencione "El Sello de Oricalcos"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -35,14 +35,11 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={id,48179391,125,130,129}
-    -- Activar desde la mano
-function s.hfilter0(c)
+    --	*EFECTO 0°
+function s.hfilter(c)
 	return c:IsFaceup() and c:IsCode(48179391,125,130)
 end
-function s.handcon(e)
-	return Duel.IsExistingMatchingCard(s.hfilter0,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
-end
-    -- Invocar y cambiar ataque
+    -- 	*EFECTO 1°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
@@ -51,19 +48,19 @@ function s.spfilter(c,e,tp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_REMOVED)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,1,nil,e,tp):GetFirst()
 	local at=Duel.GetAttacker()
 	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 and at and at:CanAttack() and not at:IsImmuneToEffect(e) then
 		Duel.CalculateDamage(at,tc)
 	end
 end
-    -- Añadir a la mano 1 monstruo del cementerio
+    -- 	*EFECTO 2°
 function s.thfilter(c)
 	return c:IsMonster() and c:ListsCode(48179391) and c:IsAbleToHand()
 end

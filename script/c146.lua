@@ -2,10 +2,10 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- No se activan cartas o efectos por tu adversario por la Invocación
+    -- 	0° No se activan cartas o efectos por tu adversario por la Invocación
     local e0=Ritual.AddProcGreaterCode(c,10,nil,147)
     e0:SetTarget(s.target(e0))
-	-- Recuperar y robar 1 carta
+	-- 	1° Barajar 1 "Luzbel, El Querubín Ungido" y esta carta en tu Cementerio y robar 1 carta
     local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
 end
-    -- No se activan cartas o efectos por tu adversario
+    -- 	*No se activan cartas o efectos por tu adversario
 function s.target(eff)
 	local tg = eff:GetTarget()
 	return function(e,...)
@@ -30,7 +30,7 @@ end
 function s.chlimit(e,ep,tp)
 	return tp==ep
 end
-    -- Recuperar y robar 1 carta
+    -- 	*EFECTO 1°
 s.listed_names={147}
 function s.costfilter(c)
 	return c:IsCode(147) and c:IsAbleToDeck()

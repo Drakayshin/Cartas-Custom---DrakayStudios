@@ -2,9 +2,8 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Proceso de Péndulo
 	Pendulum.AddProcedure(c)
-    -- Invocar de Modo Especial
+    -- 	0° Invocar de Modo Especial 1 monstruo Dinosaurio, Reptil o Serpiente Marina que tengan Nivel entre tus Escalas de Péndulo
     local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -16,9 +15,9 @@ function s.initial_effect(c)
 	e0:SetOperation(s.spop)
 	c:RegisterEffect(e0)
 
-    -- Efecto de Péndulo
+    -- EFECTO DE PENDULO
 
-    -- Destruir y Invocar de Modo Especial
+    -- 	1° Destruir y Invocar de Modo Especial Dinosaurio, Reptil o Serpiente Marina desde tu mano
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(8463720,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
@@ -30,7 +29,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
 end
-    -- Invocar de Modo Especial
+    -- 	*EFECTO 0°
 function s.spfilter(c,e,tp,lsc,rsc)
 	local lv=c:GetLevel()
 	return c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and c:HasLevel() and lv>lsc and lv<rsc
@@ -58,7 +57,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-	-- Destruir y Invocar
+	--	*EFECTO 1°
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end

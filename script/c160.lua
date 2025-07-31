@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Añadir 1 monstruo y/o Invocar de Modo Especial
+	-- 	0° Añadir 1 monstruo de Volteo/Invocar de Modo Especial 1 monstruo de Volteo de Nivel 5 o mayor
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,6 +13,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 end
 s.listed_series={0x15b}
+	--	*EFECTO 0°
 function s.ldlv7filter(c)
 	return c:IsLevelAbove(5) and c:IsType(TYPE_FLIP)
 end

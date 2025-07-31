@@ -2,13 +2,13 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación
+	-- 	0° Invocar por Ritual
 	local e0=Ritual.CreateProc({handler=c,lvtype=RITPROC_EQUAL,location=LOCATION_GRAVE|LOCATION_REMOVED,matfilter=s.mfilter})
-	e0:SetCountLimit(1,id)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
+	e0:SetCountLimit(1,{id,0})
 	e0:SetCost(s.thcost)
 	c:RegisterEffect(e0)
-	-- Evitar Destrucción
+	-- 	1° Evitar Destrucción de uno o más Monstruos Ritual
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EFFECT_DESTROY_REPLACE)
@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.repop)
 	c:RegisterEffect(e1)
 end
+	--	*EFECTO 0°
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
@@ -26,7 +27,7 @@ end
 function s.mfilter(c)
 	return c:IsLocation(LOCATION_MZONE)
 end
-    --Evitar destrucción
+    --	*EFECTO 1°
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
 		and c:IsType(TYPE_RITUAL) and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT)

@@ -2,9 +2,9 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Limite de ser Invocado 1 vez por turno
+    -- 	*Limite de ser Invocado 1 vez por turno
 	c:SetSPSummonOnce(id)
-    -- Tipo de carta por Tipo de Invocación
+    -- 	0° Tratar esta carta como Normal en tu Mano
     local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -12,11 +12,11 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_ADD_TYPE)
 	e0:SetValue(TYPE_NORMAL)
 	c:RegisterEffect(e0)
-	local e1=e0:Clone()
-	e1:SetCode(EFFECT_REMOVE_TYPE)
-	e1:SetValue(TYPE_EFFECT)
-	c:RegisterEffect(e1)
-	-- Destrucción por Tipo de Invocación
+	local e0a=e0:Clone()
+	e0a:SetCode(EFFECT_REMOVE_TYPE)
+	e0a:SetValue(TYPE_EFFECT)
+	c:RegisterEffect(e0a)
+	-- 1° Destruir monstruos que controle tu adversario que tengan ATK o DEF igual o menor al ATK/DEF de esta carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -25,7 +25,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-    -- Invocar de Modo Especial
+    -- 2° Invocar de Modo Especial a esta carta desde el Cementerio
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 end
-    -- Destrucción por Tipo de Invocación
+    --	*FECTO 1°
 function s.filter(c,atk)
 	return c:IsFaceup() and (c:IsAttackBelow(atk) or c:IsDefenseBelow(atk))
 end
@@ -57,7 +57,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 	end
 end
-    -- Invocar de Modo Especial
+    --	*FECTO 2°
 function s.filter1(c)
 	return (c:IsCode(id) and c:IsFaceup())
 end
@@ -74,7 +74,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e)
 		and not Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_ONFIELD,0,1,nil)then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
-        -- Barajalo a tu Deck cuando deje el Campo
+        --	*Barajalo a tu Deck cuando deje el Campo
         local e2=Effect.CreateEffect(e:GetHandler())
         e2:SetDescription(3900)
 		e2:SetType(EFFECT_TYPE_SINGLE)

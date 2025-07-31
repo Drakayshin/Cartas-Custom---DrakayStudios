@@ -2,17 +2,16 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Proceso de Péndulo
 	Pendulum.AddProcedure(c)
-    -- Inafectada
+    -- 	0° Inafectada por efectos de monstruo que no sean Péndulo
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
-	e0:SetValue(s.efilter)
+	e0:SetValue(function(e,te) return te:IsMonsterEffect() and not te:GetOwner():IsType(TYPE_PENDULUM) end)
 	c:RegisterEffect(e0)
-    -- Ganar ATK
+    -- 	1° Gana la mitad del ataque del monstruo destruido por batalla contra esta carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
@@ -20,9 +19,9 @@ function s.initial_effect(c)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 
-    -- Efecto de Péndulo
-
-	-- Añadir a la mano 2 monstruos Péndulo
+	-- 	EFECTO DE PENDULO
+	
+	-- 	2° Añadir a la mano 2 monstruos Péndulo
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -32,17 +31,13 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-    -- Inafectada
-function s.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER) and te:IsActivated() and not te:GetOwner():IsType(TYPE_PENDULUM)
-end
-    -- Ganar ATK
+	--	*EFECTO 1°
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		local bc=c:GetBattleTarget()
 		local atk=math.max(bc:GetBaseAttack(),bc:GetBaseDefense())/2		
-		--Increase ATK
+		--	*Incrementar ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -51,7 +46,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-	-- Añadir a la mano
+	--	*EFECTO 2°
 function s.filter(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and c:IsAbleToHand()
 end

@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Ganar LP por ATK
+    -- 	0° Ganar LP igual al ATK de un monstruo en el Campo, y si lo haces, reducer su ATK a 0
     local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_RECOVER)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.atktg)
 	e0:SetOperation(s.atkop)
 	c:RegisterEffect(e0)
-	-- Cannot be destroyed by battle with monsters of the same type
+	-- 	1° No puede ser destruido en batalla
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	-- Voltear y Negar por selección
+	--	2° Negar activación de la carta que seleccione esta carta boca abajo y destruirla
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
-    -- Ganar LP por ATK
+    -- 	*EFECTO 0°
 function s.filter(c)
 	return c:IsFaceup() and c:GetAttack()>0
 end
@@ -59,7 +59,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Recover(tp,atk,REASON_EFFECT)
 	end
 end
-    -- Voltear, Negar y destruir
+    -- 	*EFECTO 2°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

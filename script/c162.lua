@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Reducir ATK y negar efectos
+	-- 	0° Reducir ATK a 0 y negar efectos de un monstruo en el Campo del adversario
     local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_DISABLE)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
     e0:SetTarget(s.target)
 	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
-	-- Voltear y Negar por selección
+	-- 	1° Negar activación de la carta que seleccione esta carta boca abajo y destruirla
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
 end
-    -- Cambiar ATK y negar efectos
+    -- 	*EFECTO 0°
 function s.filter(c)
 	return c:IsFaceup() and c:GetAttack()>0
 end
@@ -60,7 +60,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 	end
 end
-    -- Negar y destruir
+    -- 	*EFETO 1°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

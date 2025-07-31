@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
-    -- Activar desde la mano
+    -- 	0° Activar desde la mano
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -11,14 +11,14 @@ function s.initial_effect(c)
 	e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	e0:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>0 end)
 	c:RegisterEffect(e0)
-    -- Cadena limitada
+    -- 	1° Cadena limitada a los efectos de monstruo Bestia Divina
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
     e1:SetCode(EVENT_CHAINING)
     e1:SetRange(LOCATION_FZONE)
     e1:SetOperation(s.chainop)
     c:RegisterEffect(e1)
-	-- Activación y poder robar
+	-- 	2° Activación y poder robar
 	local e2=Effect.CreateEffect(c)
     e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
     e2:SetCountLimit(1,{id,1})
 	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
-    -- Reducir daño a la mitad en un turno
+    -- 	3° Reducir daño recibido a la mitad durante este turno
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(EFFECT_CHANGE_DAMAGE)
@@ -40,7 +40,16 @@ function s.initial_effect(c)
 	e3:SetOperation(s.SetOperation)
 	c:RegisterEffect(e3)
 end
-    -- Robar
+    -- 	*EFECTO 1°
+function s.chainop(e,tp,eg,ep,ev,re,r,rp)
+	if re:GetHandler():IsRace(RACE_DIVINE) and re:GetHandler():IsLevel(12) then
+		Duel.SetChainLimit(s.chainlm)
+	end
+end
+function s.chainlm(e,rp,tp)
+	return tp==rp
+end
+    -- 	*EFECTO 2°
 function s.cfilter(c)
 	return c:IsRace(RACE_DIVINE) and not c:IsPublic()
 end
@@ -61,23 +70,14 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(tp,ct,REASON_EFFECT)
 	end
 end
-    -- Cadena limitada
-function s.chainop(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler():IsRace(RACE_DIVINE) and re:GetHandler():IsLevel(12) then
-		Duel.SetChainLimit(s.chainlm)
-	end
-end
-function s.chainlm(e,rp,tp)
-	return tp==rp
-end
-    -- Reducir daño a la mitad
+    --	*EFECTO 3°
 function s.SetCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToGraveAsCost() and c:IsStatus(STATUS_EFFECT_ENABLED) end
 	Duel.SendtoGrave(c,REASON_COST)
 end
 function s.SetOperation(e,tp,eg,ep,ev,re,r,rp)
-	-- Reducir daño a la mitad
+	-- 	*Reducir daño recibido a la mitad este turno
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)

@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Indestructibles por efecto la 1° vez
+	-- 	0° Evitar destrucción de monstruos "LV" por efecto la 1° vez
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e0:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x41))
 	e0:SetValue(s.indct)
 	c:RegisterEffect(e0)
-	-- Activate + Efecto de busqueda
+	-- 	1° Activación/busquecar o Invocar de Modo Especial un monstruo "LV" de Nivel 5 o menor en tu Deck
 	local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	-- Recuperar 3 cartas por seleccion
+	-- 	2° Barajar 3 cartas entre monstruo "LV" y/o Mágica/Trampa "Antología"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e8,0x41}
-    -- Indestructibles por efecto
+    -- 	*EFECTO 0°
 function s.indct(e,re,r,rp)
 	if r&REASON_EFFECT==REASON_EFFECT then
 		return 1
@@ -44,19 +44,19 @@ function s.indct(e,re,r,rp)
 		return 0
 	end
 end
-    -- Activación
+    -- 	*EFECTO 1°
 function s.sfilter(c)
 	return c:IsSetCard(0x41) and c:IsLevelBelow(5) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,ft)
+	local g=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp,ft)
 	local sc=g:GetFirst()
 	if sc then
 		Duel.BreakEffect()
@@ -67,16 +67,16 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		aux.Stringid(id,1))
 	end
 end
-	-- Recuperar 3 cartas por seleccion
+	-- 	EFECTO 2°
 function s.filter(c)
 	return (c:IsSetCard(0x3e8) or c:IsSetCard(0x41)) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter(chkc) end
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
-		and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
+		and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,3,nil)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,3,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,3,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end

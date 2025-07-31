@@ -2,23 +2,23 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	--	*Solo puedes controlar 1 en tu Campo
 	c:SetUniqueOnField(1,0,id)
-	-- Activación
+	-- 	0° Activación
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
-	--Additional Normal summon
+	--	1° Invocación adicinal de Modo Normal a un Monstruo Ciberso
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
-	e1:SetCountLimit(1)
-	e1:SetTarget(s.extg)
+	e1:SetTargetRange(LOCATION_HAND|LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_CYBERSE|RACE_MACHINE))
 	c:RegisterEffect(e1)
-    -- Desterrar y robar
+    -- 	2° Desterrar y robar 1 carta
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_REMOVE)
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.activate)
 	c:RegisterEffect(e2)
-	-- ATK UP
+	-- 3° Aumentar el ATK de un monstruo Ciberso por su DEF
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,3))
 	e3:SetCategory(CATEGORY_ATKCHANGE)
@@ -46,11 +46,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
 end
-	-- Invocación adicional
-function s.extg(e,c)
-	return c:IsRace(RACE_CYBERSE) or c:IsRace(RACE_MACHINE)
-end
-    -- Descarte, Robo y destierro
+    -- 	*EFECTO 2°
 function s.cfilter(c)
 	return c:IsRace(RACE_CYBERSE) and c:IsDiscardable()
 end
@@ -80,7 +76,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-    -- ATAK UP
+    -- 	*EFECTO 3°
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
@@ -89,9 +85,9 @@ function s.atkcfilter(c)
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(s.atkcfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.atkcfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,s.atkcfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.atkcfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
 function s.atkfilter(c)

@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Añadir 1 monstruo que mencione al "El Sello del Oricalcos"
+	-- 	0° Añadir 1 monstruo que mencione al "El Sello del Oricalcos"
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,2))
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-	-- Negar Ataque y cambiar la posicion de batalla
+	-- 	1° Negar Ataque y cambiar la posicion de batalla
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_POSITION)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.natg)
 	e1:SetOperation(s.naop)
 	c:RegisterEffect(e1)
-	-- Invocar de Modo especial y alterar ATK/DEF
+	-- 	2° Invocar de Modo especial y alterar ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_ATKCHANGE)
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={48179391}
-	-- Añadir 1 monstruo que mencione al "El Sello del Oricalcos"
+	-- 	*EFECTO 0°
 function s.thfilter(c)
 	return c:ListsCode(48179391) and c:IsMonster() and not c:IsCode(id) and c:IsAbleToHand()
 end
@@ -54,7 +54,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-	-- Negar Ataque y cambiar la posicion de batalla
+	-- 	*EFECTO 1°
 function s.natg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
@@ -65,7 +65,7 @@ function s.naop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEUP_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end
-	-- Invocar de Modo especial y reducir ATK/DEF
+	-- 	*EFECTO 2°
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
@@ -85,7 +85,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		-- Covertir el ATK/DEF a la mitad
+		--	*Reducir el ATK/DEF a la mitad
 		local tc=Duel.GetFirstTarget()
 		if not (tc:IsRelateToEffect(e) and tc:IsFaceup()) then return end
 		local e1=Effect.CreateEffect(c)

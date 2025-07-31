@@ -2,15 +2,14 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar 1 por turno
+	-- 	*Invocar 1 por turno
 	c:SetSPSummonOnce(id)
-	-- Material de Fusión
+	-- 	*Invocar por Fusión
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
-	-- Alt. Invocación Especial
+	-- 	*Alt. Invocación por contacto
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
-
-    -- Reducir ATK/DEF
+    -- 	0° Reducir 1900 el ATK/DEF del monstruo que destruya por batalla a esta carta 
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,1))
 	e0:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
@@ -19,7 +18,7 @@ function s.initial_effect(c)
 	e0:SetOperation(s.desop)
 	c:RegisterEffect(e0)
 end
-    -- Material de Fusión
+    -- 	*Filtro de materiales
 function s.matfilter1(c,fc,sumtype,tp)
 	return c:IsRace(RACE_PLANT,fc,sumtype,tp) and c:IsType(TYPE_NORMAL,fc,sumtype,tp)
 end
@@ -35,8 +34,7 @@ end
 function s.contactop(g)
 	Duel.Release(g,REASON_COST+REASON_MATERIAL)
 end
-
-    -- Al ser destruida
+    --	*EFECTO 0°
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetAttacker()

@@ -2,29 +2,29 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación
+	-- 	0° Activación
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
-	-- Limite de Invocación del Deck Extra
+	-- 	1° No puedes Invocar de Modo Especial desde el Deck Extra, excepto monstruos Péndulo
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
+	e1:SetTarget(function(e,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_PENDULUM) end)
 	c:RegisterEffect(e1)
-	-- ATK reducido
+	-- 	2° Monstruos que controle tu adversario pierden 500 ATK por cada monstruo boca abajo en tu Campo
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(0,LOCATION_MZONE)
-	e2:SetValue(s.atkvalue)
+	e2:SetValue(function(e,c) return Duel.GetMatchingGroupCount(Card.IsFacedown,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)*-500 end)
 	c:RegisterEffect(e2)
-	-- Cambiar Posición de Defensa
+	-- 	3° Cambiar Posición de Defensa
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -37,15 +37,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.activate)
 	c:RegisterEffect(e3)
 end
-	-- Limite de Invocación del Deck Extra
-function s.splimit(e,c)
-	return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_PENDULUM)
-end
-	-- ATK reducido
-function s.atkvalue(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsFacedown,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)*-500
-end
-	-- Cambiar Posición de Defensa
+	--	*EFECTO 3°
 function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FLIP) and c:IsCanTurnSet()
 end

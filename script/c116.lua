@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-    -- Invocación Ritual
+    -- 	0° Invocación Ritual
 	local e0=Ritual.AddProcEqual{handler=c,filter=s.ritualfil,nil,nil,nil}
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e0:SetType(EFFECT_TYPE_IGNITION)
@@ -11,14 +11,14 @@ function s.initial_effect(c)
 	e0:SetCountLimit(1,id)
 	e0:SetCost(s.thcost)
 	c:RegisterEffect(e0)
-	-- Efectos negados
+	-- 	1° Efectos negados
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetCode(EFFECT_DISABLE)
 	c:RegisterEffect(e1)
-    -- Invocar durante la 2da Stadby Phase
+    -- 	2° Invocar durante la 2da Stadby Phase 1 monstruo Normal y doblar su ATK/DEF
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={229}
-    -- Invocar por Ritual
+    -- 	*EFECTO 0°
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsPublic() end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
@@ -39,7 +39,7 @@ end
 function s.ritualfil(c)
 	return c:IsLevelBelow(8) and c:IsRitualMonster()
 end
-    -- Invocar durante la 2da siguiente Stadby Phase
+    -- 	*EFECTO 2°
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
@@ -49,7 +49,7 @@ function s.filter(c,e,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
     local e1=Effect.CreateEffect(e:GetHandler())
@@ -72,20 +72,22 @@ end
 function s.spop1(e,tp,eg,ep,ev,re,r,rp)
     if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local c=e:GetHandler()
-	local tc=g:GetFirst()
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_SET_ATTACK)
-	e2:SetValue(tc:GetBaseAttack()*2)
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-	tc:RegisterEffect(e2)
-    local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_SET_DEFENSE)
-	e3:SetValue(tc:GetBaseDefense()*2)
-	e3:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-	tc:RegisterEffect(e3)
-	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		local c=e:GetHandler()
+		local tc=g:GetFirst()
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_SET_ATTACK)
+		e2:SetValue(tc:GetBaseAttack()*2)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+		tc:RegisterEffect(e2)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_SET_DEFENSE)
+		e3:SetValue(tc:GetBaseDefense()*2)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+		tc:RegisterEffect(e3)
+	end
 end

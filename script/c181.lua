@@ -2,30 +2,30 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Daño a los LP del Adversario
+    -- 	0° Daño a los LP del Adversario
     local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_DAMAGE)
 	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_DRAW_PHASE)
-    e0:SetCountLimit(1,id)
-    e0:SetCondition(s.condition)
+    e0:SetCountLimit(1,{id,0})
+    e0:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return Duel.GetLP(tp)>Duel.GetLP(1-tp) end)
 	e0:SetTarget(s.dmtarget)
 	e0:SetOperation(s.dmact)
 	c:RegisterEffect(e0)
-	-- Ganar LP
+	-- 	1° Ganar LP
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-    e1:SetCountLimit(1,id)
-    e1:SetCondition(s.condition1)
+    e1:SetCountLimit(1,{id,0})
+    e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return Duel.GetLP(tp)<Duel.GetLP(1-tp) end)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-    -- Colocar esta carta, regresando otra
+    -- 	2° Colocar esta carta, regresando otra en tu Campo a tu mano
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -39,11 +39,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={id,48179391,125,130}
-    -- Condición de activación
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetLP(tp)>Duel.GetLP(1-tp)
-end
-    -- Causar daño
+    -- 	*EFCTO 0°
 function s.dmtarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)~=0 end
 	Duel.SetTargetPlayer(1-tp)
@@ -56,10 +52,7 @@ function s.dmact(e,tp,eg,ep,ev,re,r,rp)
 	local dam=Duel.GetFieldGroupCount(p,0,LOCATION_MZONE)*500
 	Duel.Damage(p,dam,REASON_EFFECT)
 end
-    -- Ganar LP
-function s.condition1(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetLP(tp)<Duel.GetLP(1-tp)
-end
+    -- 	*EFECTO 1°
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)>0 end
 	local rec=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)*500
@@ -72,7 +65,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local rec=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)*500
 	Duel.Recover(p,rec,REASON_EFFECT)
 end
-    -- Colocar esta carta y regresar otra
+    -- 	*EFECTO 2°
 function s.setcond(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end

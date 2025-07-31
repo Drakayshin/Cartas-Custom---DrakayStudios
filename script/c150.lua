@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Buscar cartas
+	-- 	0° Añadir 1 monstruo "LV" y una carta en mencione "LV"
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	-- Evitar destrucción
+	-- 	1° Evitar destrucciónde uno o más monstruos "LV"
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EFFECT_DESTROY_REPLACE)
@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x41,0x3e8}
-	-- Buscar cartas
+	--	*EFECTO 0°
 function s.filter1(c)
 	return c:IsSetCard(0x41) and c:IsAbleToHand()
 end
@@ -31,13 +31,13 @@ function s.filter2(c)
 	return  not c:IsCode(id) and c:IsAbleToHand() and c:IsSpellTrap() and (c:IsSetCard(0x3e8) or c:IsCode(25290459) or c:IsCode(61850482) or c:IsCode(88089103) or c:IsCode(90500169))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
-		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK+LOCATION_GRAVE)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK|LOCATION_GRAVE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetMatchingGroup(s.filter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
-	local g2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+	local g1=Duel.GetMatchingGroup(s.filter1,tp,LOCATION_DECK|LOCATION_GRAVE,0,nil)
+	local g2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_DECK|LOCATION_GRAVE,0,nil)
 	if #g1>0 and #g2>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg1=g1:Select(tp,1,1,nil)
@@ -63,7 +63,7 @@ end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA)
 end
-	-- Evitar destrucción
+	-- 	*EFECTO 1°
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x41) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) 
 		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT+REASON_BATTLE)

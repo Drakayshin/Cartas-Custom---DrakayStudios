@@ -2,30 +2,31 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
+	--	*Solo puedes controlar 1 en tu Campo
     c:SetUniqueOnField(1,0,id)
-	-- Invocación de Sincronía
+	-- 	*Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsType,TYPE_SYNCHRO),1,99)
-	-- Limite de Invocación
+	-- 	*Limite de Invocación de Modo Especial
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetRange(LOCATION_GRAVE,LOCATION_REMOVED)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetValue(s.splimit)
+	e0:SetValue(function(e,se,sp,st) return se:GetHandler():IsSetCard(0x3eb) end)
 	c:RegisterEffect(e0)
-	-- No recibes daño de batalla de esta carta
+	-- 	1° No recibes daño de batalla que involucre a carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	-- Ataque directo
+	-- 	2° Ataque directo
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DIRECT_ATTACK)
 	c:RegisterEffect(e2)
-	-- invocar de Modo Especial
+	-- 	3° invocar de Modo Especial 1 monstruo "Empíreo" en tu Cementerio o desterrado
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -36,7 +37,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-    -- Destruir monstruo
+    -- 	4° Destruir 1 monstruo en el Campo del adversario e infligirle daño igual al ATK original de ese monstruo
     local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -49,28 +50,24 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x3eb}
-	-- Debe ser Invocada de forma especifica
-function s.splimit(e,se,sp,st)
-	return se:GetHandler():IsSetCard(0x3eb)
-end
-	-- Invocar de Modo Especial
+	-- 	*EFECTO 3°
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x3eb) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE|LOCATION_REMOVED)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-    -- Destruir monstruo
+    -- 	*EFECTO 4°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and Duel.GetAttackTarget()==nil
 end

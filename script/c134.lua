@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Negar efecto de monstruo/Activar e invocar
+	-- 	0° Negar la activación de monstruo/Activar e invocar
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_NEGATE)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,16 +13,16 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	-- Puedes activar desde la mano
+	-- 	1° Puedes activar desde la mano
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e1:SetCondition(s.handcon)
+	e1:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0 end)
 	c:RegisterEffect(e1)
 end
 s.listed_names={id,48179391}
-    -- Costo Mitad de LP
+    -- 	*EFECTO 0°
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
@@ -34,7 +34,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
-    -- Negar y activar Carta Magica de Campo
+    -- 	*EFECTO 0° (Activar 1 "El Sello de Oricalcos, y Invocar de Modo Especial "Dartz, Regente del Oricalcos")
 function s.filter(c,tp)
 	return c:IsCode(48179391,125,130) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
@@ -43,7 +43,7 @@ function s.filter1(c,e,tp)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) then
-		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,nil,tp)
+		local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE,0,nil,tp)
         if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
             Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
             local tc=g:Select(tp,1,1,nil):GetFirst()
@@ -59,13 +59,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         end
         if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-        local tc=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+        local tc=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
         if tc then
             Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
         end
     end
-end
-	-- Activar desde la mano
-function s.handcon(e)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0
 end

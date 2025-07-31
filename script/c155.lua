@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activación
+	--	0° Añadir efectos a un monstruo "Saurio Guerrero"
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
     e0:SetCategory(CATEGORY_DESTROY)
@@ -16,9 +16,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 end
 s.listed_series={0x3ea,65601601}
-
+	--	*EFECTO 0°
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsSetCard(65601601)
+	return c:IsFaceup() and c:IsSetCard(0x3ea)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tgfilter(chkc) end

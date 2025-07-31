@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación e Invocación
+	-- 	0° Invocar de Modo Especial hasta 2 monstruos "Dragoncella" de Nivel 4 o menor, desde tu mano
 	local e0=Effect.CreateEffect(c)
     e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	--Barajear hasta 5 "Dragoncella" al Deck
+	--	1° Barajear hasta 5 monstruos "Dragoncella" y/o Dragón en tu Cementerio al Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TODECK)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x133}
-	-- Invocar
+	-- 	*EFECTO 0°
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,3) and 
 	Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>3 end
@@ -51,7 +51,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-	-- Recuperar
+	--	*EFECTO 1°
 function s.tdfilter(c)
 	return c:IsMonster() and c:IsSetCard(0x133) or c:IsRace(RACE_DRAGON) and c:IsAbleToDeck()
 end

@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Buscar y poder robar
+	-- 	0° Buscar 1 monstruo Bestia Divina y poder robar 1 carta
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DRAW)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-    -- Negar efecto
+    -- 	1° Negar efecto acivado por tu adversario
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetCategory(CATEGORY_DISABLE)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
 end
-    -- Buscar y poder robar
+    -- 	*EFECTO 0!
 function s.thfilter(c)
 	return c:IsRace(RACE_DIVINE) and c:IsAbleToHand()
 end
@@ -48,7 +48,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-    -- Negar efecto
+    -- 	*EFECTO 1°
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_DIVINE)
 end

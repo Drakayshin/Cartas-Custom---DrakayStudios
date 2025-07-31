@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--Invocar de Modo Especial
+	--	0° Invocar de Modo Especial si es destruida
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -13,38 +13,33 @@ function s.initial_effect(c)
 	e0:SetOperation(s.operation)
 	e0:SetLabel(0)
 	c:RegisterEffect(e0)
-    --ATK UP x cada Invocacion
+    --	1° Gana 500 ATK/DEF x cada Invocacion por su efecto
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_MZONE)
     e2:SetCondition(s.oricalcon)
-	e2:SetValue(s.val)
+	e2:SetValue(function(e,c) return e:GetLabelObject():GetLabel()*500 end)
 	e2:SetLabelObject(e0)
 	c:RegisterEffect(e2)
-    -- DEF UP x cada Invocacion
+	local e2a=e2:Clone()
+	e2a:SetCode(EFFECT_UPDATE_DEFENSE)
+    e2a:SetCondition(s.oricalcon)
+	c:RegisterEffect(e2a)
+	-- 	3° Reduce el daño de batalla que involucre a esta carta a tu adversario
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	e3:SetRange(LOCATION_MZONE)
-    e3:SetCondition(s.oricalcon)
-	e3:SetValue(s.val)
-	e3:SetLabelObject(e0)
+	e3:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	e3:SetValue(aux.ChangeBattleDamage(1,HALF_DAMAGE))
 	c:RegisterEffect(e3)
-	-- Reduce el daño de batalla de tu adversario a la mitad
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
-	e4:SetValue(aux.ChangeBattleDamage(1,HALF_DAMAGE))
-	c:RegisterEffect(e4)
 end
 s.listed_names={48179391}
+	--	*Condición general de los siguientes efectos
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
-    -- Invocar de Modo Especial
+	--	*EFECTO 0°
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -63,7 +58,4 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 	end
-end
-function s.val(e,c)
-	return e:GetLabelObject():GetLabel()*500
 end

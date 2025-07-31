@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación e Invocación
+	-- 	0° Invocar de Modo Especial hasta 2 Dragoncella y regresar hasta 2 monstruo en el Campo del adversario
 	local e0=Effect.CreateEffect(c)
     e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 end
 s.listed_series={0x133}
-	-- Invocar y regresar
+	-- 	*EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x133),tp,LOCATION_MZONE,0,1,nil)
 end
@@ -47,7 +47,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         end
 	end
     Duel.SpecialSummonComplete()
-    -- Invocar solo monstruos Dragoncella
+    -- 	*Invocar monstruos "Dragoncella" este turno
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)

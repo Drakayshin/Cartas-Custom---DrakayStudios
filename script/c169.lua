@@ -2,12 +2,12 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Activación
+	-- 	0° Activación
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
-	-- Reducir a la mitad del daño
+	-- 	1° Reducir a la mitad del daño
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	e1:SetCountLimit(2)
 	e1:SetOperation(s.rdop)
 	c:RegisterEffect(e1)
-	-- Destierro
+	-- 	2° Desterrar 1 monstruo dependiendo el resultado del efecto
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_COIN+CATEGORY_DAMAGE)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.toss_coin=true
-	-- Daño por batalla a la mitad
+	-- 	*EFECTO 1°
 function s.rdop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.Hint(HINT_CARD,1-tp,id)
@@ -39,7 +39,7 @@ function s.rdop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	end
 end
-	-- Destierro por lanzamiento de moneda
+	-- 	*EFECTO 1°
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_MZONE,0,1,nil)

@@ -3,9 +3,9 @@
 local s,id=GetID()
 function s.initial_effect(c)
     Pendulum.AddProcedure(c)
-    -- Invocación 1 vez por turno
+    -- 	*Invocación de esta carta 1 vez por turno
 	c:SetSPSummonOnce(id)
-    -- Inafectador por Nivel/Rango menor
+    -- 	0° Inafectador por Nivel/Rango menor
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -13,12 +13,12 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetValue(aux.qlifilter) -- Condición de Nivel/Rango usado en Qli
 	c:RegisterEffect(e0)
-    -- Daño de Penetración
+    -- 	1° Daño de Penetración
     local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e1)
-    -- Ganar ATK
+    -- 	2° Sacrificar 1 monstruo y ganar su ATK original
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
@@ -29,18 +29,18 @@ function s.initial_effect(c)
 	e2:SetOperation(s.atop)
 	c:RegisterEffect(e2)
 
-    -- Efecto de Péndulo
+    -- EFECTO DE PENDULO
 
-    -- Limite de Invocación por Péndulo
+    -- 	3° Limite de Invocación por Péndulo
     local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_PZONE)
 	e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
 	e3:SetTargetRange(1,0)
-	e3:SetTarget(s.splimit)
+	e3:SetTarget(function(e,c,sump,sumtype,sumpos,targetp)return not c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and (sumtype&SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM end)
 	c:RegisterEffect(e3)
-    -- Destruir y buscar
+    -- 	4° Destruir y buscar
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -52,7 +52,7 @@ function s.initial_effect(c)
 	e4:SetOperation(s.thop)
 	c:RegisterEffect(e4)
 end
-    -- Ganat ATK
+    --	*EFECTO 2°
 function s.atkfilter(c)
 	return c:GetTextAttack()>0
 end
@@ -68,7 +68,7 @@ end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) then
-		--Increase ATK
+		--	*Incrementar ATK
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -77,11 +77,7 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-    -- Limite de Invocación por Péndulo
-function s.splimit(e,c,sump,sumtype,sumpos,targetp)
-	return not c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and (sumtype&SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
-end
-    -- Destruir y buscar
+    --	*EFECTO 4°
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_PZONE,0) == 1
 end

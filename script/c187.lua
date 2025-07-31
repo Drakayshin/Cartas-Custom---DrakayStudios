@@ -2,28 +2,28 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Solo 1 Boca arriba en tu campo
+	-- 	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Material de Fusión
+	-- 	Invocación por Fusión
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
-	-- Alt. Invocación Especial
+	-- 	*Alt. Invocación por contacto
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
-    -- No ser Material de Fusión
+    -- 	0° No ser Material de Fusión
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
-    -- Negar efectos
+    -- 	1° Niega los efectos de monstruos que batalle contra esta carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_BATTLE_START)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
-    -- Invocar de Modo Especial
+    -- 	2° Invocar de Modo Especial 1 monstruo Dragón, Guerrero o Wyrm
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x10cf}
-    -- Material de Fusión
+    -- 	*Filtro de materiales
 function s.matfilter1(c,fc,sumtype,tp)
 	return c:IsSetCard(0x10cf)
 end
@@ -51,7 +51,7 @@ end
 function s.contactop(g)
 	Duel.Release(g,REASON_COST+REASON_MATERIAL)
 end
-    -- Negar efectos
+    -- 	*EFECTO 1°
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetBattleTarget()
 	if tc then
@@ -67,20 +67,20 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 end
-    -- Invocar de Modo Especial
+    -- 	*EFECTO 2°
 function s.filter(c,e,tp)
 	return (c:IsRace(RACE_WARRIOR) or c:IsRace(RACE_DRAGON) or c:IsRace(RACE_WYRM)) and (c:IsLevelAbove(7) or c:IsRankAbove(7)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	-- Efecto
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.HintSelection(g,true)
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and not g:GetFirst():IsSetCard(0x10cf) then
 		local tg=Duel.SelectMatchingCard(tp,Card.IsMonster,tp,LOCATION_DECK,0,2,2,nil)

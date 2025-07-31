@@ -2,44 +2,39 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Materiales
+   	--	*Solo 1 en tu Campo
+	c:SetUniqueOnField(1,0,id)
+	-- 	*Invocación por Fusión
 	c:EnableReviveLimit()
 	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsType,TYPE_FUSION),s.matfilter,s.matfilter2,s.matfilter3)
-	-- Solo 1 Boca arriba en tu campo
-    c:SetUniqueOnField(1,0,id)
-	--Debe ser primero Invocador por Fusion
+	--	*Debe ser primero Invocador por Fusion
+	c:AddMustFirstBeFusionSummoned()
+	-- 	0° Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetValue(s.splimit)
+	e0:SetDescription(aux.Stringid(id,1))
+	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+    e0:SetProperty(EFFECT_FLAG_DELAY)
+	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e0:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
+	e0:SetCountLimit(1,{id,0})
+	e0:SetTarget(s.settg)
+	e0:SetOperation(s.setop)
 	c:RegisterEffect(e0)
-	-- Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
+    -- 	1° Negar y destruir una carta activada por tipo (Monstruo, Mágica, Trampa)
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetTarget(s.settg)
-	e1:SetOperation(s.setop)
-	c:RegisterEffect(e1)
-    -- Negate the activation of an opponent's card or effect
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e2:SetCode(EVENT_CHAINING)
-	e2:SetRange(LOCATION_MZONE)
-    e2:SetCountLimit(3,{id,2})
-    e2:SetCost(s.negcost)
-	e2:SetCondition(s.negcon)
-	e2:SetTarget(s.negtg)
-	e2:SetOperation(s.negop)
-    c:RegisterEffect(e2)
-	--Registro de Tipos
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e1:SetCode(EVENT_CHAINING)
+	e1:SetRange(LOCATION_MZONE)
+    e1:SetCountLimit(3,{id,1})
+    e1:SetCost(s.negcost)
+	e1:SetCondition(s.negcon)
+	e1:SetTarget(s.negtg)
+	e1:SetOperation(s.negop)
+    c:RegisterEffect(e1)
+	-- *Registro de Tipos
 	aux.GlobalCheck(s,function()
 		s.type_list={}
 		s.type_list[0]=0
@@ -50,7 +45,7 @@ function s.initial_effect(c)
 			end)
 		end)
 end
-    -- Materiales del Arquetipo con nombres diferentes
+	--	*Filtros de materiales
 function s.matfilter(c,fc,sumtype,tp)
 	return c:IsOnField() and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
 end
@@ -60,11 +55,7 @@ end
 function s.matfilter3(c,fc,sumtype,tp)
 	return c:IsOnField() and not c:IsType(TYPE_TOKEN,fc,sumtype,tp)
 end
-    -- Debe ser primero Invocador por Fusion
-function s.splimit(e,se,sp,st)
-	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
-end
-    -- Colocar hasta 3 Cartas Magicas/Trampas desde tu Deck
+	--	*EFECTO 1°
 function s.setfilter(c)
 	return (c:IsSpell() or c:IsTrap()) and c:IsSSetable()
 end
@@ -80,11 +71,11 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,sg)
 	end
 end
-    -- Negar y destruir
+	--	*EFECTO 2°
 function s.cfilter(c,rtype)
 	return (not c:IsOnField() or c:IsFaceup()) and c:IsType(rtype) and c:IsAbleToRemoveAsCost()
 end
-	-- Desterrar el mismo tipo de carta en tu Cementerio
+	-- 	*Desterrar el mismo tipo de carta en tu Cementerio
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rtype=(re:GetActiveType()&0x7)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil,rtype) end

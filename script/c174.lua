@@ -3,21 +3,21 @@
 local s,id=GetID()
 function s.initial_effect(c)
     Pendulum.AddProcedure(c,false)
-	-- Invocación por Sincronía
+	-- 	*Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_SYNCHRO),1,1,Synchro.NonTunerEx(Card.IsType,TYPE_SYNCHRO),1,99,s.exmatfilter)
-    -- Sin daño de batalla de esta carta
+    -- 	0° No recibes daño de batalla que involucre a carta
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
-    -- Ataque directo
+    -- 	1° Ataque directo
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DIRECT_ATTACK)
 	c:RegisterEffect(e1)
-    -- Cambiar su Posición de Batalla Luego de atacar
+    -- 	2° Cambiar su Posición de Batalla de esta carta Luego de atacar
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.poscon)
 	e2:SetOperation(s.posop)
 	c:RegisterEffect(e2)
-    -- invocar de Modo Especial
+    -- 	3° invocar de Modo Especial hasta 2 monstruos "Empíreo" en tu Cementerio o destierro
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -37,7 +37,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
-    -- Poner en Zona de Pendulo
+    -- 	4° Si es destruida en el Zona de Monstruos, Poner esta carta en la Zona de Péndulo
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -48,9 +48,9 @@ function s.initial_effect(c)
 	e4:SetOperation(s.penop)
 	c:RegisterEffect(e4)
 
-    -- Efecto de Péndulo
+    -- EFECTO DE PENDULO
 
-    -- Invocar 1 monstruo "Empíreo"
+    -- 	5° Invocar 1 monstruo "Empíreo" desde tu Cementerio o Destierro
 	local e5=Effect.CreateEffect(c)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetType(EFFECT_TYPE_IGNITION)
@@ -60,7 +60,7 @@ function s.initial_effect(c)
 	e5:SetTarget(s.sptg1)
 	e5:SetOperation(s.spop1)
 	c:RegisterEffect(e5)
-    -- Invocar en Zona de Péndulo
+    -- Invocar de Modo Especial a esta carta desde la Zona de Péndulo 
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,3))
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -74,11 +74,21 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 s.listed_series={0x3eb}
-    -- Trato de Cantante
+    -- 	*Tratar 1 monstruo "Empíreo" como Cantante
 function s.exmatfilter(c,scard,sumtype,tp)
 	return c:IsSetCard(0x3eb,scard,sumtype,tp)
 end
-	-- Invocar 1 monstruo desde el Cementerio 
+    -- 	*EFECTO 2°
+function s.poscon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetAttackedCount()>0
+end
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsAttackPos() then
+		Duel.ChangePosition(c,POS_FACEUP_DEFENSE)
+	end
+end
+	-- 	*EFECTO 3°
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x3eb) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -110,17 +120,7 @@ end
 function s.damval(e,re,val,r,rp,rc)
 	return math.floor(val/2)
 end
-    -- Cambiar su Posición de Batalla Luego de atacar
-function s.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetAttackedCount()>0
-end
-function s.posop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsAttackPos() then
-		Duel.ChangePosition(c,POS_FACEUP_DEFENSE)
-	end
-end
-    -- Poner en Zona de Pendulo
+    -- 	*EFECTO 4°
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return r&REASON_EFFECT+REASON_BATTLE~=0 and c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
@@ -135,7 +135,7 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end
-    -- Invocar 1 monstruo "Empíreo"
+    -- 	*EFECTO 5°
 function s.cfilter(c)
 	return c:IsFacedown() or not c:IsSetCard(0x3eb)
 end
@@ -147,18 +147,18 @@ function s.spfilter1(c,e,tp,ex)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+		and Duel.IsExistingMatchingCard(s.spfilter1,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE|LOCATION_REMOVED)
 end
 function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter1),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter1),tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-    -- Invocar en Zona de Péndulo
+    -- 	*EFECTO 6°
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	return ep==tp and a:IsControler(1-tp) and a:IsFaceup() and a:IsRelateToBattle()

@@ -2,12 +2,12 @@
 --DrakaStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Solo 1 Boca arriba en tu campo
+	-- 	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	--Invocación Xyz: usando rangos
+	--	*Invocación por Xyz
 	Xyz.AddProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
-    -- Alt. Invocació por Xyz
+    -- 	0° Alt. Invocació por Xyz usando Monstruos Xyz Rango 4
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
@@ -17,16 +17,16 @@ function s.initial_effect(c)
 	e0:SetTarget(function(e,c) return c:IsRank(4) end)
 	e0:SetValue(function(e,_,rc) return rc==e:GetHandler() and 8 or 0 end)
 	c:RegisterEffect(e0)
-    -- Inmunidad
+    -- 	1° No es afectado por efectos de cartas de tu adversario
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(s.imcon)
-	e1:SetValue(s.efilter)
+	e1:SetValue(function(e,te) return te:GetOwnerPlayer()~=e:GetHandlerPlayer() end)
 	c:RegisterEffect(e1)
-    -- Acoplar monstruo destruido por batalla
+    -- 	2° Acoplar monstruo destruido por batalla contra esta carta
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.atchtg)
 	e2:SetOperation(s.atchop)
 	c:RegisterEffect(e2)
-    -- Desterrar 3 cartas
+    -- 	3° Desterrar 3 cartas (1 en la mano, Campo y Cementerio de tu adversario)
     local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_REMOVE)
@@ -48,7 +48,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.rmtg)
 	e3:SetOperation(s.rmop)
 	c:RegisterEffect(e3)
-    -- Cambiar Posicion de Batalla
+    -- 	4° Cambiar Posicion de Batalla de todos los monstruos que controle tu adversario a Posición de Defensa boca abajo
     local e4=Effect.CreateEffect(c)
     e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_POSITION)
@@ -62,17 +62,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4,false,REGISTER_FLAG_DETACH_XMAT)
 end
 s.listed_series={0x10cf}
-    -- Inmunidad
+    --	*EFECTO 1°
 function s.imfilter(c)
 	return c:IsType(TYPE_RITUAL) or c:IsType(TYPE_FUSION) or c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_LINK)
 end
 function s.imcon(e)
 	return e:GetHandler():GetOverlayGroup():IsExists(s.imfilter,1,nil)
 end
-function s.efilter(e,te)
-	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
-end
-    -- Acoplar monstruo destruido por batalla
+    -- 	*EFECTO 2°
 function s.atchtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
@@ -91,7 +88,7 @@ function s.atchop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(c,bc,true)
 	end
 end
-    -- Desterrar 3 cartas exactas
+    -- *EFECTO 3°
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(e:GetHandlerPlayer(),69832741) 
 		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_HAND,1,nil)
@@ -116,7 +113,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(sg1,POS_FACEUP,REASON_EFFECT)
 	end
 end
-    -- Cambiar Posicion de Batalla
+    -- 	*EFECTO 4°
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)

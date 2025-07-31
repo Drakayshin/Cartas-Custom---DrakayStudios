@@ -5,14 +5,14 @@ function s.initial_effect(c)
 	-- Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,2,2,aux.FilterBoolFunction(Card.IsCode,89631139),1,1)
-	-- Limite de Invocación
+	-- 	0° Debe ser Invocado por Sincronía
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.synlimit)
 	c:RegisterEffect(e0)
-	-- No selecionar por adversaro
+	-- 	1° No puede ser seleccionado por tu adversario o destruido por efectos
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -20,32 +20,31 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
-	-- Indestructible por efectos
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e2:SetValue(s.indval)
+	local e1a=e1:Clone()
+	e1a:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1a:SetValue(s.indval)
+	c:RegisterEffect(e1a)
+	-- 	2° Gana ATK por cada monstruo Dragón en tu Campo o Cementerio
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetValue(function(e,c) return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE|LOCATION_MZONE,0,nil,RACE_DRAGON)*300 end)
 	c:RegisterEffect(e2)
-	-- ATK UP
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetValue(s.val)
-	c:RegisterEffect(e3)
 	-- Negar y destruir
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_CHAINING)
-	e4:SetCountLimit(1,id)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCondition(s.discon)
-	e4:SetTarget(s.distg)
-	e4:SetOperation(s.disop)
-	c:RegisterEffect(e4)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_CHAINING)
+	e3:SetCountLimit(1,{id,0})
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(s.discon)
+	e3:SetTarget(s.distg)
+	e3:SetOperation(s.disop)
+	c:RegisterEffect(e3)
 	-- Invocar 1 Ojos Azules
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,2))
@@ -62,21 +61,11 @@ end
 s.listed_series={0xdd}
 s.material={89631139}
 s.listed_names={89631139}
-function s.eqval(ec,c,tp)
-	return ec:IsControler(tp) and ec:IsSetCard(0xdd)
-end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
-end
-	-- No puede ser seleccionado ni Destruido por efectos de cartas del adversario
+	--	*EFECTO 1°
 function s.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
 end
-	-- ATK UP
-function s.val(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE+LOCATION_MZONE,0,nil,RACE_DRAGON)*300
-end
-	-- Negar activación
+	--	*EFECTO 3°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
@@ -92,23 +81,23 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
-	-- Invocar 1 Ojos Azules
+	--	*EFECTO 4°
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsSynchroSummoned() and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0xdd) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE|LOCATION_REMOVED)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)

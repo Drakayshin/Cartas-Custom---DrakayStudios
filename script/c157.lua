@@ -2,48 +2,44 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- immune a Trampas
+	-- 	0° immune a Efectos de cartas Trampa de tu adversario
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetRange(LOCATION_MZONE)
-	e0:SetValue(s.efilter)
+	e0:SetValue(function(e,te) return te:IsActiveType(TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetHandlerPlayer() end)
 	c:RegisterEffect(e0)
-    -- Segundo ataque
+    -- 	1° Si esta carta batallo contra un monstruo en Posición de Defensa, puede hacer un segundo ataque
     local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_DAMAGE_STEP_END)
 	e1:SetOperation(s.caop)
 	c:RegisterEffect(e1)
-    -- Destruir por batalla
+    -- 	2° Invocación de Modo Especial 1 monstruo "Saurio Guerrero LV7"
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetOperation(s.bdop)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
+	e2:SetCondition(s.spcon)
+	e2:SetCost(s.spcost)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-    -- Invocación Especial
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e3:SetCondition(s.spcon)
-	e3:SetCost(s.spcost)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
-	c:RegisterEffect(e3)
+	-- 	*Contador por destruir por batalla a un monstruo
+	local e2a=Effect.CreateEffect(c)
+	e2a:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2a:SetCode(EVENT_BATTLE_DESTROYING)
+	e2a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2a:SetOperation(s.bdop)
+	c:RegisterEffect(e2a)
 end
 s.listed_names={156,158}
 s.LVnum=5
 s.LVset=0x3ea
-    -- immune a Trampas
-function s.efilter(e,te)
-	return te:IsActiveType(TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
-end
-    -- Segundo ataque
+    -- 	*EFECTP 1°
 function s.caop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
@@ -51,11 +47,7 @@ function s.caop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChainAttack()
 	end
 end
-    -- Destruir por batalla
-function s.bdop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-end
-    --Invocación Especial
+    --	*EFECTO 2°
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(id)>0
 end
@@ -79,4 +71,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP)>0 then
 		tc:CompleteProcedure()
 	end
+end
+    -- 	*EFECTO 2a°
+function s.bdop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end

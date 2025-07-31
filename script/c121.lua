@@ -2,9 +2,9 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Solo 1 Boca arriba en tu campo
+    -- *Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Buscar "El Sello de Oricalcos" o 1 carta que lo mencione
+	-- 	0° Buscar "El Sello de Oricalcos" o 1 carta que lo mencione desde tu Deck
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
 	c:RegisterEffect(e0)
-	-- Prevenir respuesta a la activacion de tus Spell/Traps
+	-- 	1° Prevenir respuesta a la activacion de tus Spell/Traps
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAINING)
@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e1:SetCondition(s.oricalcon)
 	e1:SetOperation(s.chainop)
 	c:RegisterEffect(e1)
-	-- Cambio de daño
+	-- 	2° Cambio de daño por efecto
     local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -31,30 +31,30 @@ function s.initial_effect(c)
 	e2:SetCondition(s.oricalcon)
 	e2:SetValue(s.rev)
 	c:RegisterEffect(e2)
-    -- Negar ataque
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e4:SetCondition(aux.AND(s.condition,s.oricalcon))
-	e4:SetCost(s.cost)
-	e4:SetOperation(s.operation)
-	c:RegisterEffect(e4)
+    -- 	3° Negar un ataque declarado por tu adversario
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e3:SetCondition(aux.AND(s.condition,s.oricalcon))
+	e3:SetCost(s.cost)
+	e3:SetOperation(s.operation)
+	c:RegisterEffect(e3)
 end
 s.listed_names={48179391}
 function s.thfilter(c)
 	return (c:IsCode(48179391) or c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
 end
-	-- Buscar "El Sello de Oricalcos" o 1 carta que lo mencione
+	--	*EFECTO 0°
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,nil)
 	if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
@@ -62,10 +62,11 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
+	--	*Condición general de los siguientes efectos
 function s.oricalcon(e)
-    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
+    return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD|LOCATION_GRAVE,0,1,nil)
 end
-	-- No respuesta de monstruos
+	--	*EFECTO 1°
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsSpellTrapEffect() and re:GetOwnerPlayer()==tp then
 		Duel.SetChainLimit(s.chainlm)
@@ -74,11 +75,11 @@ end
 function s.chainlm(e,ep,tp)
 	return ep==tp or not e:IsMonsterEffect()
 end
-    -- Cambio de daño
+	--	*EFECTO 2°
 function s.rev(e,re,r,rp,rc)
 	return (r&REASON_EFFECT)~=0
 end
-    -- Negar ataque
+	--	*EFECTO 3°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
     return tp~=Duel.GetTurnPlayer()
 end

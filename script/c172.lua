@@ -2,29 +2,29 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar por Sincronía
+	-- 	*Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,1,99,Synchro.NonTunerEx(Card.IsType,TYPE_SYNCHRO),1,1)
-	-- Limite de Invocación
+	-- 	*Limite de Invocación de Modo Especial
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetRange(LOCATION_GRAVE,LOCATION_REMOVED)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetValue(s.splimit)
+	e0:SetValue(function(e,se,sp,st) return se:GetHandler():IsSetCard(0x3eb) end)
 	c:RegisterEffect(e0)
-	-- No recibes daño de batalla de esta carta
+	-- 	1° No recibes daño de batalla que involucre a carta
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	-- Ataque directo
+	-- 	2° Ataque directo
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DIRECT_ATTACK)
 	c:RegisterEffect(e2)
-    -- Ningún monstruo es destruido por batalla contra esta carta
+    -- 	3° Ningún monstruo es destruido por batalla contra esta carta
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.indestg)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
-    --Daño igual al ATK/DEF mas alto
+    --	4° Infligir daño igual al ATK/DEF mas alto del monstruo que batallo contra esta carta
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DAMAGE)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -45,16 +45,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 s.listed_series={0x3eb}
-	-- Debe ser Invocada de forma especifica
-function s.splimit(e,se,sp,st)
-	return se:GetHandler():IsSetCard(0x3eb)
-end
-    -- Ningún monstruo es destruido por batalla
+    -- 	*EFECTO 3°
 function s.indestg(e,c)
 	local handler=e:GetHandler()
 	return c==handler or c==handler:GetBattleTarget()
 end
-    --Daño igual al ATK/DEF mas alto
+    --	*EFECTO 4
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=e:GetHandler():GetBattleTarget()
 	local dam=math.max(bc:GetTextAttack(),bc:GetTextDefense())

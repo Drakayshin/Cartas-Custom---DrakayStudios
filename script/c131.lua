@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Añadir 1 carta aleatoria de la mano
+	-- 	0° Añadir 1 carta aleatoria de la mano
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
@@ -15,10 +15,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 end
 s.listed_names={48179391}
+	--	*EFECTO 0°
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0,1,nil)
 end
-    -- Añadir 1 carta aleatoria de la mano
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
 end
@@ -30,7 +30,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
     Duel.SendtoHand(ag1,tp,REASON_EFFECT)
 end
-    -- Costo de no batallar este turno
+    --	*No puedes declarar ataques este turno
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
 	local e1=Effect.CreateEffect(e:GetHandler())

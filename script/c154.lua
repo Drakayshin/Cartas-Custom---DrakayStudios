@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Invocar y Destruir
+	-- 	0° INvocar de Modo Especial y negar efecto
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE)
@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
-	-- Reducir ATK
+	-- 	1° Reducir 200 ATK por cada carta en tu mano a los monstruos que controle tu adversario
     local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -22,10 +22,10 @@ function s.initial_effect(c)
 	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetValue(function(e) return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)*-200 end)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e2)
-    -- Regresar a la mano
+	local e1a=e1:Clone()
+	e1a:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e1a)
+    -- 	2° Regresar a la mano desde el Cementerio si un monstruo "LV" deja tu Campo
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -40,7 +40,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x41}
-    -- Invocar y Destruir
+    -- 	*EFECTO 0°
 function s.selfspconfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x41)
 end
@@ -60,7 +60,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.NegateEffect(ev)
 	end
 end
-    -- Añadir a la mano
+    -- 	*EFECTO 2°
 function s.addtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToHand() end

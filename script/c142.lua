@@ -2,17 +2,16 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- Proceso de Péndulo
 	Pendulum.AddProcedure(c)
-    -- Inafectada
+    -- 	0° Inafectada por efectos de monstruos que no sean Péndulo
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
-	e0:SetValue(s.efilter)
+	e0:SetValue(function(e,te) return te:IsMonsterEffect() and not te:GetOwner():IsType(TYPE_PENDULUM) end)
 	c:RegisterEffect(e0)
-    -- Ganar DEF
+    -- 1° Aumenta 1000 DEF si es Invocado por Péndulo
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -21,15 +20,15 @@ function s.initial_effect(c)
 	e1:SetCondition(s.defcon)
 	e1:SetOperation(s.defop)
 	c:RegisterEffect(e1)
-    -- Ataque en Posición de Defensa
+    -- 	2° Puede atacar en Posición de Defensa
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DEFENSE_ATTACK)
 	c:RegisterEffect(e2)
 
-    -- Efecto de Péndulo
+    -- 	EFECTO DE PENDULO
 
-	-- Negar efecto de selección
+	-- 3° Negar efecto de selección en el Campo
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_CHAIN_SOLVING)
@@ -38,11 +37,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-    -- Inafectada
-function s.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER) and te:IsActivated() and not te:GetOwner():IsType(TYPE_PENDULUM)
-end
-    -- Ganar ATK
+    -- 	*EFECTO 1°
 function s.defcon(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	return c:GetSummonType()==SUMMON_TYPE_PENDULUM and c:IsPreviousLocation(LOCATION_HAND)
@@ -58,7 +53,7 @@ function s.defop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-	-- Negar efecto de selección
+	--	*EFECTO 3°
 function s.cfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and c:IsControler(tp)
 end

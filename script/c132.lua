@@ -3,90 +3,92 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	Pendulum.AddProcedure(c)
-    -- Solo 1 Boca arriba en tu campo
+    -- *Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Invocar de Modo Especial
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_EXTRA|LOCATION_HAND)
-	e1:SetCountLimit(1,{id,1},EFFECT_COUNT_CODE_OATH)
-	e1:SetCondition(s.oricalcon)
-	c:RegisterEffect(e1)
-    -- Inafectada
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_IMMUNE_EFFECT)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-    e2:SetCondition(s.oricalcon)
-	e2:SetValue(s.efilter)
-	c:RegisterEffect(e2)
-    -- Reducir ATK/DEF
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(0,LOCATION_MZONE)
-    e3:SetCondition(s.oricalcon)
-	e3:SetValue(-500)
-	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e4)
-    --Robar y descartar
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,0))
-	e5:SetCategory(CATEGORY_DRAW+CATEGORY_HANDES)
-	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
-	e5:SetCondition(s.oricalcon)
-	e5:SetTarget(s.drtg)
-	e5:SetOperation(s.drop)
-	c:RegisterEffect(e5)
-    -- Invocar de Modo Especial
-    local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,1))
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetType(EFFECT_TYPE_IGNITION)
-    e6:SetRange(LOCATION_MZONE)
-    e6:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
-	e6:SetCondition(s.oricalcon)
-    e6:SetCost(s.cost)
-	e6:SetTarget(s.sptg)
-	e6:SetOperation(s.spop)
-	c:RegisterEffect(e6)
-	--Regresar al Deck si deja el Campo
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-	e7:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e7:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id) end)
-	e7:SetValue(LOCATION_DECKBOT)
-	c:RegisterEffect(e7)
-	local e8=Effect.CreateEffect(c)
-	e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e8:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e8:SetOperation(function(e) e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1) end)
-	c:RegisterEffect(e8)
-    -- Efecto de Péndulo
-    -- Negar y destruir
-    local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,2))
-	e0:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
-	e0:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e0:SetCode(EVENT_CHAINING)
-	e0:SetRange(LOCATION_PZONE)
-    e0:SetCondition(s.negcon)
-	e0:SetTarget(s.negtg)
-	e0:SetOperation(s.negop)
+	-- 	1° Invocar de Modo Especial si controlas un "El Sello de Oricalcos"
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e0:SetRange(LOCATION_EXTRA|LOCATION_HAND)
+	e0:SetCountLimit(1,{id,1},EFFECT_COUNT_CODE_OATH)
+	e0:SetCondition(s.oricalcon)
 	c:RegisterEffect(e0)
-    --Register types
+    -- 	1° No es afectada por efectos de otras cartas
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+    e1:SetCondition(s.oricalcon)
+	e1:SetValue(function(e,te) return te:GetOwner()~=e:GetOwner() end)
+	c:RegisterEffect(e1)
+    -- 	2° Monstruos que controle tu adversario pierden 500 ATK/DEF
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+    e2:SetCondition(s.oricalcon)
+	e2:SetValue(-500)
+	c:RegisterEffect(e2)
+	local e2a=e2:Clone()
+	e2a:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e2a)
+    --	3° Robar 2 cartas y descartar 1 carta de tu mano
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_DRAW+CATEGORY_HANDES)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
+	e3:SetCondition(s.oricalcon)
+	e3:SetTarget(s.drtg)
+	e3:SetOperation(s.drop)
+	c:RegisterEffect(e3)
+    -- 	4° Invocar de Modo Especial hasta 2 monstruo que mencionen "El Sello de Oricalcos"
+    local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+    e4:SetRange(LOCATION_MZONE)
+    e4:SetCountLimit(1,0,EFFECT_COUNT_CODE_SINGLE)
+	e4:SetCondition(s.oricalcon)
+    e4:SetCost(s.cost)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
+	--	5° Regresar al Deck si deja el Campo
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetCondition(function(e) return e:GetHandler():HasFlagEffect(id) end)
+	e5:SetValue(LOCATION_DECKBOT)
+	c:RegisterEffect(e5)
+	local e5a=Effect.CreateEffect(c)
+	e5a:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5a:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5a:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5a:SetOperation(function(e) e:GetHandler():RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD,0,1) end)
+	c:RegisterEffect(e5a)
+
+	--	EFECTO DE PENDULO
+	
+    -- Negar y destruir
+    local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,2))
+	e6:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
+	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e6:SetCode(EVENT_CHAINING)
+	e6:SetRange(LOCATION_PZONE)
+    e6:SetCondition(s.negcon)
+	e6:SetTarget(s.negtg)
+	e6:SetOperation(s.negop)
+	c:RegisterEffect(e6)
+    --	*Registro de tipos
 	aux.GlobalCheck(s,function()
 		s.type_list={}
 		s.type_list[0]=0
@@ -98,15 +100,11 @@ function s.initial_effect(c)
 		end)
 end
 s.listed_names={id,48179391,125,130}
-
+	--	*Condigicón general para los siguientes efectos
 function s.oricalcon(e)
     return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,48179391,125,130),e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
-    -- Inafectada
-function s.efilter(e,te)
-	return te:GetOwner()~=e:GetOwner()
-end
-    -- Robar y descartar
+    -- 	*EFECTO 3°
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
 	Duel.SetTargetPlayer(tp)
@@ -122,7 +120,7 @@ function s.drop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 	end
 end
-    -- Invocar de Modo Especial
+    -- 	*EFECTO 4°
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
@@ -142,8 +140,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-    -- Efecto de Péndulo
-    -- Negar y destruir
+    --	EFECTO DE PENDULO
+	--	*EFECTO 6°
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) 
 	and Duel.IsChainNegatable(ev) and s.type_list[tp]&re:GetActiveType()==0
