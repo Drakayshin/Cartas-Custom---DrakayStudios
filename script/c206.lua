@@ -71,7 +71,7 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-    local g=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsAbleToRemove),tp,0,LOCATION_MZONE|LOCATION_GRAVE,1,1,nil)
+    local g=Duel.SelectMatchingCard(1-tp,aux.FaceupFilter(Card.IsAbleToRemove),1-tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,nil)
 	if #g>0 then
 		Duel.HintSelection(g)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
