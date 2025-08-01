@@ -18,7 +18,7 @@ end
 s.listed_series={0x3ea,65601601}
 	--	*EFECTO 0°
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ea)
+	return c:IsFaceup() and c:IsSetCard(65601601)	--LV|Saurio Guerrero
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tgfilter(chkc) end
