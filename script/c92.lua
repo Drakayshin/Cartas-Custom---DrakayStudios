@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
     Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
-    --	2°  Robar y Buscar 1 monstruo "Terranigma"
+    --	2° Robar y Buscar 1 monstruo "Terranigma"
     local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,4))
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK+CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -35,10 +35,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e7}
-function s.counterfilter(c)
-	return c:IsSetCard(0x3e7) and c:IsMonster()
-end
-	-- 	1° Buscar o Colocar 1 Mágica/Trampa "Terranigma"
+	-- 	*EFECTO 1°
 function s.cfilter(c)
 	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and (c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED)) and c:IsAbleToDeckAsCost()
 end
@@ -53,7 +50,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if #sg>0 then
 		Duel.SendtoDeck(sg,nil,3,REASON_COST)
 	end
-	-- * Solo puedes Invocar de Modo Especial monstruos "Terranigma"
+	-- 	*Solo puedes Invocar de Modo Especial monstruos "Terranigma"
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -63,6 +60,9 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTarget(s.splimit)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+end
+function s.counterfilter(c)
+	return c:IsSetCard(0x3e7) and c:IsMonster()
 end
 function s.thsetfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsSpellTrap() and c:IsAbleToHand()
@@ -77,7 +77,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not sc then return end
 	aux.ToHandOrElse(sc,tp,function(sc) return sc:IsSSetable() end,function(sc) Duel.SSet(tp,sc) end,aux.Stringid(id,3))
 end
-    -- 	2° Robar y Buscar 1 monstruo "Terranigma"
+    -- 	*EFECTO 2°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsLocation(LOCATION_GRAVE)

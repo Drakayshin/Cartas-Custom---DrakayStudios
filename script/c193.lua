@@ -2,21 +2,21 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Solo 1 Boca arriba en tu campo
+    -- 	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	-- Invocación por Fusion de contacto
+	-- 	*Invocación por Fusion de contacto
 	c:EnableReviveLimit()
     Fusion.AddProcMixN(c,true,true,s.ffilter,3)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit)
-	-- Inafectado
+	-- 	0° Inafectado
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_IMMUNE_EFFECT)
 	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetRange(LOCATION_MZONE)
-	e0:SetValue(s.efilter)
+	e0:SetValue(function(e,te) return te:GetOwner()~=e:GetOwner() end)
 	c:RegisterEffect(e0)
-    -- Invocar 1 Monstruo Fusión
+    -- 	1° Invocar 1 Monstruo Fusión
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -26,20 +26,20 @@ function s.initial_effect(c)
 	e1:SetTarget(s.esptg)
 	e1:SetOperation(s.espop)
 	c:RegisterEffect(e1)
-    -- Regresa al Deck Extra al final de turno
+    -- 	*Regresa al Deck Extra al final de turno
 	aux.EnableNeosReturn(c,nil,nil,nil)
 end
 s.listed_names={10000060,id} 
 s.listed_series={SET_DARK_MAGICIAN}
 s.material_setcode={SET_LEGENDARY_DRAGON}
-	-- Invocación por Fusion
+	--	*Filtro de materiales
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
 	return c:IsSetCard(SET_LEGENDARY_DRAGON,fc,0,tp) and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,0,tp),fc,0,tp))
 end
 function s.fusfilter(c,code,fc,sumtype,tp)
 	return c:IsSummonCode(fc,0,tp,code) and not c:IsHasEffect(511002961)
 end
-	-- Invocación por Fusion de contacto
+	-- 	*Fusion por contacto
 function s.contactfil(tp)
 	return Duel.GetMatchingGroup(Card.IsAbleToDeckOrExtraAsCost,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
 end
@@ -50,11 +50,7 @@ end
 function s.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
-	-- Inafectado
-function s.efilter(e,te)
-	return te:GetOwner()~=e:GetOwner()
-end
-    -- Invocar 1 Monstruo Fusión
+    -- 	*EFECTO 1°
 function s.spfilter(c,e,tp)
     return c:IsType(TYPE_FUSION) and (c.material_race or c.material_trap or c:ListsCode(1784686)) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,true,false)

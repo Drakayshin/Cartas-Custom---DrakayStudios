@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e1:SetTarget(function(e,c) return c:IsSetCard(0x3e7) end)
 	e1:SetValue(function(e,re,r,rp) return (r&REASON_BATTLE)==0 and 0 or 1 end)
     c:RegisterEffect(e1)
-    -- 2° Todos los monstruos en el Campo de tu adversario 
+    -- 	2° Todos los monstruos en el Campo de tu adversario 
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)
@@ -27,22 +27,22 @@ function s.initial_effect(c)
 	e2:SetTargetRange(0,LOCATION_MZONE)
 	e2:SetValue(ATTRIBUTE_DARK)
     c:RegisterEffect(e2)
-    -- 3° Destruir 1 carta en el Campo
-    local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(511000186,0))
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCondition(s.descon)
-	e2:SetCost(s.descost)
-	e2:SetTarget(s.destg)
-	e2:SetOperation(s.desop)
-	c:RegisterEffect(e2)
+    -- 	3° Destruir 1 carta en el Campo, pero saltar tu Fase de Batalla
+    local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(511000186,0))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(s.descon)
+	e3:SetCost(s.descost)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={0x3e7}
-    --  Efecto 0°
+    --  *EFECTO 0°
 function s.thfilter(c,tp)
 	return c:IsMonster() and c:IsSetCard(0x3e7) and c:IsAbleToHand()
 		and not Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
@@ -57,7 +57,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-    --	Efecto 3°
+    --	*EFECTO 3°
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsTurnPlayer(tp) and Duel.GetCurrentPhase()==PHASE_MAIN1
 end

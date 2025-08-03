@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e7}
-    --  Efecto 0°
+    --  *EFECTO 0°
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsLevelAbove(7)
 end
@@ -73,7 +73,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		tc=g:GetNext()
 	end
 end
-	-- 1° Efecto 1°
+	-- 	*EFECTO 1°
 function s.negcon2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
@@ -130,7 +130,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
 	Duel.NegateEffect(ev)
 end
-    --  Efecto 2°
+    --  *EFECTO 2°
 function s.actfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsMonster() and c:IsLevelAbove(9)
 end

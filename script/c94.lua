@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x3e7}
-    -- 	0° Cambiar el efecto activado de un monstruo
+    -- 	*EFECTO 0°
 function s.chcon(e,tp,eg,ep,ev,re,r,rp)
     local rc=re:GetHandler()
     return rp==1-tp and (re:IsMonsterEffect() or rc:IsSpellTrap())
@@ -60,7 +60,7 @@ function s.repop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Summon(1-tp,g,true,nil)
 	end
 end
-    -- 	1° Regresa a la mano junto al monstruo que ataque a esta carta
+    -- 	*EFCTO 1°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()
 end

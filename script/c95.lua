@@ -35,7 +35,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e2)
 end
 s.listed_series={0x3e7}
-    -- 	1° Invocar de Modo Normal 1 monstruo "Terranigma"
+    -- 	*EFECTO 1°
 function s.sumfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsSummonable(true,nil)
 end
@@ -51,7 +51,7 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Summon(tp,tc,true,nil)
 	end
 end
-	--	 2° Negar efectos y reducir ATK a 0
+	--	*EFECTO 2°
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e7) and not c:IsCode(id)
 end
@@ -74,7 +74,7 @@ function s.diszaop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		tc:NegateEffects(c)
 		if tc:IsMonster() then
-		--	Reducir ATK si es un monstruo
+		--	*Reducir ATK si es un monstruo
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)

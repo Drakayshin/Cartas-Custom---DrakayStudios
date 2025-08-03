@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--	 Solo 1 Boca arriba en tu campo
+	--	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	--	 0° No puede ser Invocado de Modo Normal/Colocado
@@ -38,38 +38,38 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_UNRELEASABLE_SUM)
 	e3:SetValue(s.sumlimit)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetCode(EFFECT_CANNOT_RELEASE)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetTargetRange(0,1)
-	e4:SetTarget(s.relval)
-	e4:SetValue(1)
-	c:RegisterEffect(e4)
+	local e3a=Effect.CreateEffect(c)
+	e3a:SetType(EFFECT_TYPE_FIELD)
+	e3a:SetCode(EFFECT_CANNOT_RELEASE)
+	e3a:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3a:SetRange(LOCATION_MZONE)
+	e3a:SetTargetRange(0,1)
+	e3a:SetTarget(function(e,c) return c==e:GetHandler() end)
+	e3a:SetValue(1)
+	c:RegisterEffect(e3a)
 	--	 4° Niega los efectos de monstruos del adversario que batallen contra esta carta
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_BATTLE_START)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetOperation(s.atkop)
+	c:RegisterEffect(e4)
+	-- 	5° Monstruos "Terranigma" infligen daño de penetración a tu adversario
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_BATTLE_START)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetCode(EFFECT_PIERCE)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetOperation(s.atkop)
+	e5:SetTargetRange(LOCATION_MZONE,0)
+	e5:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x3e7))
 	c:RegisterEffect(e5)
-	-- 6° Monstruos "Terranigma" infligen daño de penetración a tu adversario
+	-- 	6° Inflige daño de penetración
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_FIELD)
+	e6:SetType(EFFECT_TYPE_SINGLE)
 	e6:SetCode(EFFECT_PIERCE)
-	e6:SetRange(LOCATION_MZONE)
-	e6:SetTargetRange(LOCATION_MZONE,0)
-	e6:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x3e7))
 	c:RegisterEffect(e6)
-	-- 7° Inflige daño de penetración
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_PIERCE)
-	c:RegisterEffect(e7)
 end
 s.listed_series={0x3e7}
-	-- 	1° Invocación de Modo Especial de esta carta
+	-- 	*EFECTO 1°
 function s.spfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsMonster() and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true,true)
 end
@@ -99,15 +99,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_COST)
     g:DeleteGroup()
 end
-	-- 	3° Tu adversario no puede Sacrificar esta carta boca arriba
+	-- 	*EFECTO 3°
 function s.sumlimit(e,c)
 	if not c then return false end
 	return not c:IsControler(e:GetHandlerPlayer())
 end
-function s.relval(e,c)
-	return c==e:GetHandler()
-end
-	-- 	4° Niega los efectos de monstruos del adversario que batallen contra esta carta
+	-- 	*EFECTO 4°
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetBattleTarget()
 	if tc then

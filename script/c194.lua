@@ -2,14 +2,14 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    -- Puedes activar desde la mano
+    -- 	0° Puedes activar desde la mano
     local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,1))
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e0:SetCondition(s.handcon)
+	e0:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0 end)
 	c:RegisterEffect(e0)
-    -- Activar 1 carta de Campo
+    -- 	1° Activar 1 carta de Campo
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_DECKDES)
@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.actg)
 	e1:SetOperation(s.acop)
 	c:RegisterEffect(e1)
-	-- Ganar LP
+	-- 	2° Ganar LP igual al ATK de un tipo de monstruo en el Campo
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_RECOVER)
@@ -33,11 +33,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.listed_names={48179391,125,130}
-	-- Activar desde la mano
-function s.handcon(e)
-	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0
-end
-    -- Activar 1 carta de Campo
+    -- 	*EFECTO 1°
 function s.acfilter(c,tp)
 	return c:IsFieldSpell() and c:IsCode(48179391,125,130)
 end
@@ -60,7 +56,7 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.DiscardDeck(tp,3,REASON_EFFECT)
 	end
 end
-	-- Ganar LP
+	-- 	*EFECTO 2°
 function s.rfilter(c,race)
 	return c:IsFaceup() and c:IsRace(race)
 end

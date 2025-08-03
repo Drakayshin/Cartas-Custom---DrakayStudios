@@ -2,7 +2,7 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    --  Solo 1 Boca arriba en tu campo
+    --  *Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
     --  0° No puede ser Invocado de Modo Especial
 	local e0=Effect.CreateEffect(c)
@@ -51,7 +51,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 s.listed_names={0x3e7}
-   --  Efecto 3°
+   --  *EFECTO 3°
 function s.filter(c)
 	return c:IsFacedown() or not c:IsSetCard(0x3e7)
 end
@@ -61,7 +61,7 @@ function s.ntcon(e,c,minc,zone)
 	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,zone)>0
 		and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil))
 end
-    --  Efecto 5°
+    --  *EFECTO 5°
 function s.thfilter(c)
 	return c:IsSetCard(0x3e7) and c:GetCode()~=id and c:IsAbleToHand()
 end

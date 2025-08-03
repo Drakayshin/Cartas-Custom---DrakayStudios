@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.chtg)
 	e1:SetOperation(s.chop)
     c:RegisterEffect(e1)
-    --	2 y 3° Buscar 1 monstruo "Terranigma"
+    --	2° Buscar 1 monstruo "Terranigma"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -34,17 +34,17 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_FLIP)
-	c:RegisterEffect(e3)
+	local e2a=e2:Clone()
+	e2a:SetCode(EVENT_FLIP)
+	c:RegisterEffect(e2a)
 end
 s.listed_series={0x3e7}
-    --	0° Si esta carta batalla con un monstruo, ninguno puede ser destruido en esa batalla
+    --	*EFECTO 0°
 function s.indestg(e,c)
 	local handler=e:GetHandler()
 	return c==handler or c==handler:GetBattleTarget()
 end
-    --	1° Cambiar el efecto activado de un monstruo
+    --	*EFECTO 1°
 function s.chcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsMonsterEffect()
 end
@@ -60,7 +60,7 @@ function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(tp,1,REASON_EFFECT)
 	Duel.Draw(1-tp,1,REASON_EFFECT)
 end
-    --	2° y 3° Buscar 1 monstruo "Terranigma"
+    --	*EFECTO 2°
 function s.thfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsMonster() and c:IsAbleToHand()
 end

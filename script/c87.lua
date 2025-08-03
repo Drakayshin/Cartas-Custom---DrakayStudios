@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x3e7}
-	--	Efecto 0°
+	--	*EFECTO 0°
 function s.cfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsMonster() and not c:IsPublic()
 end
@@ -57,7 +57,7 @@ function s.drwop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-	--	Efecto 1°
+	--	*EFECTO 1°
 function s.sfilter(c,e,ec)
 	if not c:IsSetCard(0x3e7) and c:IsMonster() then return false end
 	local e1=Effect.CreateEffect(ec)

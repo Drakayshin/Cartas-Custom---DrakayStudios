@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-    -- 	3° y 4° Cambiar ATK/DEF original
+    -- 	3° Ganar el ATK/DEF más alto en el Campo, excepto de esta carta
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -28,28 +28,28 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(s.adval)
 	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_SET_DEFENSE_FINAL)
-    c:RegisterEffect(e4)
-    --	ATK check
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(id)
-	c:RegisterEffect(e5)
-	-- 	5° Buscar 1 monstruo Terranigma" e Invocar de ser posible
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,0))
-	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SUMMON)
-	e6:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
-	e6:SetProperty(EFFECT_FLAG_DELAY)
-	e6:SetCode(EVENT_SUMMON_SUCCESS)
-	e6:SetCountLimit(1,id)
-	e6:SetTarget(s.nstg)
-	e6:SetOperation(s.nsop)
-	c:RegisterEffect(e6)
+	local e3a=e3:Clone()
+	e3a:SetCode(EFFECT_SET_DEFENSE_FINAL)
+    c:RegisterEffect(e3a)
+    --	Verificar ATK
+	local e3b=Effect.CreateEffect(c)
+	e3b:SetType(EFFECT_TYPE_SINGLE)
+	e3b:SetCode(id)
+	c:RegisterEffect(e3b)
+	-- 	4° Buscar 1 monstruo Terranigma" e Invocar 1 monstruo de Oscuridad de ser posible
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SUMMON)
+	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
+	e4:SetCode(EVENT_SUMMON_SUCCESS)
+	e4:SetCountLimit(1,{id,0})
+	e4:SetTarget(s.nstg)
+	e4:SetOperation(s.nsop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={0x3e7}
-    -- 	1° No puede atacar en el turno que sea Invocado de Modo Normal
+    -- 	*EFECTO 1°
 function s.atklimit(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -57,7 +57,7 @@ function s.atklimit(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESETS_STANDARD_PHASE_END)
 	e:GetHandler():RegisterEffect(e1)
 end
-    -- 	2° y 3° Cambiar ATK/DEF original
+    -- 	*EFECTO 3°
 function s.filter(c)
 	return c:IsFaceup() and not c:IsHasEffect(id)
 end
@@ -74,7 +74,7 @@ function s.adval(e,c)
 		return val+0
 	end
 end
-	-- 	4° Buscar 1 monstruo Terranigma" e Invocar de ser posible
+	-- 	*EFECTO 4°
 function s.filter1(c)
 	return c:IsSetCard(0x3e7) and c:IsMonster() and c:IsAbleToHand()
 end

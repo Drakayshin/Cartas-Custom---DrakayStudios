@@ -2,53 +2,52 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--	 Solo 1 Boca arriba en tu campo
+	--	*Solo 1 Boca arriba en tu campo
     c:SetUniqueOnField(1,0,id)
-	--	 0° No puede ser Invocado de Modo Normal/Colocado
+	--	0° No puede ser Invocado de Modo Normal/Colocado
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.FALSE)
 	c:RegisterEffect(e0)
-	--  1° y 2° Requiere 4 Sacrificios para ser Invocado de Modo Normal/Colocación
+	--  1° Requiere 4 Sacrificios para ser Invocado de Modo Normal/Colocación
 	local e1=aux.AddNormalSummonProcedure(c,true,false,4,4,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0))
-	local e2=aux.AddNormalSetProcedure(c,true,false,4,4,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0))
-    --  4° La Invocación de esta carta no puede ser negada
-    local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e5:SetCode(EFFECT_CANNOT_DISABLE_SUMMON)
-    c:RegisterEffect(e5)
-    --  5° Desterrar cartas boca abajo
-    local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,1))
-	e6:SetCategory(CATEGORY_REMOVE)
-	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e6:SetCode(EVENT_SUMMON_SUCCESS)
-    e6:SetCountLimit(1,{id,1},EFFECT_COUNT_CODE_DUEL)
-    e6:SetTarget(s.bshth)
-	e6:SetOperation(s.bshop)
-    c:RegisterEffect(e6)
-    --  6° Efectos Variados
-    local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(id,2))
-	e7:SetType(EFFECT_TYPE_QUICK_O)
-	e7:SetCode(EVENT_FREE_CHAIN)
-	e7:SetRange(LOCATION_MZONE)
-	e7:SetHintTiming(TIMING_BATTLE_PHASE,TIMING_BATTLE_PHASE)
-    e7:SetCost(Cost.PayLP(2000))
-    e7:SetCountLimit(1,{id,2})
-	e7:SetTarget(s.efftg)
-	e7:SetOperation(s.effop)
-	c:RegisterEffect(e7)
+	local e1a=aux.AddNormalSetProcedure(c,true,false,4,4,SUMMON_TYPE_TRIBUTE,aux.Stringid(id,0))
+    --  2° La Invocación de esta carta no puede ser negada
+    local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCode(EFFECT_CANNOT_DISABLE_SUMMON)
+    c:RegisterEffect(e2)
+    --  3° Si es Invocado por Sacrificio, desterrar cartas boca abajo del Campo del adversario
+    local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_REMOVE)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+    e3:SetCode(EVENT_SUMMON_SUCCESS)
+    e3:SetCountLimit(1,{id,1},EFFECT_COUNT_CODE_DUEL)
+    e3:SetTarget(s.bshth)
+	e3:SetOperation(s.bshop)
+    c:RegisterEffect(e3)
+    --  4° Efectos Variados
+    local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,2))
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetHintTiming(TIMING_BATTLE_PHASE,TIMING_BATTLE_PHASE)
+    e4:SetCost(Cost.PayLP(2000))
+    e4:SetCountLimit(1,{id,2})
+	e4:SetTarget(s.efftg)
+	e4:SetOperation(s.effop)
+	c:RegisterEffect(e4)
 end
 s.listed_series={0x3e7}
-
 function s.tlimit(e,c)
 	return not c:IsAttribute(ATTRIBUTE_DARK)
 end
-    --  Efecto 5°
+    --  Efecto 3°
 function s.rmfilter(c,p)
 	return Duel.IsPlayerCanRemove(p,c) and not c:IsType(TYPE_TOKEN)
 end
@@ -73,7 +72,7 @@ function s.bshop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(sg,POS_FACEDOWN,REASON_RULE,PLAYER_NONE,1-tp)
 	end
 end
-    --  Efecto 6°
+    --  Efecto 4°
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local b1=true
@@ -90,7 +89,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local op=e:GetLabel()
 	if op==1 then
-		--  1° Cambia el ATK de un monstruo a 0 y esta carta gana su ATK original
+		--  *EFECTO 1° Cambia el ATK de un monstruo a 0 y esta carta gana su ATK original
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(id,3))
 		e1:SetCategory(CATEGORY_ATKCHANGE)
@@ -101,7 +100,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESETS_STANDARD_PHASE_END)
 		c:RegisterEffect(e1)
 	elseif op==2 then
-		--  2° Niega los efectos de 1 monstruo en Posicion de ATK de tu adversario, y esta carta gana sus efectos
+		--  *EFECTO 2° Niega los efectos de 1 monstruo en Posicion de ATK de tu adversario, y esta carta gana sus efectos
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_NEGATE)
 		local sc=Duel.SelectMatchingCard(tp,s.efffilter,tp,0,LOCATION_MZONE,1,1,nil):GetFirst()
 		if sc and not sc:IsStatus(STATUS_DISABLED) then
@@ -112,7 +111,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SetChainLimit(s.chlimit)
 end
-    -- Efecto 6 (1°) 
+    -- 	*EFECTO 4(1°) 
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
@@ -137,7 +136,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		bc:RegisterEffect(e1)
 	end
 end
-    -- Efecto 6 (2°)
+    -- 	*EFECTO 4°(2°)
 function s.efffilter(c)
 	return c:IsNegatableMonster() and c:IsAttackPos()
 end

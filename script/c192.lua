@@ -2,13 +2,13 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- ACtivación: Invocar por Fusión
+	-- 	0° Invocar por Fusión
 	local e0=Fusion.CreateSummonEff(c,aux.FilterBoolFunction(Card.IsSetCard,SET_TEARLAMENTS),Fusion.OnFieldMat(Card.IsAbleToDeck),s.fextra,Fusion.ShuffleMaterial,nil,nil,nil,nil,nil,nil,nil,nil,nil,s.extratg)
 	e0:SetCost(s.cost)
 	e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e0)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
-	-- Buscar una Trampa o monstruo Tearlaments
+	-- 	1° Buscar una Trampa o monstruo Tearlaments
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -22,14 +22,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={SET_TEARLAMENTS}
-	-- Limitación de invocación por activación
+	--	*EFECTO 0°
 function s.counterfilter(c)
 	return not c:IsSummonLocation(LOCATION_EXTRA) or c:IsType(TYPE_FUSION)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 	local c=e:GetHandler()
-	--Cannot Special Summon from the Extra Deck, except Fusion Monsters
+	--	*No puedes Invocar monstruos del Deck Extra, excepto Monstruos de Fusión
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -53,7 +53,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,LOCATION_PUBLIC)
 end
-	-- Buscar una Trampa o monstruo Tearlaments
+	-- 	*EFECTO 1°
 function s.thfilter(c)
 	return c:IsSetCard(SET_TEARLAMENTS) and not c:IsCode(id) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end

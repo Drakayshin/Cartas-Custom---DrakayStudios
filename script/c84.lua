@@ -27,11 +27,11 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(s.handcon)
+	e2:SetCondition(function(e) return Duel.IsExistingMatchingCard(s.actfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) end)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3e7}
-	--  Efecto 0°
+    --  *EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x3e7),tp,LOCATION_MZONE,0,1,nil) then return false end
 	for i=1,ev do
@@ -74,7 +74,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SendtoDeck(dg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
-    --  Efecto 1°
+    --  *EFECTO 1°
 function s.rmtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_MZONE,0,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_MZONE,0,nil)
@@ -101,10 +101,7 @@ end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ReturnToField(e:GetLabelObject())
 end
-    --  Efecto 2°
+    --  *EFECTO 2°
 function s.actfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsMonster() and c:IsLevelAbove(7)
-end
-function s.handcon(e)
-	return Duel.IsExistingMatchingCard(s.actfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end

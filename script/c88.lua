@@ -25,7 +25,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e0:SetTargetRange(1,0)
 	e0:SetValue(s.aclimit)
 	Duel.RegisterEffect(e0,tp)
-	--	1, 2 y 3° Invocar de Modo Normal 1 monstruo "Terranigma" si tu adversario Invoca un monstruo
+	--	1°, 2° y 3° Invocar de Modo Normal 1 monstruo "Terranigma" si tu adversario Invoca un monstruo
     local e1=Effect.CreateEffect(e:GetHandler())
     e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_SUMMON)
@@ -69,7 +69,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetTarget(s.thtg)
 	e4:SetOperation(s.thop)
 	Duel.RegisterEffect(e4,tp)
-    --	5° Ganar LP
+    --	5° Ganar LP igual al daño causado por una batalla que involucre a un monstruo "Terranigma"
     local e5=Effect.CreateEffect(c)
     e5:SetDescription(aux.Stringid(id,3))
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

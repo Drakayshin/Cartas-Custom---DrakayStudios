@@ -14,34 +14,34 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
     c:RegisterEffect(e0)
-    local e1=e0:Clone()
-	e1:SetCode(EVENT_FLIP_SUMMON)
-	c:RegisterEffect(e1)
-	local e2=e0:Clone()
-	e2:SetCode(EVENT_SPSUMMON)
+    local e0a=e0:Clone()
+	e0a:SetCode(EVENT_FLIP_SUMMON)
+	c:RegisterEffect(e0a)
+	local e0b=e0:Clone()
+	e0b:SetCode(EVENT_SPSUMMON)
+	c:RegisterEffect(e0b)
+    --  1° Negar activación de una carta Magica/Trampa o efecto de monstruo
+    local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,2))
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_REMOVE)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_CHAINING)
+	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(s.negcon)
+	e1:SetTarget(s.negtg)
+	e1:SetOperation(s.negop)
+    c:RegisterEffect(e1)
+    --  2° Activar desde la mano con tu adversario tiene 3 o mas cartas en su Campo
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,3))
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e2:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>2 end)
 	c:RegisterEffect(e2)
-    --  3° Negar activación de una carta Magica/Trampa o efecto de monstruo
-    local e3=Effect.CreateEffect(c)
-    e0:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_REMOVE)
-	e3:SetType(EFFECT_TYPE_ACTIVATE)
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e3:SetCondition(s.negcon)
-	e3:SetTarget(s.negtg)
-	e3:SetOperation(s.negop)
-    c:RegisterEffect(e3)
-    --  4° Activar desde la mano con tu adversario tiene 3 o mas cartas en su Campo
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,3))
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e4:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_ONFIELD)>2 end)
-	c:RegisterEffect(e4)
 end
 s.listed_names={99}
 s.listed_series={0x3e7}
-    --  *Efecto 0°, 1° y 2°
+    --  *Efecto 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain(true)==0
 end
@@ -75,7 +75,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-    --  *Efecto 3°
+    --  *Efecto 1°
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3e7)
 end

@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x3e7}
-	--	Efecto 0°
+	--	*EFECTO 0°
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x3e7),tp,LOCATION_MZONE,0,1,nil) then return false end
 	for i=1,ev do
@@ -65,7 +65,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SendtoDeck(dg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end
-    --	Efecto 1°
+    --	*EFECTO 1°
 function s.repfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
 		and not c:IsReason(REASON_REPLACE) and c:IsReason(REASON_EFFECT|REASON_BATTLE)
