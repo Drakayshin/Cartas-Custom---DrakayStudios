@@ -43,12 +43,12 @@ function s.splimit(e,c)
 	return not (c:IsSetCard(0x3e7) and c:IsMonster())
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,3,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,3,5,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
-	local sg=aux.SelectUnselectGroup(g,e,tp,1,3,aux.dncheck,1,tp,HINTMSG_TODECK)
+	local sg=aux.SelectUnselectGroup(g,e,tp,3,5,aux.dncheck,1,tp,HINTMSG_TODECK)
 	if #sg>0 then
-		Duel.SendtoDeck(sg,nil,3,REASON_COST)
+		Duel.SendtoDeck(sg,nil,5,REASON_COST)
 	end
 	-- 	*Solo puedes Invocar de Modo Especial monstruos "Terranigma"
 	local e1=Effect.CreateEffect(e:GetHandler())

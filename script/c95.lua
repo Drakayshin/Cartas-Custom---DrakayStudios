@@ -53,10 +53,10 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--	*EFECTO 2°
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3e7) and not c:IsCode(id)
+	return c:IsFaceup() and c:IsSetCard(0x3e7)
 end
-function s.con(e)
-	return Duel.IsExistingMatchingCard(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+function s.con(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
 function s.diszafilter(c)
 	return c:IsFaceup() or c:HasNonZeroAttack() and c:IsNegatableMonster()

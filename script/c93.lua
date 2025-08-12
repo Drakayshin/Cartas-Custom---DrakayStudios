@@ -42,29 +42,18 @@ function s.initial_effect(c)
 	e2a:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2a:SetValue(function(e,te) return te:GetOwnerPlayer()~=e:GetHandlerPlayer() end)
 	c:RegisterEffect(e2a)
-    -- 	3° Gana 500 ATK/DEF por cada monstruo de Oscuridad en el Campo
+    -- 	3° Invocar de Modo Normal 1 monstruo "Terranigma"
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetDescription(aux.Stringid(id,0))
+	e3:SetCategory(CATEGORY_SUMMON)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetValue(s.atkval)
+	e3:SetHintTiming(TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_DAMAGE_STEP)
+	e3:SetCountLimit(1)
+	e3:SetTarget(s.sumtg)
+	e3:SetOperation(s.sumop)
 	c:RegisterEffect(e3)
-	local e3a=e3:Clone()
-	e3a:SetCode(EFFECT_UPDATE_DEFENSE)
-    c:RegisterEffect(e3a)
-    -- 	4° Invocar de Modo Normal 1 monstruo "Terranigma"
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,0))
-	e4:SetCategory(CATEGORY_SUMMON)
-	e4:SetType(EFFECT_TYPE_QUICK_O)
-	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetHintTiming(TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_DAMAGE_STEP)
-	e4:SetCountLimit(1)
-	e4:SetTarget(s.sumtg)
-	e4:SetOperation(s.sumop)
-	c:RegisterEffect(e4)
 end
 s.listed_series={0x3e7}
 	-- 	*EFECTO 1°
@@ -83,11 +72,7 @@ end
 function s.con(e)
 	return Duel.IsExistingMatchingCard(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
-    -- 	*EFECTP 3°
-function s.atkval(e,c)
-	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsAttribute,ATTRIBUTE_DARK),c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,0,nil)*500
-end
-    -- 	*EFECTO 4°
+    -- 	*EFECTO 3°
 function s.sumfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsSummonable(true,nil)
 end
