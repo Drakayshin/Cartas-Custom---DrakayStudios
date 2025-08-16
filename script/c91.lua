@@ -62,7 +62,7 @@ function s.repop(e,tp,eg,ep,ev,re,r,rp)
 end
     --	*EFECTO 2°
 function s.thfilter(c)
-	return c:IsSetCard(0x3e7) and c:IsMonster() and c:IsAbleToHand()
+	return c:IsSetCard(0x3e7) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end

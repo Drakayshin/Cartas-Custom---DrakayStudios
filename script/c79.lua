@@ -55,7 +55,7 @@ function s.initial_effect(c)
 	e4:SetTarget(s.sumtg)
 	e4:SetOperation(s.sumop)
 	c:RegisterEffect(e4)
-    --  4° Añadir a la mano 1 carta "Terranigma" desde tu Deck, excepto "Arcabastión Terranigma"
+    --  4° Añadir a la mano 1 monstruo "Terranigma" desde tu Deck, con nombre diferente al de tus monstruos en tu Cementerio
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,0))
 	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -64,7 +64,6 @@ function s.initial_effect(c)
 	e6:SetRange(LOCATION_FZONE)
 	e6:SetCountLimit(1)
 	e6:SetCost(Cost.PayLP(1200))
-	e6:SetTarget(s.thtg)
 	e6:SetOperation(s.thop)
 	c:RegisterEffect(e6)
     --  5° Activar desde la mano
@@ -191,19 +190,17 @@ function s.acop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
     --  *EFECTO 5°
-function s.thfilter(c)
-	return c:IsSetCard(0x3e7) and c:IsMonster() and c:IsAbleToHand() and not c:IsCode(id)
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function s.thfilter(c,tp)
+	return c:IsSetCard(0x3e7) and c:IsMonster() and c:IsAbleToHand() 
+	and not Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil,tp)
 	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
 	end
 end

@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	local e0b=e0:Clone()
 	e0b:SetCode(EVENT_SPSUMMON)
 	c:RegisterEffect(e0b)
-    --  1° Negar activación de una carta Magica/Trampa o efecto de monstruo
+    --  1° Negar activación de una carta Magica/Trampa o efecto de monstruo y destruir todas las cartas que controle tu adversario
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,2))
 	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_REMOVE)
@@ -77,7 +77,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *Efecto 1°
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3e7)
+	return c:IsFaceup() and c:IsCode(93) or (c:IsSetCard(0x3e7) and c:IsLevelAbove(7))
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end

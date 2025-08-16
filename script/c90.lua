@@ -30,6 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e3a=e3:Clone()
 	e3a:SetCode(EFFECT_SET_DEFENSE_FINAL)
+	e3a:SetValue(s.defval)
     c:RegisterEffect(e3a)
     --	Verificar ATK
 	local e3b=Effect.CreateEffect(c)
@@ -70,6 +71,19 @@ function s.adval(e,c)
 		if not tg:IsExists(aux.TRUE,1,e:GetHandler()) then
 			g:RemoveCard(e:GetHandler())
 			tg,val=g:GetMaxGroup(Card.GetAttack)
+		end
+		return val+0
+	end
+end
+function s.defval(e,c)
+	local g=Duel.GetMatchingGroup(s.filter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if #g==0 then 
+		return 0
+	else
+		local tg,val=g:GetMaxGroup(Card.GetDefense)
+		if not tg:IsExists(aux.TRUE,1,e:GetHandler()) then
+			g:RemoveCard(e:GetHandler())
+			tg,val=g:GetMaxGroup(Card.GetDefense)
 		end
 		return val+0
 	end
