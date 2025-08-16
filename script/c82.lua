@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.negtg2)
 	e1:SetOperation(s.negop2)
 	c:RegisterEffect(e1)
-    --  2° Activar desde la mano si controlas un monstruo "Terranigma" de nivel 7 o mayor
+    --  2° Activar desde la mano si controlas un monstruo "Terranigma" de nivel 10 o mayor
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -37,7 +37,7 @@ end
 s.listed_series={0x3e7}
     --  *EFECTO 0°
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsLevelAbove(7)
+	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsLevelAbove(9)
 end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
@@ -132,7 +132,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 2°
 function s.actfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsMonster() and c:IsLevelAbove(9)
+	return c:IsFaceup() and c:IsSetCard(0x3e7) and c:IsMonster() and c:IsLevelAbove(10)
 end
 function s.handcon(e)
 	return Duel.IsExistingMatchingCard(s.actfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
