@@ -37,7 +37,7 @@ end
 s.listed_series={0x3e7}
 	-- 	*EFECTO 1°
 function s.cfilter(c)
-	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and (c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED)) and c:IsAbleToDeckAsCost()
+	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and c:IsAbleToDeckAsCost()
 end
 function s.splimit(e,c)
 	return not (c:IsSetCard(0x3e7) and c:IsMonster())
