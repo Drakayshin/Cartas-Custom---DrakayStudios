@@ -36,20 +36,17 @@ function s.initial_effect(c)
 end
 s.listed_series={0x3e7}
 	-- 	*EFECTO 1°
-function s.cfilter(c)
-	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and c:IsAbleToDeckAsCost()
+function s.counterfilter(c)
+	return c:IsSetCard(0x3e7) and c:IsMonster()
 end
-function s.splimit(e,c)
-	return not (c:IsSetCard(0x3e7) and c:IsMonster())
+function s.cfilter(c)
+	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and c:IsAbleToDeckAsCost()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,3,5,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
-	local sg=aux.SelectUnselectGroup(g,e,tp,3,5,aux.dncheck,1,tp,HINTMSG_TODECK)
-	if #sg>0 then
-		Duel.SendtoDeck(sg,nil,5,REASON_COST)
-	end
+	local rg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
+	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,3,5,aux.dncheck,0) end
+	local gp=aux.SelectUnselectGroup(rg,e,tp,3,5,aux.dncheck,1,tp,HINTMSG_TODECK)
+	Duel.SendtoDeck(gp,nil,5,REASON_COST)
 	-- 	*Solo puedes Invocar de Modo Especial monstruos "Terranigma"
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,1))
@@ -61,8 +58,8 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function s.counterfilter(c)
-	return c:IsSetCard(0x3e7) and c:IsMonster()
+function s.splimit(e,c)
+	return not (c:IsSetCard(0x3e7) and c:IsMonster())
 end
 function s.thsetfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsSpellTrap() and c:IsAbleToHand()
