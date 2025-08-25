@@ -8,14 +8,14 @@ function s.initial_effect(c)
     e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_HANDES+CATEGORY_DRAW)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetCode(EVENT_CHAINING)
-	e0:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e0:SetRange(LOCATION_HAND)
 	e0:SetCountLimit(1,{id,0},EFFECT_COUNT_CODE_DUEL)
 	e0:SetCondition(s.chcon)
 	e0:SetTarget(s.chtg)
 	e0:SetOperation(s.chop)
 	c:RegisterEffect(e0)
 	local e0a=e0:Clone()
-	e0:SetRange(LOCATION_GRAVE)
+	e0a:SetRange(LOCATION_GRAVE)
 	e0a:SetCountLimit(1,{id,1},EFFECT_COUNT_CODE_DUEL)
 	c:RegisterEffect(e0a)
 	local e0b=e0:Clone()
@@ -39,7 +39,7 @@ s.listed_series={0x3e7}
     -- 	*EFECTO 0°
 function s.chcon(e,tp,eg,ep,ev,re,r,rp,chk)
     local trig_loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-    return ep==1-tp and re:IsMonsterEffect() and trig_loc&(LOCATION_HAND|LOCATION_GRAVE)>0
+    return ep==1-tp and re:IsMonsterEffect() and trig_loc&(LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED)>0
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
