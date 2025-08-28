@@ -2,28 +2,25 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    --  0° Repcuerar hasta 3 cartas en el Campo, Cementerio o Destierro a su respectivo dueño
+	--	0° Cambiar la Posición de batala de los monstruos de tu adversario a Posición de Defensa boca abajo
     local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_TOHAND)
+	e0:SetCategory(CATEGORY_POSITION)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e0:SetCode(EVENT_FLIP)
-	e0:SetTarget(s.rthtg)
-	e0:SetOperation(s.rthop)
+	e0:SetTarget(s.postg)
+	e0:SetOperation(s.posop)
 	c:RegisterEffect(e0)
-	--  1° Cambiar la posición de batalla de esta carta y otro monstruo en el Campo
+	--  1° Invocar de Modo Especial a esta carta desde la mano en Posición de Defensa boca abajo
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
-    e1:SetCategory(CATEGORY_POSITION)
-    e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-    e1:SetType(EFFECT_TYPE_QUICK_O)
-    e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetTarget(s.settg)
-	e1:SetOperation(s.setop)
-	c:RegisterEffect(e1)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+    c:RegisterEffect(e1)
     -- 	2° Negar activación de la carta que seleccione esta carta boca abajo y destruirla
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
@@ -40,38 +37,69 @@ function s.initial_effect(c)
 end
 s.listed_series={0x3ea}
     --  *EFECTO 0°
-function s.rthtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,PLAYER_ALL,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED)
+function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,nil,1,1-tp,LOCATION_MZONE)
 end
-function s.rthop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED,1,3,nil)
-	if #g>0 then
-		Duel.HintSelection(g)
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil)
+	if #g==0 or Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)==0 then return end
+	local c=e:GetHandler()
+	for tc in g:Match(Card.IsPosition,nil,POS_FACEDOWN_DEFENSE):Iter() do
+		--  *No pueden cambiar sus Posiciones de Batalla
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(3313)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		tc:RegisterEffect(e1)
 	end
 end
     --  *EFECTO 1°
-function s.setfilter(c)
-	return c:IsFaceup() and c:IsCanTurnSet()
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
-function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc~=c and s.setfilter(chkc) end
-	if chk==0 then return s.setfilter(c)
-		and Duel.IsExistingTarget(s.setfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,c) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,s.setfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c)
-	g:AddCard(c)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,2,0,0)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x3ea) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	local g=Group.FromCards(c,tc)
-	if g:IsExists(function(c,e) return not c:IsFaceup() or not c:IsRelateToEffect(e) end,1,nil,e) then return end
-	Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)~=0 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			local sg=g:Select(tp,1,1,nil)
+			local tc=sg:GetFirst()
+			if tc then
+                Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
+                --  *No puede ser Sacrificado
+				local e1=Effect.CreateEffect(c)
+				e1:SetDescription(3303)
+				e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_UNRELEASABLE_SUM)
+				e1:SetValue(1)
+				e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+				tc:RegisterEffect(e1)
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_SINGLE)
+				e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+				e2:SetValue(1)
+				e2:SetReset(RESET_EVENT|RESETS_STANDARD)
+				tc:RegisterEffect(e2)
+			end
+		end
+	end
 end
     --  *EFECTO 2°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
