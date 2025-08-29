@@ -46,10 +46,14 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	local c=e:GetHandler()
-	if #g>0 and c:IsMonster() then
+	if #g>0 then
 		Duel.HintSelection(g)
-        Duel.SendtoGrave(g,REASON_EFFECT)
-        Duel.Damage(1-tp,1000,REASON_EFFECT)
+		Duel.SendtoGrave(g,REASON_EFFECT)
+		local sg=g:RandomSelect(1-tp,1)
+		local tc=sg:GetFirst()
+		if tc:IsMonster() then
+			Duel.Damage(1-tp,1000,REASON_EFFECT)
+		end
 	end
 end
     --  *EFECTO 1°
