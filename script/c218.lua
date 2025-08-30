@@ -14,7 +14,7 @@ function s.initial_effect(c)
 end
     --  *EFECTO 0°
 function s.filter(c)
-	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_DINOSAUR) and c:IsLevelAbove(7) and c:IsFaceup()
+	return c:IsType(TYPE_PENDULUM) and c:IsOriginalRace(RACE_DINOSAUR|RACE_REPTILE) and c:IsLevelAbove(7) and c:IsFaceup()
 end
 function s.desfilter(c,atk,g)
 	return (c:IsFacedown() or not c:IsType(TYPE_PENDULUM)) and c:IsDestructable() and c:IsAttackBelow(atk) and not g:IsContains(c) 

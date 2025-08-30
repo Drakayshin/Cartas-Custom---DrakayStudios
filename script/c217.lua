@@ -78,7 +78,7 @@ end
     --  *EFECTO 1
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
-	return c:IsSummonType(SUMMON_TYPE_PENDULUM) and c:IsPreviousLocation(LOCATION_HAND)
+	return c:IsSummonType(SUMMON_TYPE_PENDULUM)
 end
 function s.atkfilter(c)
 	return c:IsFaceup()
@@ -122,10 +122,10 @@ function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,aux.FaceupFilter(Card.IsSpellTrap),tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetTargetCard(g:GetFirst())
-	Duel.SetTargetPlayer(tc:GetOwner())
+	Duel.SetTargetPlayer(1-tc:GetOwner())
 	Duel.SetTargetParam(dam/2)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tc:GetOwner(),dam/2)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tc:GetOwner(),dam/2)
 end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
