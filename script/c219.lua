@@ -65,7 +65,7 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_CHAINING)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,{id,4})
-	e5:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return rp==1-tp and Duel.IsChainDisablable(ev) end)
+	e5:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():IsPosition(POS_ATTACK) and rp==1-tp and Duel.IsChainDisablable(ev) end)
 	e5:SetTarget(s.distg)
 	e5:SetOperation(s.disop)
     c:RegisterEffect(e5)
@@ -112,7 +112,7 @@ function s.fusfilter(c,code,fc,sumtype,tp)
 end
     --  *Fusión por contacto
 function s.matfilter(c)
-	return c:IsAbleToRemoveAsCost() and  c:IsFaceup() or aux.SpElimFilter(c,false,true)
+	return c:IsAbleToRemoveAsCost() and c:IsFaceup()
 end
 function s.contactfil(tp)
 	return Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_EXTRA|LOCATION_GRAVE,0,nil)
@@ -156,6 +156,7 @@ end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
+	local dg=Group.CreateGroup()
     if tc:IsFaceup() and tc:IsRelateToEffect(e) then
         --  *Reducir ATK/DEF
 		local e1=Effect.CreateEffect(c)
@@ -170,7 +171,11 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(-2000)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2)
+		if preatk~=0 and tc:GetAttack()==0 then dg:AddCard(tc) end
 	end
+	if #dg==0 then return end
+	Duel.BreakEffect()
+	Duel.Destroy(dg,REASON_EFFECT)
 end
     --  *EFECTO 4°
 function s.filter(c,atk)
@@ -189,6 +194,13 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.Destroy(g,REASON_EFFECT)
 	if ct>0 then
 		Duel.BreakEffect()
+		local ct=#Duel.GetOperatedGroup()
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		e1:SetValue(ct*300)
+		c:RegisterEffect(e1)
 	end
 end
     --  *EFECTO 5°
@@ -199,7 +211,7 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.ChangePosition(c,POS_FACEUP_DEFENSE) then
+	if c:IsFaceup() and c:IsRelateToEffect(e) and Duel.ChangePosition(c,POS_FACEUP_DEFENSE)~=0 then
 		Duel.NegateActivation(ev)
 	end
 end
