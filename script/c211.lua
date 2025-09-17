@@ -44,8 +44,12 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_DARKLORD}
     --  *Filtro de Materiales
-function s.ffilter(c,fc,sumtype,tp)
+function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
 	return c:IsAttribute(ATTRIBUTE_DARK,fc,sumtype,tp) and c:IsRace(RACE_FAIRY,fc,sumtype,tp)
+	 and (not sg or not sg:IsExists(s.fusfilter,1,c,c:GetCode(fc,0,tp),fc,0,tp))
+end
+function s.fusfilter(c,code,fc,sumtype,tp)
+	return c:IsSummonCode(fc,0,tp,code) and not c:IsHasEffect(511002961)
 end
     --  *EFECTO 0°
 function s.desrescon(sg,e,tp,mg)
@@ -108,7 +112,7 @@ end
 	--	*EFECTO 2°
 function s.reccon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp==1-tp and c:IsFusionSummoned() and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+	return rp==1-tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
 end
 function s.recfilter(c)
 	return c:IsSetCard(SET_DARKLORD) and c:IsMonster()
