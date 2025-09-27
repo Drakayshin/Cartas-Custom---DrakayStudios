@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
     --  *Invocación por Enlace
 	c:EnableReviveLimit()
-    Link.AddProcedure(c,nil,1,2,s.lcheck)
+    Link.AddProcedure(c,nil,2,2,s.lcheck)
     --  0° Destruir esta carta si un Monstruo de Enlace "Solaravalon" deja el Campo por efecto de una carta
     local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_DESTROY)
@@ -47,7 +47,7 @@ end
 s.listed_series={SET_SUNAVALON,SET_SUNVINE,0x4157}
     --  *Filtro de Materiales
 function s.lcheck(g,lc,sumtype,tp)
-	return g:IsExists(Card.IsRace,1,nil,RACE_PLANT,lc,sumtype,tp)
+	return g:IsExists(Card.IsRace,1,nil,RACE_PLANT,lc,sumtype,tp) and g:IsExists(Card.IsType,1,nil,TYPE_NORMAL,lc,sumtype,tp)
 end
     --  *EFECTO 0°
 function s.cfilter(c,tp,rp)
@@ -99,7 +99,7 @@ function s.distg(e,c)
 	end
 	local bc=c:GetBattleTarget()
 	if c:IsRelateToBattle() and bc and bc:IsControler(e:GetHandlerPlayer())
-		and bc:IsFaceup() and bc:IsSetCard({SET_SUNAVALON,SET_SUNVINE}) then
+		and bc:IsFaceup() and bc:IsSetCard({SET_SUNVINE}) then
 		c:RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1,fid)
 		return true
 	end
