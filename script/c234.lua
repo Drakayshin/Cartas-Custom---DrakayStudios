@@ -38,7 +38,7 @@ end
 s.listed_series={0x3ee}
     --  *EFECTO 2°
 function s.spconfilter(c)
-	return c:IsOriginalRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee) and c:IsFaceup()
+	return c:IsOriginalRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or (c:IsSetCard(0x3ee) and not c:IsType(TYPE_TUNER)) and c:IsFaceup()
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.spconfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)

@@ -133,7 +133,8 @@ end
 	-- 	*EFECTO 2°
 function s.splimit(e,se,sp,st)
 	return (st&SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL and Duel.GetLP(e:GetHandlerPlayer())>=10000 
-	or ((se:GetHandler():ListsCode(48179391) and e:GetHandler():IsLocation(LOCATION_HAND)))
+	or ((se:GetHandler():ListsCode(48179391) and Duel.GetLP(e:GetHandlerPlayer())>=10000  
+	and e:GetHandler():IsLocation(LOCATION_HAND)))
 end
 	-- 	*EFECTO 3°
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)

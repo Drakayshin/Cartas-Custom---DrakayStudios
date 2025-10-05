@@ -48,9 +48,5 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 1°
 function s.setfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and c:IsLevelBelow(4)
-end
-    --  *EFECTO 2°
-function s.handfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ee) and c:IsType(TYPE_SYNCHRO|TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and c:IsLevelAbove(4)
 end
