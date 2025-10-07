@@ -1,6 +1,5 @@
---スカーレッド・スーパーノヴァ・ドラゴン
---Red Supernova Dragon
---Scripted by AlphaKretin
+--Paladín del Éxodo Flauriga
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     --  *Invocación por Sincronía
@@ -13,22 +12,25 @@ function s.initial_effect(c)
 	e0:SetRange(LOCATION_EXTRA)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.synlimit)
-    c:RegisterEffect(e0)
-    --  1° Puede ser tratado como un monstruo de Nivel 4, 5 o 6 para una Invocación por Sincronía o Xyz
-    local e1=Effect.CreateEffect(c)
+	c:RegisterEffect(e0)
+    --  1° No recibes daño de batalla que involucre a carta
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetOperation(s.synlv)
+	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
-    local e1a=Effect.CreateEffect(c)
-	e1a:SetType(EFFECT_TYPE_SINGLE)
-	e1a:SetCode(EFFECT_XYZ_LEVEL)
-	e1a:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	--	1a° No recibes daño por efectos
+	local e1a=Effect.CreateEffect(c)
+	e1a:SetType(EFFECT_TYPE_FIELD)
+	e1a:SetCode(EFFECT_CHANGE_DAMAGE)
 	e1a:SetRange(LOCATION_MZONE)
-	e1a:SetValue(s.xyzlv)
-    c:RegisterEffect(e1a)
+	e1a:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1a:SetTargetRange(1,0)
+	e1a:SetValue(s.damval)
+	c:RegisterEffect(e1a)
+	local e1b=e1a:Clone()
+	e1b:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e1b)
     --  2° Gana ATK igual a tus LP
     local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -89,20 +91,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6a)
 end
 s.listed_series={0x3ee}
-    --  *EFECTO 1°  (Sincronía)
-function s.synlv(e,tg,ntg,sg,lv,sc,tp)
-	local c=e:GetHandler()
-	local sum=(sg-c):GetSum(Card.GetSynchroLevel,sc)
-	if sum+c:GetSynchroLevel(sc)==lv then return true,true end
-	return (sc:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee)) and ((sum+4==lv) or (sum+5==lv)),true
-end   
-    --  *EFECTO 1° (Xyz)
-function s.xyzlv(e,c,rc)
-	if rc:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee) then
-		return 4,5,e:GetHandler():GetLevel()
-	else
-		return e:GetHandler():GetLevel()
-	end
+	--	*EFECTO 1a°
+function s.damval(e,re,val,r,rp,rc)
+	if (r&REASON_EFFECT)~=0 then return 0
+	else return val end
 end
 	--	*EFECTO 3°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -158,7 +150,7 @@ end
     --  *EFECTO 6°
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsSynchroSummoned() and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return rp==1-tp and c:IsSynchroSummoned() and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x3ee) and c:IsLevelBelow(9) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
