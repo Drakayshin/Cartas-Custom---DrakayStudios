@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
-	e2:SetValue(s.efilter)
+	e2:SetValue(function(e,te) return te:IsMonsterEffect() and te:GetOwner()~=e:GetOwner() end)
 	c:RegisterEffect(e2)
 	-- 	3° Cambiar la Posicion de batalla
 	local e3=Effect.CreateEffect(c)
@@ -75,10 +75,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 then
 		c:CompleteProcedure()
 	end
-end
-	--	*EFECTO 2°
-function s.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
 	--	*EFECTO 3°
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
