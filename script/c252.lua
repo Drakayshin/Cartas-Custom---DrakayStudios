@@ -58,7 +58,6 @@ function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
 	local bc=e:GetHandler():GetBattleTarget()
 	e:SetLabelObject(bc)
-    Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,bc:GetAttack())
 	return c:IsStatus(STATUS_OPPO_BATTLE) and c:IsRelateToBattle() and bc:IsRelateToBattle() and not bc:IsDisabled()
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
