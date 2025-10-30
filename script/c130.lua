@@ -19,25 +19,25 @@ function s.initial_effect(c)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(function(e,c,sump,sumtype,sumpos,targetp)return c:IsLocation(LOCATION_EXTRA)end)
 	c:RegisterEffect(e1)
-	-- 	2° Monstruo que controles ganan 500 ATK/DEF
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
+	-- 	2° No es afectada por efectos de otras cartas
+    local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_IMMUNE_EFFECT)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetValue(500)
+	e2:SetValue(function(e,te) return te:GetOwner()~=e:GetOwner() end)
 	c:RegisterEffect(e2)
-    local e2a=e2:Clone()
-	e2a:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e2a)
-	-- 	3° No es afectada por efectos de otras cartas
-    local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_IMMUNE_EFFECT)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	-- 	3° Monstruo que controles ganan 500 ATK/DEF
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_FZONE)
-	e3:SetValue(function(e,te) return te:GetOwner()~=e:GetOwner() end)
+	e3:SetCode(EFFECT_UPDATE_ATTACK)
+	e3:SetTargetRange(LOCATION_MZONE,0)
+	e3:SetValue(500)
 	c:RegisterEffect(e3)
+    local e3a=e3:Clone()
+	e3a:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e3a)
 	--	4° Tu adversario solo puede atacar al monstruo que tenga en ATK mas alto en tu Campo
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -66,7 +66,7 @@ function s.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e6:SetOperation(s.op)
 	c:RegisterEffect(e6)
-    -- Recuperar del Cementerio 1 carta que mencione
+    -- Recuperar del Cementerio hasta 3 cartas en el Cementerio o destierro
 	local e7=Effect.CreateEffect(c)
 	e7:SetDescription(aux.Stringid(id,1))
 	e7:SetCategory(CATEGORY_TOHAND)
@@ -109,20 +109,24 @@ function s.recop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.Recover(p,rec,REASON_EFFECT)
 end
-	-- 	*EFECTO 6°
-function s.thfilter(c)
-	return (c:ListsCode(48179391)) and not c:IsCode(id) and c:IsAbleToHand()
-end
+	-- 	*EFECTO 7°
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE+LOCATION_REMOVED)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE|LOCATION_REMOVED)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
-	local sg=aux.SelectUnselectGroup(g,e,tp,1,3,aux.dncheck,1,tp,HINTMSG_ATOHAND)
-	if #sg>0 then
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,3,nil)
+	if #g>0 then
+		Duel.HintSelection(g)
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_CANNOT_DRAW)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetDescription(aux.Stringid(id,2))
+		e1:SetTargetRange(1,0)
+		e1:SetReset(RESET_PHASE|PHASE_END)
+		Duel.RegisterEffect(e1,tp)
 	end
 end
