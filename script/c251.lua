@@ -1,99 +1,79 @@
---Vanguardia Flauriga
+--Éxodo de los Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--  0° Regresar 1 carta en el Campo o Cementerio a la mano
+	--  0° Añadir a tu mano, o Invoca de Modo Especial 1 monstruo "Flauriga" desde tu Deck o Cementerio
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_TOHAND)
+	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_SPECIAL_SUMMON)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
-    e0:SetHintTiming(0,TIMING_MAIN_END|TIMING_BATTLE_START|TIMING_BATTLE_PHASE|TIMING_BATTLE_STEP_END|TIMING_BATTLE_END)
-    e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e0:SetCost(s.shucost)
-	e0:SetTarget(s.retthtg)
-	e0:SetOperation(s.retthop)
+	e0:SetHintTiming(0,TIMING_STANDBY_PHASE|TIMING_MAIN_END|TIMINGS_CHECK_MONSTER_E)
+    e0:SetCountLimit(1,{id,0})
+    e0:SetCost(Cost.PayLP(1000))
+	e0:SetTarget(s.spth)
+	e0:SetOperation(s.spop)
     c:RegisterEffect(e0)
-    --  1° Recuperar hasta 3 cartas "Flauriga" desde el destierro
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetCategory(CATEGORY_TODECK)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
+    --  1° Alterar el Nivel de 1 monstruo "Flauriga"
+    local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetCategory(CATEGORY_LVCHANGE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_GRAVE)
-    e1:SetCode(EVENT_FREE_CHAIN)
-    e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+	e1:SetCountLimit(1,{id,1})
 	e1:SetCost(Cost.SelfBanish)
-	e1:SetTarget(s.tdtg)
-	e1:SetOperation(s.tdop)
+	e1:SetTarget(s.lvtg)
+	e1:SetOperation(s.lvop)
 	c:RegisterEffect(e1)
 end
 s.listed_series={0x3ee}
     --  *EFECTO 0°
-function s.unfilter(c)
-	return c:IsMonster() and c:IsSetCard(0x3ee) and c:IsAbleToDeckOrExtraAsCost()
+function s.thspfilter(c,e,tp,sp_chk)
+    return c:IsSetCard(0x3ee) and c:IsMonster() and (c:IsAbleToHand() or (sp_chk and c:IsCanBeSpecialSummoned(e,0,tp,false,false))
+    and not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,c:GetCode()),tp,LOCATION_ONFIELD,0,1,nil))
 end
-function s.shucost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.unfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,s.unfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,2,2,nil)
-	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
-end
-function s.retthtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_ONFIELD|LOCATION_GRAVE)
-end
-function s.retthop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(Card.IsAbleToHand),tp,LOCATION_ONFIELD|LOCATION_GRAVE,LOCATION_ONFIELD|LOCATION_GRAVE,1,1,nil)
-	if #g>0 then
-		Duel.HintSelection(g)
-        Duel.SendtoHand(g,nil,REASON_EFFECT)
-		local tc=g:GetFirst()
-		if tc:IsMonster() then
-            Duel.Damage(1-tp,tc:GetLevel()*200,REASON_EFFECT)
-            Duel.Recover(tp,tc:GetLevel()*300,REASON_EFFECT)
-		end
+function s.spth(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+	   local sp_chk=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	   return Duel.IsExistingMatchingCard(s.thspfilter,tp,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp,sp_chk)
 	end
+	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local sp_chk=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
+	local sc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thspfilter),tp,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp,sp_chk):GetFirst()
+	if not sc then return end
+	aux.ToHandOrElse(sc,tp,
+		function() return sp_chk and sc:IsCanBeSpecialSummoned(e,0,tp,false,false) end,
+		function() Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP) end,
+		aux.Stringid(id,1)
+	)
 end
     --  *EFECTO 1°
-function s.tdfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ee) and c:IsAbleToDeck()
+function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:HasLevel() and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(aux.FaceupFilter(Card.HasLevel),tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectTarget(tp,aux.FaceupFilter(Card.HasLevel),tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+	local lv=Duel.AnnounceNumberRange(tp,1,10,tc:GetLevel())
+	e:SetLabel(lv)
+	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,tc,1,tp,0)
 end
-function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.tdfilter(chkc) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_REMOVED,0,1,e:GetHandler())
-		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.tdfilter,tp,LOCATION_REMOVED,0,1,3,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
-end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetTargetCards(e)
-	if #g>0 then
-        Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-        --  *Daño por batalla
-        local e1=Effect.CreateEffect(e:GetHandler())
-        e1:SetType(EFFECT_TYPE_FIELD)
-        e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-        e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-        e1:SetTargetRange(1,0)
-        e1:SetValue(1)
-        e1:SetReset(RESET_PHASE|PHASE_END)
-        Duel.RegisterEffect(e1,tp)
-        --  *Daño por efectos de cartas
-        local e2=Effect.CreateEffect(e:GetHandler())
-        e2:SetType(EFFECT_TYPE_FIELD)
-        e2:SetCode(EFFECT_CHANGE_DAMAGE)
-        e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-        e2:SetTargetRange(1,0)
-        e2:SetValue(s.val)
-        e2:SetReset(RESET_PHASE|PHASE_END)
-        Duel.RegisterEffect(e2,tp)
+function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if not (tc:IsFaceup() and tc:HasLevel() and tc:IsRelateToEffect(e)) then return end
+	local lv=e:GetLabel()
+	if lv>0 and not tc:IsLevel(lv) then
+		--Its Level becomes the declared Level until the end of this turn
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetValue(lv)
+		e1:SetReset(RESETS_STANDARD_PHASE_END)
+		tc:RegisterEffect(e1)
 	end
-end
-function s.val(e,re,val,r,rp,rc)
-	if e:GetHandlerPlayer()~=rp then
-		return 0
-	else return val end
 end

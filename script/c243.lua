@@ -1,11 +1,11 @@
---Paladín del Éxodo Flauriga
+--El Apócrifo Heraldo Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
     --  *Invocación por Sincronía
-	c:EnableReviveLimit()
-	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(Card.IsType,TYPE_SYNCHRO),1,1)
-	--  0° Debe ser primero Invocado por Sincronía
+    c:EnableReviveLimit()
+	Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x3ee),2,2,Synchro.NonTuner(nil),1,99)
+	--	0° Debe ser Primero Invocado por Sincronía
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -13,127 +13,90 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e0:SetValue(aux.synlimit)
 	c:RegisterEffect(e0)
-    --  1° No recibes daño de batalla que involucre a carta
-	local e1=Effect.CreateEffect(c)
+    --  0° Tu adversrio no puede Sacrificar esta carta en el Campo
+    local e0a=Effect.CreateEffect(c)
+	e0a:SetType(EFFECT_TYPE_SINGLE)
+	e0a:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0a:SetRange(LOCATION_MZONE)
+	e0a:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e0a:SetValue(s.sumlimit)
+	c:RegisterEffect(e0a)
+	local e0b=Effect.CreateEffect(c)
+	e0b:SetType(EFFECT_TYPE_FIELD)
+	e0b:SetCode(EFFECT_CANNOT_RELEASE)
+	e0b:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e0b:SetRange(LOCATION_MZONE)
+	e0b:SetTargetRange(0,1)
+	e0b:SetTarget(function(e,c) return c==e:GetHandler() end)
+	e0b:SetValue(1)
+    c:RegisterEffect(e0b)
+    --  1° No puede ser desterrada en el Campo
+    local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e1:SetValue(1)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetCode(EFFECT_CANNOT_REMOVE)
+	e1:SetRange(LOCATION_MZONE)
 	c:RegisterEffect(e1)
-	--	1a° No recibes daño por efectos
-	local e1a=Effect.CreateEffect(c)
+	local e1a=e1:Clone()
 	e1a:SetType(EFFECT_TYPE_FIELD)
-	e1a:SetCode(EFFECT_CHANGE_DAMAGE)
-	e1a:SetRange(LOCATION_MZONE)
 	e1a:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1a:SetTargetRange(1,0)
-	e1a:SetValue(s.damval)
-	c:RegisterEffect(e1a)
-	local e1b=e1a:Clone()
-	e1b:SetCode(EFFECT_NO_EFFECT_DAMAGE)
-	c:RegisterEffect(e1b)
-    --  2° Gana ATK igual a tus LP
+	e1a:SetTargetRange(1,1)
+	e1a:SetTarget(function(e,c,p) return c==e:GetHandler() end)
+    c:RegisterEffect(e1a)
+    --  2° Negar la activación de una carat y ganar LP igual al ATK original si es un monstruo
     local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_RECOVER)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(function(e,c) return Duel.GetLP(c:GetControler(1,e)) end)
+    e2:SetCountLimit(1,{id,0})
+    e2:SetCost(Cost.PayLP(1000))
+	e2:SetCondition(s.discon)
+	e2:SetTarget(s.distg)
+	e2:SetOperation(s.disop)
     c:RegisterEffect(e2)
-    --  3° Negar activación de carta y destruir, con posible destierro de 1 carta en el Campo o cualquier Cementerio
-    local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetCountLimit(1,{id,0})
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-    e3:SetRange(LOCATION_MZONE)
-    e3:SetCost(Cost.PayLP(1500))
-	e3:SetCondition(s.discon)
-	e3:SetTarget(s.distg)
-	e3:SetOperation(s.disop)
-    c:RegisterEffect(e3)
-    -- 	4° Ganar LP igual al ATK original del monstruo destruido por batalla contra esta carta
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_RECOVER)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_BATTLE_DESTROYING)
-	e4:SetCountLimit(1,{id,1})
-	e4:SetCondition(aux.bdocon)
-	e4:SetTarget(s.lptg)
-	e4:SetOperation(s.lpop)
-	c:RegisterEffect(e4)
-    -- 5° Infligir daño igual al ATK original del monstruo destruido por batalla contra esta carta
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,3))
-	e5:SetCategory(CATEGORY_DAMAGE)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_BATTLE_DESTROYING)
-    e5:SetCountLimit(1,{id,1})
-	e5:SetTarget(s.damtg)
-	e5:SetOperation(s.damop)
-    c:RegisterEffect(e5)
-    --  6° Invocar de Modo Especial 1 monstruo "Flauriga" de Nivel 9 o menor desde tu mano, Cementerio o Destierro
-    local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(id,4))
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e6:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_CAL)
-	e6:SetCode(EVENT_DESTROYED)
-	e6:SetCountLimit(1,{id,2})
-	e6:SetCondition(s.spcon)
-	e6:SetTarget(s.sptg)
-	e6:SetOperation(s.spop)
-    c:RegisterEffect(e6)
-    local e6a=e6:Clone()
-	e6a:SetCode(EVENT_REMOVE)
-	c:RegisterEffect(e6a)
+    --  3° Infligir daño igual al ATK original del monstruo destruido por batalla contra esta carta
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_DAMAGE)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_BATTLE_DESTROYING)
+    e3:SetCountLimit(1,{id,1})
+	e3:SetTarget(s.damtg)
+	e3:SetOperation(s.damop)
+	c:RegisterEffect(e3)
 end
 s.listed_series={0x3ee}
-	--	*EFECTO 1a°
-function s.damval(e,re,val,r,rp,rc)
-	if (r&REASON_EFFECT)~=0 then return 0
-	else return val end
+    -- 	*EFECTO 0°
+function s.sumlimit(e,c)
+    if not c then return false end
+    return not c:IsControler(e:GetHandlerPlayer())
 end
-	--	*EFECTO 3°
+    --  *EFECTO 2°
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	return Duel.IsChainNegatable(ev)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
-end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-		local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
-		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local sg=g:Select(tp,1,1,nil)
-			Duel.HintSelection(sg)
-			Duel.BreakEffect()
-			Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+	if re:GetHandler():IsRelateToEffect(re) then
+		if re:GetHandler():IsMonster() then
+			Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,re:GetHandler():GetBaseAttack())
 		end
 	end
 end
-    --	*EFECTO 4°
-function s.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local dam=e:GetHandler():GetBattleTarget():GetBaseAttack()
-	if chk==0 then return dam>0 end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(dam)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,dam)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
+    if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re)
+		and re:GetHandler():IsMonster() and re:GetHandler():GetBaseAttack()>0 then
+		Duel.BreakEffect()
+		Duel.Recover(tp,re:GetHandler():GetBaseAttack(),REASON_EFFECT)
+	end
 end
-function s.lpop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Recover(p,d,REASON_EFFECT)
-end
-    -- 	*EFECTO 5°
+    --  *EFECTO 3°
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local tc=e:GetHandler():GetBattleTarget()
@@ -146,26 +109,4 @@ end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
-end
-    --  *EFECTO 6°
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return rp==1-tp and c:IsSynchroSummoned() and c:IsPreviousLocation(LOCATION_ONFIELD)
-end
-function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x3ee) and c:IsLevelBelow(9) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED)
-end
-function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-	end
 end

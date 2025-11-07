@@ -1,4 +1,4 @@
---Cabalkiria del Génesis Flamante
+--Segador de los Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)

@@ -1,119 +1,127 @@
---Laios, El Prominente Flamante
+--Ryumaru, Luchador Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-    --  *Invocación por Sincronía
-    c:EnableReviveLimit()
-    Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0x3ee),1,1,Synchro.NonTuner(nil),1,99)
-    --  0° Ganar ATK igual a uno de sus Materiales de Sincronía (monstruo Cantante)
-    local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e0:SetCondition(s.valcon)
-	e0:SetOperation(s.valop)
+    --  0° Invocar de Modo Especial y tratarla como un monstruo Cantante
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetProperty(EFFECT_FLAG_DELAY)
+	e0:SetRange(LOCATION_HAND)
+	e0:SetCountLimit(1,{id,0})
+	e0:SetCost(s.selfspcost)
+	e0:SetTarget(s.selfsptg)
+	e0:SetOperation(s.selfspop)
 	c:RegisterEffect(e0)
-    --  1° Devolver a la mano, 1 carta en el Campo
-    local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCountLimit(1,{id,0})
-	e1:SetCost(s.rmcost)
-	e1:SetCondition(s.bscon)
-	e1:SetTarget(s.bstg)
-	e1:SetOperation(s.bsop)
-    c:RegisterEffect(e1)
-    --  2° Añadir o colocar 1 Mágica/Trampa "Flauriga" desde tu Deck
-    local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_NO_TURN_RESET)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E|TIMING_MAIN_END|TIMING_DAMAGE_STEP)
-	e2:SetRange(LOCATION_MZONE)
-    e2:SetCountLimit(1,{id,1})
-    e2:SetCost(Cost.PayLP(1000))
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
+	--  1° monstrar 1 carta en tu mano y añadir a tu mano 2 cartas "Flauriga" con diferentes tipo (Monstruo, Magia, Trampa)
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_HANDES)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,{id,1})
+	e1:SetCost(Cost.Reveal(s.revealfilter,true,1,1,function(e,tp,g) e:SetLabel(g:GetFirst():GetMainCardType()) end))
+	e1:SetTarget(s.handtg)
+	e1:SetOperation(s.handop)
+	c:RegisterEffect(e1)
+	--  1° Efectos añadidos al ser material de Sincronía
+	local e2=Effect.CreateEffect(c)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+    e2:SetCode(EVENT_BE_MATERIAL)
+    e2:SetCountLimit(1,{id,2})
+	e2:SetCondition(s.effcon)
+	e2:SetOperation(s.effop)
 	c:RegisterEffect(e2)
 end
 s.listed_series={0x3ee}
     --  *EFECTO 0°
-function s.valcon(e)
-	return e:GetHandler():IsSynchroSummoned()
+function s.selfspcostfilter(c,tp)
+	return c:IsAbleToRemoveAsCost() and c:IsSetCard(0x3ee) and  c:IsMonster() and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
 end
-function s.valop(e,tp,eg,ep,ev,re,r,rp)
+function s.selfspcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(id)==0
+		and Duel.IsExistingMatchingCard(s.selfspcostfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,nil,tp) end
+	e:GetHandler():RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.selfspcostfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,1,nil,tp)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
+end
+function s.selfsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local g=c:GetMaterial()
-	local tc=g:GetFirst()
-	local atk=0
-	while tc do
-		if tc:IsType(TYPE_TUNER) and tc:IsSetCard(0x3ee) then
-		local tatk=tc:GetTextAttack()
-		if tatk<0 then tatk=0 end
-		atk=atk+tatk
-		end
-		tc=g:GetNext()
+	c:AssumeProperty(ASSUME_TYPE,c:GetType()|TYPE_TUNER)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+end
+function s.selfspop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	c:AssumeProperty(ASSUME_TYPE,c:GetType()|TYPE_TUNER)
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+		--  *Es tratado como un monstruo Cantante
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_ADD_TYPE)
+		e1:SetValue(TYPE_TUNER)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		c:RegisterEffect(e1)
 	end
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(atk)
-	e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
-	c:RegisterEffect(e1)
+	Duel.SpecialSummonComplete()
 end
-	--  *EFECTO 1°
-function s.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetAttackAnnouncedCount()==0 end
-	--	*No puede atacar este turno
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(3206)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetReset(RESETS_STANDARD_PHASE_END)
-	c:RegisterEffect(e1,true)
-	c:RegisterFlagEffect(id,RESETS_STANDARD_PHASE_END,0,1)
+    --  *EFECTO 1°
+function s.revealfilter(c,e,tp)
+	return c:IsSetCard(0x3ee) and not c:IsPublic()
+	and Duel.GetMatchingGroup(s.handtgfilter,tp,LOCATION_DECK,0,nil,c:GetMainCardType()):GetClassCount(Card.GetMainCardType)==2
 end
-function s.bscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSynchroSummoned()
+function s.handtgfilter(c,main_type)
+	return c:IsSetCard(0x3ee) and c:IsAbleToHand() and not c:IsType(main_type)
 end
-function s.bstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+function s.handtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
-function s.bsop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and re:GetHandler():IsMonster() and re:GetHandler():GetBaseAttack()>0 then
+function s.handop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(s.handtgfilter,tp,LOCATION_DECK,0,nil,e:GetLabel())
+	if #g<2 then return end
+	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.dpcheck(Card.GetMainCardType),1,tp,HINTMSG_ATOHAND)
+	if #sg==2 and Duel.SendtoHand(sg,nil,REASON_EFFECT)>0 then
+		Duel.ConfirmCards(1-tp,sg)
+		Duel.ShuffleHand(tp)
 		Duel.BreakEffect()
-        Duel.SendtoHand(tc,nil,REASON_EFFECT)
-        Duel.Recover(tp,re:GetHandler():GetBaseAttack(),REASON_EFFECT)
+		Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT|REASON_DISCARD,nil)
 	end
 end
-	--  *EFECTO 2°
-function s.thfilter(c)
-	return c:IsSpellTrap() and c:IsSetCard(0x3ee) and (c:IsAbleToHand() or c:IsSSetable())
+	--	*EFECTO 2°
+function s.effcon(e,tp,eg,ep,ev,re,r,rp)
+    return ((r==REASON_XYZ and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)) 
+    or (r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():HasLevel())) and e:GetHandler():GetReasonCard():IsSetCard(0x3ee)
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function s.effop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	--  *Robar 1 carta si destruye a un monstruo en batalla
+    local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+    e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(aux.bdocon)
+	e1:SetTarget(s.drtg)
+	e1:SetOperation(s.drop)
+    e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+    rc:RegisterEffect(e1)
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
-	local tc=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if not tc then return end
-	aux.ToHandOrElse(tc,tp,
-		Card.IsSSetable,
-		function(c)
-			Duel.SSet(tp,tc)
-		end,
-		aux.Stringid(id,2)
-	)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end

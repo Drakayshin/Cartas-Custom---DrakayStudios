@@ -1,81 +1,97 @@
---Tajador Flauriga
+--Persuasión Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	--  0° Aumentar ATK y ganar LP
+    --  0° Negar Invocación
     local e0=Effect.CreateEffect(c)
-    e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_RECOVER)
+	e0:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_REMOVE)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
-	e0:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e0:SetCode(EVENT_FREE_CHAIN)
-    e0:SetHintTiming(TIMING_DAMAGE_STEP)
+    e0:SetCode(EVENT_SPSUMMON)
     e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e0:SetCondition(s.atkcon)
-	e0:SetTarget(s.atkth)
-	e0:SetOperation(s.atkop)
-    c:RegisterEffect(e0)
-    --  1° Multiple ataque este turno
-    local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,1))
+	e0:SetCondition(s.condition)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.negarop)
+	c:RegisterEffect(e0)
+	--  1° Negar la activación o efecto que incluya invocar de Modo Especial
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(s.matkth)
-	e1:SetOperation(s.matkop)
-	c:RegisterEffect(e1)
-end
+    e1:SetCode(EVENT_CHAINING)
+    e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
+    e1:SetCondition(s.condition1)
+    e1:SetOperation(s.negarop1)
+    c:RegisterEffect(e1)
+    --  2° Activar en el turno que es colocada
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetCondition(function(e) return Duel.IsExistingMatchingCard(s.setfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) end)
+	c:RegisterEffect(e2)
+end   
 s.listed_series={0x3ee}
     --  *EFECTO 0°
-function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
-end
-function s.atkfilter(c)
-	return c:HasNonZeroDefense() and c:IsSetCard(0x3ee)
-end
-function s.atkth(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) and chkc:IsControler(tp) end
-	if chk==0 then return Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
-end
-function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local def=tc:GetDefense()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and def>0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(tc:GetDefense())
-		tc:RegisterEffect(e1)
-		Duel.BreakEffect()
-		Duel.Recover(tp,tc:GetDefense(),REASON_EFFECT)
-		--	*Infligir daño de penetración
-		tc:AddPiercing(RESETS_STANDARD_PHASE_END,e:GetHandler())
-	end
-end
-    --  *EFECTO 1°
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3ee)
 end
-function s.matkth(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+    if tp==ep or not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
+	return Duel.GetCurrentChain(true)==0
 end
-function s.matkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		--  *Puede atacar a todos los monstruos este turno
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_ATTACK_ALL)
-		e1:SetValue(1)
-		e1:SetReset(RESETS_STANDARD_PHASE_END)
-		tc:RegisterEffect(e1)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,#eg,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,#eg,0,0)
+end
+function s.negarop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsChainDisablable(0) then
+		local sel=1
+		local g=Duel.GetMatchingGroup(Card.IsSpell,tp,0,LOCATION_HAND,nil)
+		Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(id,0))
+		if #g>0 then
+			sel=Duel.SelectOption(1-tp,1213,1214)
+		else
+			sel=Duel.SelectOption(1-tp,1214)+1
+		end
+		if sel==0 then
+			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DISCARD)
+			local sg=g:Select(1-tp,1,1,nil)
+			Duel.SendtoGrave(sg,REASON_EFFECT|REASON_DISCARD)
+			Duel.NegateEffect(0)
+			return
+		end
 	end
+    Duel.NegateSummon(eg)
+	Duel.Destroy(eg,REASON_EFFECT)
+end
+    --  *EFECTO 1°
+function s.condition1(e,tp,eg,ep,ev,re,r,rp)
+    if tp==ep or not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
+	return re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and Duel.IsChainDisablable(ev)
+end
+function s.negarop1(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsChainDisablable(0) then
+		local sel=1
+		local g=Duel.GetMatchingGroup(Card.IsSpell,tp,0,LOCATION_HAND,nil)
+		Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(id,0))
+		if #g>0 then
+			sel=Duel.SelectOption(1-tp,1213,1214)
+		else
+			sel=Duel.SelectOption(1-tp,1214)+1
+		end
+		if sel==0 then
+			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DISCARD)
+			local sg=g:Select(1-tp,1,1,nil)
+			Duel.SendtoGrave(sg,REASON_EFFECT|REASON_DISCARD)
+			Duel.NegateEffect(0)
+			return
+		end
+	end
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Remove(eg,POS_FACEUP,REASON_EFFECT)
+	end
+end
+    --  *EFECTO 2°
+function s.setfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and c:IsLevelAbove(4)
 end

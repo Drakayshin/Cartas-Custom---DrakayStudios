@@ -56,7 +56,7 @@ end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c:IsStatus(STATUS_OPPO_BATTLE) and c:IsRelateToBattle() and bc:IsRelateToBattle() and not bc:IsDisabled()
+	return c:IsStatus(STATUS_OPPO_BATTLE) and c:IsRelateToBattle()
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
