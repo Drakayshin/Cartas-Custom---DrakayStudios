@@ -50,7 +50,6 @@ function s.selfspcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.selfsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	c:AssumeProperty(ASSUME_TYPE,c:GetType()|TYPE_TUNER)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
@@ -58,7 +57,6 @@ end
 function s.selfspop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	c:AssumeProperty(ASSUME_TYPE,c:GetType()|TYPE_TUNER)
 	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
 		--  *Es tratado como un monstruo Cantante
 		local e1=Effect.CreateEffect(c)
