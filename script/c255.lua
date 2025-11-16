@@ -70,18 +70,20 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 3°
 function s.cfilter(c)
-	return c:IsRace(RACE_PYRO|RACE_THUNDER) and c:HasLevel() and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsRace(RACE_PYRO|RACE_THUNDER) and c:IsAbleToDeckOrExtraAsCost() and c:IsFaceup()
 end
 function s.dmcost(e,tp,eg,ep,ev,re,r,rp,chk)
     e:SetLabel(1)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_MZONE|LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil)
-	e:SetLabel(g:GetFirst():GetLevel()*200)
+	--	*Conjuto de Entre Nivel/Rango o Enlace -> ',g:GetFirst():GetLink()'
+	local val=math.max(g:GetFirst():GetLevel(),g:GetFirst():GetRank())
+	e:SetLabel(val*200)
     Duel.SendtoDeck(g,nil,1,REASON_COST)
 end
 function s.dmth(e,tp,eg,ep,ev,re,r,rp,chk)
-	--	*Causar daño igual al Nivel del monstruo usado como coste
+	--	*Causar daño igual al Nivel/Rango del monstruo usado como coste
 	if chk==0 then
 		local res=e:GetLabel()~=0
 		e:SetLabel(0)
@@ -92,7 +94,7 @@ function s.dmth(e,tp,eg,ep,ev,re,r,rp,chk)
     e:SetLabel(0)
 end
 function s.dmop(e,tp,eg,ep,ev,re,r,rp)
-	--	*Causar daño igual al Nivel del monstruo usado como coste
+	--	*Causar daño igual al Nivel/Rango del monstruo usado como coste
 	local d=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	Duel.Damage(1-tp,d,REASON_EFFECT,true)
     Duel.RDComplete()

@@ -95,8 +95,8 @@ function s.handop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--	*EFECTO 2°
 function s.effcon(e,tp,eg,ep,ev,re,r,rp)
-    return ((r==REASON_XYZ and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)) 
-    or (r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():HasLevel())) and e:GetHandler():GetReasonCard():IsSetCard(0x3ee)
+	return ((r==REASON_XYZ and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD))
+	or (r==REASON_SYNCHRO and e:GetHandler():GetReasonCard():HasLevel()))
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -1,4 +1,4 @@
---Laios, El Prominente Flamante
+--Laios, El Prominente Flauriga
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
@@ -88,13 +88,16 @@ function s.bstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1500)
 end
 function s.bsop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and re:GetHandler():IsMonster() then
+	if tc:IsRelateToEffect(e) then
 		Duel.BreakEffect()
         Duel.SendtoHand(tc,nil,REASON_EFFECT)
-        Duel.Recover(tp,1500,REASON_EFFECT)
+		if tc:IsLocation(LOCATION_HAND) and tc:IsMonster() then
+			Duel.Recover(tp,1500,REASON_EFFECT)
+		end
 	end
 end
 	--  *EFECTO 2°

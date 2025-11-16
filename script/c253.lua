@@ -58,7 +58,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 1°
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3ee)
+	return c:IsFaceup() and (c:IsSetCard(0x3ee) or c:IsOriginalRace(RACE_WARRIOR|RACE_BEASTWARRIOR))
 end
 function s.matkth(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end

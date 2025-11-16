@@ -64,16 +64,16 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 3
 function s.unfilter(c)
-	return c:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or (c:IsMonster() and c:IsSetCard(0x3ee)) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee) and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.shucost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetMatchingGroup(s.unfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
-	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,2,2,aux.dncheck,0) end
-	local gp=aux.SelectUnselectGroup(rg,e,tp,2,2,aux.dncheck,1,tp,HINTMSG_TODECK)
-	Duel.SendtoDeck(gp,nil,2,REASON_COST)
+	if chk==0 then return aux.SelectUnselectGroup(rg,e,tp,3,3,aux.dncheck,0) end
+	local gp=aux.SelectUnselectGroup(rg,e,tp,3,3,aux.dncheck,1,tp,HINTMSG_TODECK)
+	Duel.SendtoDeck(gp,nil,3,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return (c:IsSetCard(0x3ee) and not c:IsType(TYPE_TUNER)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3ee) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
