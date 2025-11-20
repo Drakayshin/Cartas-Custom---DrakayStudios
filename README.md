@@ -10,7 +10,7 @@
 | :--- | :--- | :--- |
 | **1° Descarga** | Descargar el archivo `configs.json` de esta página. | Descargar el archivo `configs.json` de esta página. |
 | **2° Carpeta Destino** | Dirigirse a la carpeta `config` de su instalación de Project Ignis - EDOPro. | Dirigirse a la carpeta `EDOPRO/config` usando el "Gestor de Archivos". |
-| **3° Instalación** | **Cortar/Copiar** el archivo `configs.json` descargado y reemplazar el ya existente en la carpeta config. | **Borrar** el `configs.json` existente y luego **Cortar** el archivo `configs.json` descargado. |
+| **3° Instalación** | **Cortar/Copiar** el archivo `configs.json` descargado y reemplazar el ya existente. | **Borrar** el `configs.json` existente y luego **Cortar** el archivo `configs.json` descargado. |
 | **4° Activación** | Abrir EDOPro y verificar que el repositorio **"Cartas Custom – DrakayStudios"** se descargue al **100%**. | Seguir los pasos de verificación de EDOPro (Chequeo de Repositorio al 100%). |
 | **5° Uso** | En el editor de Decks, habilitar **"Formatos Alternativos"** y seleccionar la limitación **"Custom"**. | Habilitar "Formatos Alternativos" y seleccionar la limitación "Custom". |
 
