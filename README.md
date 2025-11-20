@@ -1,4 +1,8 @@
 # Cartas Custom - DrakayStudios
+[![Estado](https://img.shields.io/badge/Estado-Activo-success)](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios)
+[![Compatibilidad](https://img.shields.io/badge/Emulador-EDOPro-blue)](https://projectignis.org/)
+[![Lenguaje de Script](https://img.shields.io/badge/Scripting-Lua-darkblue)](https://www.lua.org/)
+[![Licencia](https://img.shields.io/badge/Licencia-Apache%202.0-red)](LICENSE)
 
 ![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
 
