@@ -25,8 +25,6 @@ descarga este archivo:
 
 ## ⭐️ Arquetipos y Proyectos Destacados
 
-Para facilitar la búsqueda y el conocimiento de mis creaciones, a continuación, se listan los principales arquetipos y proyectos incluidos en este repositorio:
-
 | Tipo | Arquetipo / Proyecto | Temas Clave |
 | :--- | :--- | :--- |
 | **Arquetipo Principal** | Terranigma | Control total del campo, OTK |
