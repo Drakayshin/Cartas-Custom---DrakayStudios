@@ -4,6 +4,14 @@
 [![Lenguaje de Script](https://img.shields.io/badge/Scripting-Lua-darkblue)](https://www.lua.org/)
 [![Licencia](https://img.shields.io/badge/Licencia-Apache%202.0-red)](LICENSE)
 
+![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
+
+Este repositorio tiene como finalidad, la recolección de cartas personalizadas (Custom Cards), creada por DrakayStudios y nexo para la población interesada en la creación de las mismas de manera pública sin fines de lucro, para el Emulador "Project Ignis - EDOPro" del juego de cartas coleccionables "Yu-Gi-Oh! - Trading Card Game"  
+
+descarga este archivo:
+
+[configs.json](https://github.com/user-attachments/files/20527143/configs.json)
+
 ## ⚙️ Método de Implementación del Repositorio
 
 | Paso | 💻 PC / Laptop | 📱 Android (Dispositivos Móviles) |
@@ -13,15 +21,6 @@
 | **3° Instalación** | **Cortar/Copiar** el archivo `configs.json` descargado y reemplazar el ya existente. | **Borrar** el `configs.json` existente y luego **Cortar** el archivo `configs.json` descargado. |
 | **4° Activación** | Abrir EDOPro y verificar que el repositorio **"Cartas Custom – DrakayStudios"** se descargue al **100%**. | Seguir los pasos de verificación de EDOPro (Chequeo de Repositorio al 100%). |
 | **5° Uso** | En el editor de Decks, habilitar **"Formatos Alternativos"** y seleccionar la limitación **"Custom"**. | Habilitar "Formatos Alternativos" y seleccionar la limitación "Custom". |
-
-![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
-
-
-Este repositorio tiene como finalidad, la recolección de cartas personalizadas (Custom Cards), creada por DrakayStudios y nexo para la población interesada en la creación de las mismas de manera pública sin fines de lucro, para el Emulador "Project Ignis - EDOPro" del juego de cartas coleccionables "Yu-Gi-Oh! - Trading Card Game"  
-
-descarga este archivo:
-
-[configs.json](https://github.com/user-attachments/files/20527143/configs.json)
 
 ## Pack de texturas para el EDOPRO PC
 Procedimiento en el siguiente video
