@@ -28,9 +28,14 @@ Procedimiento en el siguiente video
 
 https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
 
-enlace de descarga
-https://drive.google.com/file/d/1ab4WthnojzI-AKtS5Ci1UmhV60vppOOD/view?usp=sharing
+## 🌟 Recursos Adicionales
 
-## Estructure Decks
+Esta sección incluye contenido extra y guías creadas por DrakayStudios para complementar la experiencia de EDOPro.
 
-https://drive.google.com/drive/folders/1WfY4K5W8NSasu4Q6kLebb0y53o2TrpYt?usp=sharing
+### 🎨 Pack de Texturas (PC)
+Guía y enlace de descarga del pack de texturas completo para EDOPro.
+* [**Enlace de Descarga Directa**](https://drive.google.com/file/d/1ab4WthnojzI-AKtS5Ci1UmhV60vppOOD/view?usp=sharing)
+
+### 📚 Estructura de Decks
+Carpeta que contiene los archivos de decks (.ydk) estructurados por DrakayStudios, listos para importar en EDOPro.
+* [**Acceder a los Decks Estructura**](https://drive.google.com/drive/folders/1WfY4K5W8NSasu4Q6kLebb0y53o2TrpYt?usp=sharing)
