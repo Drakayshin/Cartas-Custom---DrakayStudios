@@ -1,4 +1,5 @@
-# Cartas Custom - DrakayStudios
+# 🃏 Cartas Custom - DrakayStudios: NEXO EDOPRO
+
 [![Estado](https://img.shields.io/badge/Estado-Activo-success)](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios)
 [![Compatibilidad](https://img.shields.io/badge/Emulador-EDOPro-blue)](https://projectignis.org/)
 [![Lenguaje de Script](https://img.shields.io/badge/Scripting-Lua-darkblue)](https://www.lua.org/)
@@ -6,7 +7,7 @@
 
 ![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
 
-Este repositorio tiene como finalidad, la recolección de cartas personalizadas (Custom Cards), creada por DrakayStudios y nexo para la población interesada en la creación de las mismas de manera pública sin fines de lucro, para el Emulador "Project Ignis - EDOPro" del juego de cartas coleccionables "Yu-Gi-Oh! - Trading Card Game"  
+Un repositorio dedicado a la recolección de cartas personalizadas (Custom Cards), creada por **DrakayStudios**. Sirve como un nexo para la comunidad interesada en la creación y uso público (sin fines de lucro) de contenido para el Emulador "Project Ignis - EDOPro" del juego "Yu-Gi-Oh! - Trading Card Game".
 
 descarga este archivo:
 
