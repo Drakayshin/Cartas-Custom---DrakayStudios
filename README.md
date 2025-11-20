@@ -23,6 +23,19 @@ descarga este archivo:
 | **4° Activación** | Abrir EDOPro y verificar que el repositorio **"Cartas Custom – DrakayStudios"** se descargue al **100%**. | Seguir los pasos de verificación de EDOPro (Chequeo de Repositorio al 100%). |
 | **5° Uso** | En el editor de Decks, habilitar **"Formatos Alternativos"** y seleccionar la limitación **"Custom"**. | Habilitar "Formatos Alternativos" y seleccionar la limitación "Custom". |
 
+## ⭐️ Arquetipos y Proyectos Destacados
+
+Para facilitar la búsqueda y el conocimiento de mis creaciones, a continuación, se listan los principales arquetipos y proyectos incluidos en este repositorio:
+
+| Tipo | Arquetipo / Proyecto | Temas Clave |
+| :--- | :--- | :--- |
+| **Generación "Anotherverse"** | Stratios, Gluttonia, etc. | Manipulación del Destierro (Banishing), Fusión, Xyz, Link. |
+| **Arquetipo Principal** | Terranigma | Control total del campo, OTK |
+| **Arquetipo Secundario** | Oricalcos | FTK, OTK, Stun |
+| **Soporte Genérico** | Ojos Azules/Monstruos Normales. |Ciber Dragón. | Señoroscuro/a. | Solaravalon. |
+
+**Palabras clave de búsqueda:** Custom Cards, EDOPro, Yu-Gi-Oh! Custom, Cartas Personalizadas, Drakayshin, Yu-Gi-Oh!
+
 ## ⚙️ Recursos Adicionales
 
 Esta sección incluye contenido extra y guías creadas por DrakayStudios para complementar la experiencia de EDOPro.
