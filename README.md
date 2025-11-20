@@ -23,19 +23,17 @@ descarga este archivo:
 | **4° Activación** | Abrir EDOPro y verificar que el repositorio **"Cartas Custom – DrakayStudios"** se descargue al **100%**. | Seguir los pasos de verificación de EDOPro (Chequeo de Repositorio al 100%). |
 | **5° Uso** | En el editor de Decks, habilitar **"Formatos Alternativos"** y seleccionar la limitación **"Custom"**. | Habilitar "Formatos Alternativos" y seleccionar la limitación "Custom". |
 
-## Pack de texturas para el EDOPRO PC
-Procedimiento en el siguiente video
-
-https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
-
 ## ⚙️ Recursos Adicionales
 
 Esta sección incluye contenido extra y guías creadas por DrakayStudios para complementar la experiencia de EDOPro.
 
-### ** Pack de Texturas (PC)
+### Pack de Texturas (PC)
+Procedimiento en el siguiente video
+https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
+
 Guía y enlace de descarga del pack de texturas completo para EDOPro.
 * [**Enlace de Descarga Directa**](https://drive.google.com/file/d/1ab4WthnojzI-AKtS5Ci1UmhV60vppOOD/view?usp=sharing)
 
-### ** Estructura de Decks
+### Estructura de Decks
 Carpeta que contiene los archivos de decks (.ydk) estructurados por DrakayStudios, listos para importar en EDOPro.
 * [**Acceder a los Decks Estructura**](https://drive.google.com/drive/folders/1WfY4K5W8NSasu4Q6kLebb0y53o2TrpYt?usp=sharing)
