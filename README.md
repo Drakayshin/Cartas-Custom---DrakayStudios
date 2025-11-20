@@ -29,10 +29,9 @@ Para facilitar la búsqueda y el conocimiento de mis creaciones, a continuación
 
 | Tipo | Arquetipo / Proyecto | Temas Clave |
 | :--- | :--- | :--- |
-| **Generación "Anotherverse"** | Stratios, Gluttonia, etc. | Manipulación del Destierro (Banishing), Fusión, Xyz, Link. |
 | **Arquetipo Principal** | Terranigma | Control total del campo, OTK |
 | **Arquetipo Secundario** | Oricalcos | FTK, OTK, Stun |
-| **Soporte Genérico** | Ojos Azules/Monstruos Normales. |Ciber Dragón. | Señoroscuro/a. | Solaravalon. |
+| **Soporte Genérico** | Ojos Azules/Ciber Dragón/Señoroscuro(a), entre otros. |  |
 
 **Palabras clave de búsqueda:** Custom Cards, EDOPro, Yu-Gi-Oh! Custom, Cartas Personalizadas, Drakayshin, Yu-Gi-Oh!
 
