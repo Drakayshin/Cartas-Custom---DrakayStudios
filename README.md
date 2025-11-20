@@ -1,4 +1,4 @@
-# 🃏 Cartas Custom - DrakayStudios: NEXO EDOPRO
+# Cartas Custom - DrakayStudios: NEXO EDOPRO
 
 [![Estado](https://img.shields.io/badge/Estado-Activo-success)](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios)
 [![Compatibilidad](https://img.shields.io/badge/Emulador-EDOPro-blue)](https://projectignis.org/)
