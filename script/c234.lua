@@ -24,6 +24,7 @@ function s.initial_effect(c)
     --  2° Invocar de Modo Especial 1 monstruo "Flauriga" que no sea Cantante desde tu mano o Cementerio
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,3))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetCode(EVENT_FREE_CHAIN)
