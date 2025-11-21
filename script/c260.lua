@@ -7,38 +7,46 @@ function s.initial_effect(c)
 	--	*Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(nil),1,99)
-	--	0° Invocación: Destrucción Masiva (Mejorada si se usa Nivel 7+)
+	--	0° Debe ser primero Invocado por Sincronía
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_DESTROY)
-	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e0:SetProperty(EFFECT_FLAG_DELAY)
-	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e0:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) end)
-	e0:SetTarget(s.destg)
-	e0:SetOperation(s.desop)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetValue(aux.synlimit)
 	c:RegisterEffect(e0)
-	--  1° Batalla: Segundo Ataque (Trigger)
+	--	1° Invocación: Destrucción Masiva (Mejorada si se usa Nivel 7+)
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetCondition(aux.bdocon) --Si destruyó un monstruo por batalla
-	e1:SetTarget(s.atktg)
-	e1:SetOperation(s.atkop)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO) end)
+	e1:SetTarget(s.destg)
+	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	--  2° Float: Recuperar y Black Rose (Tratado como Sincronía)
+	--  2° Batalla: Segundo Ataque (Trigger)
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetCondition(s.floatcon)
-	e2:SetTarget(s.floattg)
-	e2:SetOperation(s.floatop)
+	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(aux.bdocon) --Si destruyó un monstruo por batalla
+	e2:SetTarget(s.atktg)
+	e2:SetOperation(s.atkop)
 	c:RegisterEffect(e2)
+	--  3° Float: Recuperar y Black Rose (Tratado como Sincronía)
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_LEAVE_FIELD)
+	e3:SetCondition(s.floatcon)
+	e3:SetTarget(s.floattg)
+	e3:SetOperation(s.floatop)
+	c:RegisterEffect(e3)
 end
 s.listed_names={73580471} --Black Rose Dragon
-    --  *EFECTO 0°
+    --  *EFECTO 1°
 function s.matfilter(c,sc) --Chequeo de Material Nivel 7+
 	return c:IsLevelAbove(7) and c:IsType(TYPE_MONSTER,sc,SUMMON_TYPE_SYNCHRO)
 end
@@ -87,15 +95,19 @@ end
 function s.protfilter(c) --Filtro de protección (Plantas o Dragones del controlador)
 	return (c:IsRace(RACE_PLANT) or c:IsRace(RACE_DRAGON)) and c:IsFaceup()
 end
-    --  *EFECTO 1°
+    --  *EFECTO 2°
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToBattle() and e:GetHandler():CanChainAttack() end
+	if chk==0 then 
+		local c=e:GetHandler()
+		return e:GetHandler():IsRelateToBattle() and e:GetHandler():CanChainAttack() 
+	end
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()
+	local c=e:GetHandler()
 	c:AddPiercing(RESETS_STANDARD_PHASE_END,c)
 end
-    --  *EFECTO 2°
+    --  *EFECTO 3°
 function s.floatcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsFaceup()
