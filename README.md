@@ -5,8 +5,6 @@
 [![Lenguaje de Script](https://img.shields.io/badge/Scripting-Lua-darkblue)](https://www.lua.org/)
 [![Licencia](https://img.shields.io/badge/Licencia-Apache%202.0-red)](LICENSE)
 
-![Caratula del repositorio](https://github.com/user-attachments/assets/22626942-e8dd-4c8d-a68f-8b60fb3b60ac)
-
 Un repositorio dedicado a la recolección de cartas personalizadas (Custom Cards), creada por **DrakayStudios**. Sirve como un nexo para la comunidad interesada en la creación y uso público (sin fines de lucro) de contenido para el Emulador "Project Ignis - EDOPro" del juego "Yu-Gi-Oh! - Trading Card Game".
 
 descarga este archivo:
@@ -39,6 +37,7 @@ Esta sección incluye contenido extra y guías creadas por DrakayStudios para co
 
 ### Pack de Texturas (PC)
 Procedimiento en el siguiente video
+
 https://github.com/user-attachments/assets/2d002e7e-4b59-4058-b14b-286200b88188
 
 Guía y enlace de descarga del pack de texturas completo para EDOPro.
