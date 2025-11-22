@@ -5,23 +5,23 @@ function s.initial_effect(c)
 	--  *Invocación por Fusión
 	c:EnableReviveLimit()
     c:AddMustFirstBeFusionSummoned()
-    Fusion.AddProcMix(c,true,true,10949074,s.ffilter)
-	--  0° Inmunidad a Magias/Trampas (Efecto Continuo)
+	Fusion.AddProcMix(c,true,true,10949074,s.ffilter)
+	--  0° Mecánica de Ilusión: No destruye ni es destruido en batalla
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_IMMUNE_EFFECT)
-	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e0:SetRange(LOCATION_MZONE)
-	e0:SetValue(function(e,te) return te:IsSpellTrapEffect() end)
+	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e0:SetTarget(s.indes)
+	e0:SetValue(1)
 	c:RegisterEffect(e0)
-	--  1° Mecánica de Ilusión: No destruye ni es destruido en batalla
+	--  1° Inmunidad a Magias/Trampas (Efecto Continuo)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(s.indes)
-	e1:SetValue(1)
+	e1:SetValue(function(e,te) return te:IsSpellTrapEffect() end)
 	c:RegisterEffect(e1)
 	--  2° Modificar ATK + Penetración Doble (Efecto Rápido)
 	local e2=Effect.CreateEffect(c)
@@ -52,6 +52,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.negop)
 	c:RegisterEffect(e3)
 end
+s.listed_names={10949074}
     --  *Filtro de Materiales de Fusión
 function s.ffilter(c,fc,sumtype,tp)
     return (c:IsType(TYPE_NORMAL,fc,sumtype,tp) and c:IsLevelAbove(6)) 
@@ -65,14 +66,12 @@ end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
-    --Target para cambio de ATK
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
-    --Operación de ATK y Penetración Doble
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
@@ -107,7 +106,6 @@ end
 function s.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
-    --Costo: Desterrarse hasta la End Phase
 function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemoveAsCost() end
@@ -123,7 +121,6 @@ function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-    --Target Negación
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
@@ -131,7 +128,6 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
 	end
 end
-    --Operación Negación
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		re:GetHandler():CancelToGrave()

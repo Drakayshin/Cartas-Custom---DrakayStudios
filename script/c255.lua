@@ -47,6 +47,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.dmop)
 	c:RegisterEffect(e3)
 end
+s.listed_names={63028558}
     --  *EFECTO 1°
 function s.indestg(e,c)
 	local handler=e:GetHandler()
