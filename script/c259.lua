@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	--	*Invocación por Sincronía
 	c:EnableReviveLimit()
-	Synchro.AddProcedure(c,nil,2,2,aux.FilterBoolFunction(Card.IsCode,73580471),1,1)
+	Synchro.AddProcedure(c,nil,2,99,aux.FilterBoolFunction(Card.IsCode,73580471),1,1)
 	-- EFECTO 1: INVOCACIÓN SINCRONÍA -> DESTRUIR + DAÑO + ATK
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
