@@ -23,7 +23,10 @@ function s.initial_effect(c)
     c:RegisterEffect(e1)
     local e1a=e1:Clone()
 	e1a:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e1a)
+    c:RegisterEffect(e1a)
+    local e1b=e1:Clone()
+	e1b:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e1b)
 end
 s.listed_names={73580471,CARD_BLACK_ROSE_DRAGON}
     --	*EFECTO 0°
