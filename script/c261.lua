@@ -76,7 +76,7 @@ function s.thfilter(c,e,tp,rose_chk)
 	return c:IsMonster() and c:ListsCode(CARD_BLACK_ROSE_DRAGON) and (c:IsAbleToHand() or (rose_chk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function s.sphfilter(c)
-	return c:IsMonster() and c:ListsCode(CARD_BLACK_ROSE_DRAGON) or c:IsCode(CARD_BLACK_ROSE_DRAGON) and not c:IsCode(id)
+	return (c:IsMonster() and c:ListsCode(CARD_BLACK_ROSE_DRAGON) and not c:IsCode(id)) or c:IsCode(CARD_BLACK_ROSE_DRAGON) 
 end
 function s.thsp_tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rose_chk=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
