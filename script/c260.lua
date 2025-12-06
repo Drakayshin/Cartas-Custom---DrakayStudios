@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	c:SetSPSummonOnce(id)
 	--	*Invocación por Sincronía
 	c:EnableReviveLimit()
-	Synchro.AddProcedure(c,nil,2,2,Synchro.NonTuner(nil),1,99)
+	Synchro.AddProcedure(c,nil,1,99,Synchro.NonTuner(nil),1,99)
 	--	0° Debe ser primero Invocado por Sincronía
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -29,13 +29,18 @@ function s.initial_effect(c)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
-	--  2° Batalla: Segundo Ataque (Trigger)
+	--  2° Negar Activación
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCondition(aux.bdocon) --Si destruyó un monstruo por batalla
-	e2:SetTarget(s.atktg)
-	e2:SetOperation(s.atkop)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_NEGATE)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(s.condition)
+	e2:SetCost(s.negcost)
+	e2:SetTarget(s.target)
+	e2:SetOperation(function(e,tp,eg,ep,ev) Duel.NegateActivation(ev) end)
 	c:RegisterEffect(e2)
 	--  3° Float: Recuperar y Black Rose (Tratado como Sincronía)
 	local e3=Effect.CreateEffect(c)
@@ -98,17 +103,22 @@ end
 function s.protfilter(c) --Filtro de protección (Plantas o Dragones del controlador)
 	return (c:IsRace(RACE_PLANT) or c:IsRace(RACE_DRAGON)) and c:IsFaceup()
 end
-    --  *EFECTO 2°
-function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then 
-		local c=e:GetHandler()
-		return e:GetHandler():IsRelateToBattle() and e:GetHandler():CanChainAttack() 
-	end
-end
-function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChainAttack()
+	--  *EFECTO 2°
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	c:AddPiercing(RESETS_STANDARD_PHASE_END,c)
+	if chk==0 then return c:IsAbleToRemoveAsCost() end
+	--Banish this card until the End Phase
+	aux.RemoveUntil(c,nil,REASON_COST,PHASE_END,id,e,tp,aux.DefaultFieldReturnOp)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	if tp==ep or e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not Duel.IsChainNegatable(ev) then return false end
+	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
+	local ex1,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_REMOVE)
+	return ex or ex1 and (tg~=nil or tc>0)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,tp,0)
 end
     --  *EFECTO 3°
 function s.floatcon(e,tp,eg,ep,ev,re,r,rp)

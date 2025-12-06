@@ -5,43 +5,43 @@ function s.initial_effect(c)
 	--	*Invocación por Sincronía
 	c:EnableReviveLimit()
 	Synchro.AddProcedure(c,nil,1,99,aux.FilterBoolFunction(Card.IsCode,73580471),1,1)
-	-- EFECTO 1: INVOCACIÓN SINCRONÍA -> DESTRUIR + DAÑO + ATK
+	--	EFECTO 0: INVOCACIÓN SINCRONÍA -> DESTRUIR + DAÑO + ATK
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE+CATEGORY_ATKCHANGE)
+	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e0:SetProperty(EFFECT_FLAG_DELAY)
+	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e0:SetCondition(s.descon)
+	e0:SetTarget(s.destg)
+	e0:SetOperation(s.desop)
+	c:RegisterEffect(e0)
+	--	EFECTO 1: DESTRUYE EN BATALLA -> ATAQUE EXTRA + DEBUFF + DAÑO POR PENETRACIÓN
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE+CATEGORY_ATKCHANGE)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(s.descon)
-	e1:SetTarget(s.destg)
-	e1:SetOperation(s.desop)
+	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(s.atcon)
+	e1:SetTarget(s.atktg)
+	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
-	-- EFECTO 2: DESTRUYE EN BATALLA -> ATAQUE EXTRA + DEBUFF
+	--	EFECTO 2: DESTRUIDA O DESTERRADA -> INVOCAR BLACK ROSE DRAGON
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCondition(s.atcon)
-	e2:SetTarget(s.atktg)
-	e2:SetOperation(s.atkop)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCode(EVENT_TO_GRAVE) -- Se activa si va al cementerio
+	e2:SetCondition(s.spcon_grave)
+	e2:SetTarget(s.sptg_brd)
+	e2:SetOperation(s.spop_brd)
 	c:RegisterEffect(e2)
-	-- EFECTO 3: DESTRUIDA O DESTERRADA -> INVOCAR BLACK ROSE DRAGON
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_TO_GRAVE) -- Se activa si va al cementerio
-	e3:SetCondition(s.spcon_grave)
-	e3:SetTarget(s.sptg_brd)
-	e3:SetOperation(s.spop_brd)
-	c:RegisterEffect(e3)
 	-- Clonamos el efecto para cuando es Desterrada (EVENT_REMOVE)
-	local e4=e3:Clone()
-	e4:SetCode(EVENT_REMOVE)
-	e4:SetCondition(s.spcon_remove)
-	c:RegisterEffect(e4)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_REMOVE)
+	e3:SetCondition(s.spcon_remove)
+	c:RegisterEffect(e3)
 end
 s.listed_names={73580471,CARD_BLACK_ROSE_DRAGON}
 --------------------------------------------------------------------------------
@@ -91,11 +91,12 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	-- Atacar de nuevo
+	--	*Atacar de nuevo y causar daño de penetración
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.ChainAttack()
+		c:AddPiercing(RESETS_STANDARD_PHASE_END,c)
 	end
-	-- Debuff a oponentes
+	--	*Debuff a oponentes
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	if #g>0 then
 		local tc=g:GetFirst()
@@ -106,7 +107,6 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 			e_debuff:SetValue(-600)
 			e_debuff:SetReset(RESET_EVENT+RESETS_STANDARD)
 			tc:RegisterEffect(e_debuff)
-			
 			local e_def=e_debuff:Clone()
 			e_def:SetCode(EFFECT_UPDATE_DEFENSE)
 			tc:RegisterEffect(e_def)
