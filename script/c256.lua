@@ -1,4 +1,4 @@
---Anotherverse Stratios Ex Machina
+--Anotherverse Altherios
 --DrakayStudios - Asesorado por Gemini
 local s,id=GetID()
 function s.initial_effect(c)
@@ -136,19 +136,5 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 end
     --Operación de Regreso y Destierro en End Phase
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject()
-	--Regresa al campo
-	if Duel.ReturnToField(c) then
-		--Preguntar si quiere activar el efecto de desterrar
-		if Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) 
-			and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
-			Duel.Hint(HINT_CARD,0,id)
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-			if #g>0 then
-				Duel.HintSelection(g)
-				Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-			end
-		end
-	end
+	Duel.ReturnToField(e:GetLabelObject())
 end
