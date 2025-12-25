@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(s.indestg)
+	e1:SetTarget(function(e,c) return c==e:GetHandler() or c==e:GetHandler():GetBattleTarget() end)
 	e1:SetValue(1)
     c:RegisterEffect(e1)
     --  2° Causar daño y negar efectos del monstruo que batalle contra esta carta del adversario
@@ -48,11 +48,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_names={63028558}
-    --  *EFECTO 1°
-function s.indestg(e,c)
-	local handler=e:GetHandler()
-	return c==handler or c==handler:GetBattleTarget()
-end
     --  *EFECTO 2°
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

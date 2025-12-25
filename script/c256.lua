@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e0:SetTarget(s.indes)
+	e0:SetTarget(function(e,c) return c==e:GetHandler() or c==e:GetHandler():GetBattleTarget() end)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
 	--  1° Inmunidad a Magias/Trampas (Efecto Continuo)
@@ -57,10 +57,6 @@ s.listed_names={10949074}
 function s.ffilter(c,fc,sumtype,tp)
     return (c:IsType(TYPE_NORMAL,fc,sumtype,tp) and c:IsLevelAbove(6)) 
     or (c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK,fc,sumtype,tp) and c:IsLevel(10))
-end
-    -- *EFECTO 1°
-function s.indes(e,c)
-	return c==e:GetHandler() or c==e:GetHandler():GetBattleTarget()
 end
     --  *EFECTO 2°
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)

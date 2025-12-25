@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e0:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e0:SetTarget(s.indes)
+	e0:SetTarget(function(e,c) return c==e:GetHandler() or c==e:GetHandler():GetBattleTarget() end)
 	e0:SetValue(1)
 	c:RegisterEffect(e0)
 	--	1° Tu adversario no puede activar cartas o efectos durante la Battle Phase
