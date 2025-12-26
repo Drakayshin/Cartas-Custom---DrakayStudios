@@ -104,11 +104,20 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetHandler():GetBattleTarget()
-	if bc and bc:IsRelateToBattle() and Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)>0 then
-		local val=0
-		if bc:IsType(TYPE_XYZ) then val=bc:GetRank() else val=bc:GetLevel() end
-		Duel.Damage(1-tp,val*500,REASON_EFFECT)
-	end
+    if bc and bc:IsRelateToBattle() and Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)>0 then
+        local val=0
+        -- Determinamos el valor basado en el tipo de monstruo
+        if bc:IsType(TYPE_LINK) then
+            val=bc:GetLink()*1000
+        elseif bc:IsType(TYPE_XYZ) then
+            val=bc:GetRank()*500
+        else
+            val=bc:GetLevel()*500
+        end
+        if val>0 then
+            Duel.Damage(1-tp,val,REASON_EFFECT)
+        end
+    end
 end
     --  *EFECTO 5° Lógica de Invocación Especial al dejar el campo
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
