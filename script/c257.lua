@@ -132,7 +132,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--	*EFECTO 4°
 function s.sfilter1(c,e,tp)
-    return c:IsCode(86893702) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+    return c:IsCode(86893702) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sfilter2(c,e,tp)
     -- Comprueba si el monstruo puede ser Invocado de Modo Especial al campo del adversario (1-tp)

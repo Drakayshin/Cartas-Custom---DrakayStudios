@@ -64,7 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 3
 function s.unfilter(c)
-	return c:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee) and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
+	return (c:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) or c:IsSetCard(0x3ee)) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.shucost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetMatchingGroup(s.unfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
@@ -73,7 +73,7 @@ function s.shucost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(gp,nil,3,REASON_COST)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x3ee) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3ee) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

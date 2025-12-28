@@ -90,7 +90,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 	-- 	*EFECTO 3°
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x3eb) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3eb) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -143,7 +143,7 @@ function s.empcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.spfilter1(c,e,tp,ex)
-	return c:IsSetCard(0x3eb) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3eb) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

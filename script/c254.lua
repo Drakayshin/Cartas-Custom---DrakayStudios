@@ -31,7 +31,7 @@ end
 s.listed_series={0x3ee}
     --  *EFECTO 0°
 function s.unfilter(c)
-	return c:IsMonster() and c:IsSetCard(0x3ee) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsMonster() and c:IsSetCard(0x3ee) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.shucost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.unfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,2,nil) end

@@ -179,7 +179,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousControler(tp) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
-	return c:IsType(TYPE_XYZ) and c:IsRankAbove(7) and (c:IsRace(RACE_DRAGON) or c:IsSetCard(SET_RED_EYES))
+	return c:IsType(TYPE_XYZ) and c:IsRankAbove(7) and (c:IsRace(RACE_DRAGON) or c:IsSetCard(SET_RED_EYES)) and c:IsFaceup()
 	and (Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 or not c:IsLocation(LOCATION_EXTRA)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

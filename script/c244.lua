@@ -153,7 +153,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and c:IsSynchroSummoned() and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x3ee) and c:IsLevelBelow(9) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3ee) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND|LOCATION_GRAVE)) and c:IsLevelBelow(9) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

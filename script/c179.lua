@@ -69,7 +69,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 	-- 	EFECTO 2°
 function s.filter(c)
-	return (c:IsSetCard(0x3e8) or c:IsSetCard(0x41)) and not c:IsCode(id) and c:IsAbleToHand()
+	return (c:IsSetCard(0x3e8) or c:IsSetCard(0x41)) and not c:IsCode(id) and c:IsFaceup() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter(chkc) end

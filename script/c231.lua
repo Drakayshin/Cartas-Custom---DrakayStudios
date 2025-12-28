@@ -72,7 +72,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 2°
 function s.thfilter(c)
-	return c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and c:IsAbleToHand()
+	return c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil) end
