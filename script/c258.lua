@@ -125,7 +125,8 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE) and rp==1-tp
 end
 function s.spfilter(c,e,tp)
-	return c:IsCode(47484352) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return (c:IsCode(47484352) or (c:IsRace(RACE_ILLUSION) and not c:IsCode(id)) 
+	and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
