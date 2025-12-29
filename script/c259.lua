@@ -65,7 +65,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
         local sg=g:Select(tp,1,1,nil):GetFirst()
         if sg:IsCanBeSpecialSummoned(e,0,tp,false,false) 
-            and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then -- ID 2: "¿Invocar de modo especial?"
+            and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then -- ID 1: "¿Invocar de modo especial?"
             Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
         else
             Duel.SendtoHand(sg,nil,REASON_EFFECT)
