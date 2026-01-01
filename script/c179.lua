@@ -45,7 +45,7 @@ function s.indct(e,re,r,rp)
 	end
 end
     -- 	*EFECTO 1°
-function s.sfilter(c)
+function s.sfilter(c,e,tp,ft)
 	return c:IsSetCard(0x41) and c:IsLevelBelow(5) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
