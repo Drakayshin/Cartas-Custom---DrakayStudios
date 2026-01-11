@@ -3,10 +3,10 @@
 local s,id=GetID()
 function s.initial_effect(c)
     --  0° Invocar por Fusión 1 Monstruo Fusión de Oscuridad
-	local e0=Fusion.CreateSummonEff(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),nil,s.fextra,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,s.extratg)
-    e0:SetDescription(aux.Stringid(id,0))
+	local e0=Fusion.CreateSummonEff({handler=c,fusfilter=s.fusfilter,matfilter=nil,extrafil=s.fextra,extraop=nil,extratg=s.extratg,stage2=s.stage2})
+	e0:SetDescription(aux.Stringid(id,0))
+	e0:SetProperty(EFFECT_FLAG_DELAY)
     e0:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-    e0:SetCost(Cost.PayLP(1/2))
     c:RegisterEffect(e0)
     --  1° Invocar por Enlace usando un monstruo Invocado por esta carta
     local e1=Effect.CreateEffect(c)
@@ -14,18 +14,22 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
     e1:SetCountLimit(1,id,EFFECT_COUNT_CODE_OATH)
-    e1:SetCost(Cost.PayLP(1/2))
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
 s.listed_series={SET_DARKLORD}
-    --  *EFECTO 0°
+	--  *EFECTO 0°
+function s.fusfilter(c)
+	return c:IsAttribute(ATTRIBUTE_DARK)
+end
 function s.fcheck(tp,sg,fc)
 	return sg:FilterCount(Card.IsLocation,nil,LOCATION_DECK)<=1
 end
 function s.fextra(e,tp,mg)
+	--	*Usar material extra si hay un monstruo Invocado desde el Deck Extra en el Campo del adversario
 	if Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,0,LOCATION_MZONE,1,nil,LOCATION_EXTRA) then
 		local eg=Duel.GetMatchingGroup(s.exfilter,tp,LOCATION_DECK,0,nil)
 		if eg and #eg>0 then
@@ -41,6 +45,18 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end 
+function s.stage2(e,fc,tp,sg,chk)
+	if chk==0 then
+		--	*Gana 100 ATK
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(1000)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		fc:RegisterEffect(e1)
+	end
+end
     --  *EFECTO 1°
 function s.spfilter2(c,mc,fg)
 	return c:IsRace(RACE_FAIRY) and c:IsLinkBelow(3) and c:IsLinkSummonable(mc,fg+mc)

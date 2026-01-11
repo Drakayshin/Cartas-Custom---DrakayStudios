@@ -95,7 +95,7 @@ function s.bsop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.BreakEffect()
         Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		if tc:IsLocation(LOCATION_HAND) and tc:IsMonster() then
+		if tc:IsLocation(LOCATION_HAND|LOCATION_EXTRA) and tc:IsMonster() then
 			Duel.Recover(tp,1500,REASON_EFFECT)
 		end
 	end
