@@ -2,37 +2,29 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- 	*Invocar 1 por turno
-	c:SetSPSummonOnce(id)
+	--	*Debe ser Primero Invocado por Fusión
+	c:AddMustFirstBeFusionSummoned()
 	-- 	*Invocar por Fusión
 	c:EnableReviveLimit()
-	Fusion.AddProcMix(c,true,true,s.matfilter1,s.matfilter2)
-	-- 	*Alt. Invocación por contacto
-	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.splimit,nil,nil,nil,false)
-    -- 	0° Reducir 1900 el ATK/DEF del monstruo que destruya por batalla a esta carta 
+	Fusion.AddProcMix(c,true,true,aux.FilterBoolFunctionEx(Card.IsType,TYPE_NORMAL),aux.FilterBoolFunctionEx(Card.IsOriginalRace,RACE_INSECT|RACE_PLANT))
+	--	*Fusión por contacto
+	Fusion.AddContactProc(c,function(tp) return Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,nil) end,function(g) Duel.SendtoGrave(g,REASON_COST|REASON_MATERIAL) end,nil,nil,nil,nil,false)
+	--	0° Tambien cuenta como Insecto
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,1))
-	e0:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e0:SetCode(EVENT_BATTLE_DESTROYED)
-	e0:SetOperation(s.desop)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetCode(EFFECT_ADD_RACE)
+	e0:SetRange(LOCATION_MZONE)
+	e0:SetValue(RACE_INSECT)
 	c:RegisterEffect(e0)
-end
-    -- 	*Filtro de materiales
-function s.matfilter1(c,fc,sumtype,tp)
-	return c:IsRace(RACE_PLANT,fc,sumtype,tp) and c:IsType(TYPE_NORMAL,fc,sumtype,tp)
-end
-function s.matfilter2(c,fc,sumtype,tp)
-	return c:IsRace(RACE_INSECT,fc,sumtype,tp) and c:IsLevelBelow(3)
-end
-function s.splimit(e,se,sp,st)
-	return (st&SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():GetLocation()~=LOCATION_EXTRA
-end
-function s.contactfil(tp)
-	return Duel.GetReleaseGroup(tp)
-end
-function s.contactop(g)
-	Duel.Release(g,REASON_COST+REASON_MATERIAL)
+	-- 	1° Reducir 1900 el ATK/DEF del monstruo que destruya por batalla a esta carta 
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetOperation(s.desop)
+	c:RegisterEffect(e1)
 end
     --	*EFECTO 0°
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
