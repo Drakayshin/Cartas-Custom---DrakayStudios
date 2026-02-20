@@ -113,7 +113,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
     e1:SetCode(EFFECT_IMMUNE_EFFECT)
     e1:SetRange(LOCATION_MZONE)
-    e1:SetValue(function(e,te) return te:IsMonsterEffect() and te:IsActivated() and te:GetOwnerPlayer()~=e:GetHandlerPlayer()  end)
+    e1:SetValue(function(e,te) return te:IsActivated() and te:IsMonsterEffect() and te:GetOwner()~=e:GetHandler()  end)
     e1:SetReset(RESET_EVENT|RESETS_STANDARD)
     rc:RegisterEffect(e1)
 end
