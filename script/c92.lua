@@ -40,7 +40,7 @@ function s.counterfilter(c)
 	return c:IsSetCard(0x3e7) and c:IsMonster()
 end
 function s.cfilter(c)
-	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and c:IsAbleToDeckAsCost()
+	return (c:IsAttribute(ATTRIBUTE_DARK) or c:IsSetCard(0x3e7)) and c:IsFaceup() and c:IsAbleToDeckAsCost()
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,nil)
