@@ -1,4 +1,4 @@
---Neo, El Espadachín Convergente
+--Neo, El Hechicero Convergente
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)

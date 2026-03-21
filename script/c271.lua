@@ -1,9 +1,8 @@
---Trance, el Espadachín Divergente
+--Trance, el Hechiero Divergente
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	c:EnableReviveLimit()
-	c:AddMustBeSpecialSummoned()
+	c:AddMustBeSpecialSummonedByCardEffect()
 	--  0° Invocar de Modo Especial
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)

@@ -55,8 +55,7 @@ end
 s.listed_names={10949074}
     --  *Filtro de Materiales de Fusión
 function s.ffilter(c,fc,sumtype,tp)
-    return (c:IsType(TYPE_NORMAL,fc,sumtype,tp) and c:IsLevelAbove(6)) 
-    or (c:IsAttribute(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK,fc,sumtype,tp) and c:IsLevel(10))
+    return (not c:IsType(TYPE_EFFECT,fc,sumtype,tp) and c:IsLevelAbove(7)) or c:IsLevel(10)
 end
     --  *EFECTO 2°
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
@@ -86,15 +85,18 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)
 		tc:RegisterEffect(e2)
-		--  *Otorgar Penetración Doble a ESTA carta (si sigue en campo)
+		--  *Otorgar Penetración y doble daño (si sigue en campo)
 		if c:IsRelateToEffect(e) and c:IsFaceup() then
-			--Penetración con doble daño
+			-- Doble daño de batalla 
 			local e3=Effect.CreateEffect(c)
 			e3:SetType(EFFECT_TYPE_SINGLE)
-            e3:SetCode(EFFECT_PIERCE)
-            e3:SetValue(DOUBLE_DAMAGE)
+			e3:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+			e3:SetCondition(function(e) local bc=e:GetHandler():GetBattleTarget() return bc and bc:IsControler(1-e:GetHandlerPlayer()) end)
+			e3:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
 			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			c:RegisterEffect(e3)
+			--	Daño de penetración
+			c:AddPiercing(RESETS_STANDARD_PHASE_END)
 		end
 	end
 end
