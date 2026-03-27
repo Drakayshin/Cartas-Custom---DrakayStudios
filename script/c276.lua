@@ -54,27 +54,19 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
     local code=rg:GetFirst():GetCode()
     Duel.Release(rg,REASON_COST)
     e:SetLabel(code) -- Se guarda el código del monstruo sacrificado
-    
-    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_REMOVED)
-    
-    --  *Selección opcional para desterrar
-    if Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil)
-        and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-        e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-        local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
-        Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
-    else
-        e:SetProperty(0)
-    end
+    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_REMOVED)
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+    Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
     local code=e:GetLabel()
     if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
     local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_REMOVED,0,1,1,nil,e,tp,code)
-    if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.IsExistingTarget(s.rmvfilter,tp,0,LOCATION_GRAVE|LOCATION_ONFIELD,1,nil,tp)
-    and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+    --  *Efecto de destierro opcional
+    if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 
+        and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+        local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
         local tc=Duel.GetFirstTarget()
         --  *Si se seleccionó objetivo al activar, se destierra en resolución
         if tc and tc:IsRelateToEffect(e) then
@@ -82,12 +74,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
         end
     end
 end
-function s.rmvfilter(c,tp)
-	return c:IsAbleToRemove(tp,POS_FACEDOWN,REASON_EFFECT)
-end
     -- *EFECTO 1° Funciones para e1a (Efecto en Cementerio)
 function s.gyfilter(c,e,tp)
-    return c:IsRace(RACE_WARRIOR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+    return c:IsRace(RACE_WARRIOR|RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
         and (not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup())
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)

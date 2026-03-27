@@ -29,7 +29,7 @@ function s.initial_effect(c)
 end
     --  *EFECTO 0°
 function s.spconfilter(c)
-	return c:IsRace(RACE_SPELLCASTER|RACE_WARRIOR) and c:IsFaceup() and c:IsAbleToDeckAsCost()
+	return c:IsRace(RACE_SPELLCASTER|RACE_WARRIOR) and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.spcon(e,c)
 	if c==nil then return true end
