@@ -72,7 +72,7 @@ function s.diszaop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.HintSelection(g)
 	local tc=g:GetFirst()
 	if tc then
-		tc:NegateEffects(c)
+		tc:NegateEffects(e:GetHandler(),RESETS_STANDARD_PHASE_END)
 		if tc:IsMonster() then
 		--	*Reducir ATK si es un monstruo
 		local e1=Effect.CreateEffect(c)

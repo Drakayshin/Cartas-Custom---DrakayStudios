@@ -2,15 +2,12 @@
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
-	-- 	0° Si esta carta batalla con un monstruo, ninguno puede ser destruido en esa batalla
+	-- 	0° No puede ser destruida en batalla
 	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e0:SetRange(LOCATION_MZONE)
-	e0:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e0:SetTarget(s.indestg)
 	e0:SetValue(1)
-    c:RegisterEffect(e0)
+	c:RegisterEffect(e0)
     -- 	1° Cambiar efecto de la carta activada por tu adversario
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -30,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCountLimit(1,{id,1})
+	e2:SetCountLimit(1,id)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
@@ -39,11 +36,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2a)
 end
 s.listed_series={0x3e7}
-    --	*EFECTO 0°
-function s.indestg(e,c)
-	local handler=e:GetHandler()
-	return c==handler or c==handler:GetBattleTarget()
-end
     --	*EFECTO 1°
 function s.chcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsMonsterEffect()

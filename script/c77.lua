@@ -78,6 +78,6 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 then return end
 	local rg=g:RandomSelect(tp,1)
 	if #rg>0 then
-		Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
+		Duel.Remove(rg,POS_FACEDOWN,REASON_EFFECT)
 	end
 end
