@@ -118,5 +118,5 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT)
 end
 function s.atkval(e,c)
-	return Duel.GetMatchingGroupCount(s.cfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil)*-200
+	return Duel.GetMatchingGroupCount(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)*-200
 end

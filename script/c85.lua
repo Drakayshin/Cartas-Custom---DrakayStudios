@@ -44,7 +44,7 @@ end
 s.listed_series={0x3e7}
     --  *EFECTO 0°
 function s.thfilter(c,tp)
-	return c:IsMonster() and c:IsSetCard(0x3e7) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsSetCard(0x3e7) and (c:IsLocation(LOCATION_DECK) or c:IsFaceup()) and c:IsAbleToHand()
 		and not Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)

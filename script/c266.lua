@@ -45,7 +45,7 @@ function s.xyzfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRankBelow(5)
 end
 function s.matfilter(c)
-	return c:IsSetCard(0x3ee) and c:IsMonster()
+	return c:IsSetCard(0x3ee) and c:IsMonster() and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
 end
 function s.mattg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.xyzfilter(chkc) end

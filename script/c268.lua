@@ -69,7 +69,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 end
     --  *EFECTO 2°
 function s.filter1(c,e,tp)
-	return c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x3ee) and c:IsType(TYPE_TUNER) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.filter2(c,e,tp)
 	return c:IsRace(RACE_WARRIOR|RACE_BEASTWARRIOR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

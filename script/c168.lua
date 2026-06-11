@@ -71,7 +71,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 	--	*EFECTO 4°
 function s.filter(c)
-	return c:IsRace(RACE_CYBERSE) and c:IsMonster() and c:IsAbleToDeck()
+	return c:IsRace(RACE_CYBERSE) and c:IsMonster() and (c:IsRace(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeck()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end

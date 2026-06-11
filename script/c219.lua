@@ -8,7 +8,7 @@ function s.initial_effect(c)
     Pendulum.AddProcedure(c,false)
     --  *Invocación por Fusión
     c:EnableReviveLimit()
-	Fusion.AddProcMixN(c,true,true,s.ffilter,4)
+	Fusion.AddProcMixN(c,true,true,s.ffilter,5)
 	--  *Fusión por contacto
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,false,nil,1)
     --   0° Invocar solo una vez por turno por Invocación o Fusión o Fusión por contacto
@@ -72,36 +72,48 @@ function s.initial_effect(c)
     
     --  EFECTO DE PENDULO
 
-    -- 	6° Limite de Invocación por Péndulo a Dinosaruio, Reptil o Serpiente Marina
+    -- 	6° Limite de Invocación por Péndulo a Monstruos Péndulo
     local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_FIELD)
 	e6:SetRange(LOCATION_PZONE)
 	e6:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
 	e6:SetTargetRange(1,0)
-	e6:SetTarget(function(e,c,sump,sumtype,sumpos,targetp)return not c:IsRace(RACE_DINOSAUR|RACE_REPTILE|RACE_SEASERPENT) and (sumtype&SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM end)
-    c:RegisterEffect(e6)
-    --  7° Destruir monstruos en el Campo y limitar su Invocación
-    local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(id,4))
-	e7:SetCategory(CATEGORY_DESTROY)
-	e7:SetType(EFFECT_TYPE_IGNITION)
-	e7:SetRange(LOCATION_PZONE)
-	e7:SetCountLimit(1,{id,5})
-	e7:SetTarget(s.destg1)
-	e7:SetOperation(s.desop1)
-    c:RegisterEffect(e7)
-    --  8° Invocar de Modo Especial en la misma columna
-    local e8=Effect.CreateEffect(c)
-	e8:SetDescription(aux.Stringid(id,6))
-	e8:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e8:SetType(EFFECT_TYPE_IGNITION)
-	e8:SetRange(LOCATION_PZONE)
-	e8:SetCountLimit(1,id,5)
-	e8:SetCondition(s.spcon)
-	e8:SetTarget(s.sptg)
-	e8:SetOperation(s.spop)
+	e6:SetTarget(function(e,c,sump,sumtype,sumpos,targetp)return not c:IsType(TYPE_PENDULUM) and (sumtype&SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM end)
+	c:RegisterEffect(e6)
+	--	7° Limite de ataques del adversario
+	local e7=Effect.CreateEffect(c)
+    e7:SetDescription(aux.Stringid(id,4))
+    e7:SetCategory(CATEGORY_POSITION)
+    e7:SetType(EFFECT_TYPE_IGNITION)
+    e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
+    e7:SetRange(LOCATION_PZONE)
+    e7:SetCountLimit(1,{id,5})
+    e7:SetTarget(s.postg)
+    e7:SetOperation(s.posop)
+	c:RegisterEffect(e7)
+	--	8° Negar efectos de monstruos en el Campo del adversario
+	local e8=Effect.CreateEffect(c)
+    e8:SetDescription(aux.Stringid(id,5))
+    e8:SetCategory(CATEGORY_DISABLE)
+    e8:SetType(EFFECT_TYPE_IGNITION)
+    e8:SetRange(LOCATION_PZONE)
+    e8:SetCountLimit(1,{id,6})
+    e8:SetCost(s.negcost)
+    e8:SetTarget(s.negtg)
+    e8:SetOperation(s.negop)
 	c:RegisterEffect(e8)
+	-- 9° Invocar desde la Zona de Péndulo
+	local e9=Effect.CreateEffect(c)
+    e9:SetDescription(aux.Stringid(id,6))
+    e9:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
+    e9:SetType(EFFECT_TYPE_IGNITION)
+    e9:SetRange(LOCATION_PZONE)
+    e9:SetCountLimit(1,{id,7})
+    e9:SetCondition(s.spcon)
+    e9:SetTarget(s.sptg)
+    e9:SetOperation(s.spop)
+    c:RegisterEffect(e9)
 end
     --  *Filtro de materilaes de Fusión
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
@@ -215,56 +227,95 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.NegateActivation(ev)
 	end
 end
-    --  *EFECTO 7°
-function s.destg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local tc=g:GetFirst()
-	local race=0
-	for tc in aux.Next(g) do
-		race=(race|tc:GetRace())
-	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RACE)
-	local arc=Duel.AnnounceRace(tp,1,race)
-	e:SetLabel(arc)
-	local dg=g:Filter(Card.IsRace,nil,arc)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,#dg,0,0)
+	--  *EFECTO 7°
+function s.posfilter(c)
+    return c:IsPosition(POS_FACEUP_ATTACK) and c:IsCanChangePosition()
 end
-function s.desop1(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local arc=e:GetLabel()
-	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsRace,arc),tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if #g>0 then
-		Duel.Destroy(g,REASON_EFFECT)
-	end
-	--  *Limite de Invocación
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,5))
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetTargetRange(1,1)
-	e1:SetTarget(s.sumlimit(arc))
-	e1:SetReset(RESET_PHASE|PHASE_END,2)
-	Duel.RegisterEffect(e1,tp)
+function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+    if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.posfilter(chkc) end
+    if chk==0 then return Duel.IsExistingTarget(s.posfilter,tp,LOCATION_MZONE,0,1,nil) end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+    local g=Duel.SelectTarget(tp,s.posfilter,tp,LOCATION_MZONE,0,1,1,nil)
+    Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
 end
-function s.sumlimit(arc)
-	return function(e,c,sump,sumtype,sumpos,targetp)
-				return c:IsRace(arc)
-			end
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
+    local tc=Duel.GetFirstTarget()
+    if tc:IsRelateToEffect(e) and Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)~=0 then
+        --	Aplicar la restricción de ataque al adversario
+        local e1a=Effect.CreateEffect(e:GetHandler())
+        e1a:SetType(EFFECT_TYPE_FIELD)
+        e1a:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+        e1a:SetRange(LOCATION_MZONE)
+        e1a:SetTargetRange(0,LOCATION_MZONE)
+        e1a:SetValue(s.atktg)
+        e1a:SetReset(RESET_EVENT+RESETS_STANDARD)
+        tc:RegisterEffect(e1a)
+    end
 end
-    --  *EFECTO 8°
+function s.atktg1(e,c)
+    return c~=e:GetHandler()
+end
+	--	*EFECTO 8°
+function s.cfilter(c)
+    return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToRemoveAsCost()
+end
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE|LOCATION_EXTRA,0,1,nil) end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+    local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE|LOCATION_EXTRA,0,1,1,nil)
+    e:SetLabel(g:GetFirst():GetAttribute()) -- Almacena el Atributo desterrado
+    Duel.Remove(g,POS_FACEUP,REASON_COST)
+end
+function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+end
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    local attr=e:GetLabel()
+    local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
+    local tc=g:GetFirst()
+    for tc in aux.Next(g) do
+        if tc:IsAttribute(attr) then
+            --	Niega los efectos
+            local e2a=Effect.CreateEffect(c)
+            e2a:SetType(EFFECT_TYPE_SINGLE)
+            e2a:SetCode(EFFECT_DISABLE)
+            e2a:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+            tc:RegisterEffect(e2a)
+            local e2b=Effect.CreateEffect(c)
+            e2b:SetType(EFFECT_TYPE_SINGLE)
+            e2b:SetCode(EFFECT_DISABLE_EFFECT)
+            e2b:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+            tc:RegisterEffect(e2b)
+        end
+    end
+end
+	--	*EFECTO 9°
+function s.confilter(c)
+    return c:IsFaceup()
+end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,LOCATION_MZONE,0,1,nil,LOCATION_EXTRA)
-		and Duel.IsExistingMatchingCard(Card.IsSummonLocation,tp,0,LOCATION_MZONE,1,nil,LOCATION_EXTRA)
+    return not Duel.IsExistingMatchingCard(s.confilter,tp,LOCATION_MZONE,0,1,nil)
+end
+function s.desfilter(c)
+    return c:IsLocation(LOCATION_PZONE)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+    local c=e:GetHandler()
+    if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+        and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+        and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_PZONE,0,1,c) end
+    local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_PZONE,0,c)
+    Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+    local c=e:GetHandler()
+    if not c:IsRelateToEffect(e) then return end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+    -- Selecciona la carta a destruir en la Zona de Péndulo
+    local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_PZONE,0,1,1,c)
+    if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0 then
+        Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+    end
 end
