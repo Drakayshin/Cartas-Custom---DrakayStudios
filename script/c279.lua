@@ -1,4 +1,4 @@
---Molestor
+--Elementor Oscuro
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
@@ -55,14 +55,12 @@ function s.initial_effect(c)
 end
 s.listed_names={100}
     --  *EFECTO 2°
-function s.cfilter(c)
-	return not c:IsAttribute(ATTRIBUTE_DARK)
-end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,zone)>0
-	and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or not Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil))
+	and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 
+	or not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsAttribute,ATTRIBUTE_WATER|ATTRIBUTE_EARTH|ATTRIBUTE_FIRE|ATTRIBUTE_WIND|ATTRIBUTE_LIGHT),tp,LOCATION_MZONE,0,1,nil))
 end
     --  *EFECTO 3°
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
