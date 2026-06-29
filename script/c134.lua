@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e1:SetCondition(function(e) return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0 end)
 	c:RegisterEffect(e1)
 end
-s.listed_names={id,48179391}
+s.listed_names={id,48179391,120,125,130}
     -- 	*EFECTO 0°
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -36,7 +36,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
     -- 	*EFECTO 0° (Activar 1 "El Sello de Oricalcos, y Invocar de Modo Especial "Dartz, Regente del Oricalcos")
 function s.filter(c,tp)
-	return c:IsCode(48179391,125,130) and c:GetActivateEffect():IsActivatable(tp,true,true)
+	return c:IsCode(48179391,120,125,130) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
 function s.filter1(c,e,tp)
 	return c:IsCode(132) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
