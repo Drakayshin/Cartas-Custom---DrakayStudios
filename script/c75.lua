@@ -31,6 +31,9 @@ function s.initial_effect(c)
 	e2:SetTarget(s.efftg)
 	e2:SetOperation(s.effop)
 	c:RegisterEffect(e2)
+	local e2a=e2:Clone()
+	e2a:SetCode(EVENT_SUMMON_SUCCESS)
+    c:RegisterEffect(e2a)
 end
 s.listed_series={0x3e7}
 	--	*EFECTO 1°
