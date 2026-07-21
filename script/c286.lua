@@ -1,4 +1,4 @@
---Oni-namuji, Vasallo de la Bruma
+--Ave del Paraíso
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
@@ -7,39 +7,36 @@ function s.initial_effect(c)
     
     --  EFECTO DE PENDULO
 
-    --  Efecto 0: 
+    --  Efecto 0: Invocar de Modo Especial 1 Monstruo Normal
 	local e0=Effect.CreateEffect(c)
-	e0:SetDescription(aux.Stringid(id,0))
-	e0:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
-    e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-    e0:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e0:SetCode(EVENT_PHASE|PHASE_BATTLE_START)
+	e0:SetDescription(aux.Stringid(id,1))
+	e0:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_PZONE)
-	e0:SetCountLimit(1,{id,0})
+	e0:SetCountLimit(1)
 	e0:SetTarget(s.sptg)
 	e0:SetOperation(s.spop)
 	c:RegisterEffect(e0)
 end
     --  *EFECTO 0°
+function s.spfilter(c,e,tp)
+    return c:IsType(TYPE_NORMAL) and (c:IsLocation(LOCATION_HAND|LOCATION_GRAVE) 
+    or (c:IsFaceup() and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0))
+    and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_EXTRA|LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_EXTRA|LOCATION_GRAVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-    local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
     local c=e:GetHandler()
-    local tc=Duel.GetFirstTarget()
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 
-    and Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) and Duel.Destroy(tc,REASON_EFFECT)~=0 
-    and tc:GetBaseAttack()>=0 and c:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
-		e1:SetValue(tc:GetBaseAttack())
-		c:RegisterEffect(e1)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_EXTRA|LOCATION_GRAVE,0,1,1,nil,e,tp)
+	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
+        Duel.BreakEffect()
+        Duel.Destroy(c,REASON_EFFECT)
 	end
 end
