@@ -1,80 +1,112 @@
---Paladio de la Esperanza
---DrakayStudios
+--Yacard, Héroe de la Fábula
+--DrakayStudios - Asegoria por Gemini
 local s,id=GetID()
 function s.initial_effect(c)
-    --  Efecto 0: Puede ser tratado como 2 materiales para una Invocación Xyz
+	--  Efecto 0: Añadir Atributo en el Cementerio
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_DOUBLE_XYZ_MATERIAL)
-	e0:SetValue(1)
-	e0:SetCountLimit(1,{id,0})
-	e0:SetOperation(function(e,c) return c.minxyzct and c.minxyzct>=3 and c:IsRace(RACE_SPELLCASTER|RACE_WARRIOR) end)
-	c:RegisterEffect(e0)
-	--  Efecto 1: Invocar de Modo Especial desde tu mano
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetCode(EFFECT_ADD_ATTRIBUTE)
+	e0:SetRange(LOCATION_GRAVE)
+	e0:SetValue(ATTRIBUTE_LIGHT|ATTRIBUTE_DARK)
+    c:RegisterEffect(e0)
+    --  Efecto 1: Invocar de Modo Especial a esta carta y regresar otro monstruo a la mano
+    local e1=Effect.CreateEffect(c)
+    e1:SetDescription(aux.Stringid(id,0))
+    e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
+    e1:SetType(EFFECT_TYPE_QUICK_O)
+    e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetRange(LOCATION_HAND|LOCATION_REMOVED)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e1:SetCountLimit(1,{id,1})
-	e1:SetCost(Cost.Reveal(function(c) return c:IsSpell() end))
-	e1:SetTarget(s.hsptg)
-	e1:SetOperation(s.hspop)
+    e1:SetCondition(function(e,tp) return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 end)
+    e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
     c:RegisterEffect(e1)
-    --  Efecto 2: Efecto añadido al Monstruo Xyz que tenga esta carta como material
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,4))
-    e2:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_QUICK_O)
-    e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetTarget(s.attachtg)
-	e2:SetOperation(s.attachop)
-	c:RegisterEffect(e2)
+    --  Efecto 2: Efectos en secuencia
+    local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+    e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+    e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetCountLimit(1,{id,2})
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
+    c:RegisterEffect(e2)
+    local e2a=e2:Clone()
+	e2a:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e2a)
+	local e2b=e2:Clone()
+	e2b:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e2b)
 end
-s.listed_names={CARD_DARK_MAGICIAN,CARD_DARK_MAGICIAN_GIRL}
-s.listed_series={SET_BLACK_LUSTER_SOLDIER}
-    --  *Efecto 1°
-function s.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
+    --  *EFECTO 1
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,tp,0)
+    Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,1,PLAYER_EITHER,LOCATION_ONFIELD)
 end
-function s.thspfilter(c)
-	return c:IsCode(CARD_DARK_MAGICIAN|CARD_DARK_MAGICIAN_GIRL) or c:IsSetCard(SET_BLACK_LUSTER_SOLDIER) and (c:IsAbleToHand() or (ft>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
-end
-function s.hspop(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-        local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-        local sc=Duel.SelectMatchingCard(tp,s.thspfilter,tp,LOCATION_DECK,0,1,1,nil,ft,e,tp):GetFirst()
-        if not sc then return end
-        aux.ToHandOrElse(sc,tp,
-        function(sc)
-            return ft>0 and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-        end,
-        function(sc)
-             return Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
-        end,
-        aux.Stringid(id,3))
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
+		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,c) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+        local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c)
+        if #g>0 then
+            Duel.SendtoHand(g,nil,REASON_EFFECT)
+        end
     end
 end
-    --  *Efecto 2°
-function s.attachfilter(c,tp)
-	return c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK|TYPE_PENDULUM) and c:IsAbleToChangeControler()
+    --  *EFECTO 2
+    --  Filtro para la Mágica de Equipo
+function s.eqfilter(c,tc,tp)
+    return c:IsEquipSpell() and c:CheckEquipTarget(tc) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
+        and (not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup())
 end
-function s.attachtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.attachfilter(chkc,tp) end
-	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
-		and Duel.IsExistingTarget(s.attachfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACH)
-	Duel.SelectTarget(tp,s.attachfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,tp)
+    --  Filtro para el monstruo Lanzador de Conjuros
+function s.spfilter(c,e,tp)
+    return c:IsType(TYPE_TUNER) and c:IsRace(RACE_SPELLCASTER) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+        and (not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup())
 end
-function s.attachop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and c:IsType(TYPE_XYZ) then
-		Duel.Overlay(c,tc)
-	end
+    --  Target: Se activa si al menos uno de los dos efectos se puede realizar
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+    local c=e:GetHandler()
+    local b1=Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,c,tp)
+    local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,nil,e,tp)
+    if chk==0 then return b1 or b2 end    
+    Duel.SetPossibleOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED)
+    Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED)
+end
+
+    --  Operación: Resuelve los efectos en secuencia de forma independiente
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    -- Evaluamos ambas condiciones nuevamente al momento de resolver
+    local b1=c:IsRelateToEffect(e) and c:IsFaceup() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,c,tp)
+    local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,nil,e,tp)
+	local res=false
+    -- Secuencia 1: Equipar la Mágica
+    if b1 then
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+        local g1=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,c,tp)
+        local tc=g1:GetFirst()
+        if tc then
+            res = Duel.Equip(tp,tc,c) -- Guarda un valor verdadero si el equipo es exitoso
+        end
+    end
+    -- Secuencia 2: Invocar de Modo Especial
+    if b2 then
+        -- Si la parte 1 tuvo éxito, usamos BreakEffect para marcar la secuencia ("luego/también, después")
+        if res then 
+            Duel.BreakEffect() 
+        end
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+        local g2=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,1,nil,e,tp)
+        if #g2>0 then
+            Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
+        end
+    end
 end

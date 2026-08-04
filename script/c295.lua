@@ -1,5 +1,5 @@
 --Ermitaño Fragoso de la Fábula
---DrakayStudios - Asegoria por Gemini
+--DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
 	--  Efecto 0: Mostrar en la mano para buscar y barajarse al Deck
@@ -8,27 +8,27 @@ function s.initial_effect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TODECK)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_HAND)
-	e0:SetCountLimit(1,id)
+	e0:SetCountLimit(1,{id,0})
 	e0:SetCost(Cost.SelfReveal)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
     c:RegisterEffect(e0)
     --  Efecto 1:Invocar de Modo Especial 1 monstruo
     local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,1)) -- "Invocar de Modo Especial desde mano/destierro y Deck"
+    e1:SetDescription(aux.Stringid(id,1))
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
     e1:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
     e1:SetRange(LOCATION_MZONE)
-    e1:SetCountLimit(1,id) -- "Solo puedes activar 1 efecto de 'Montaraz de la Fábula' por turno" (Cláusula compartida)
+    e1:SetCountLimit(1,{id,1})
     e1:SetTarget(s.thsptg)
     e1:SetOperation(s.thspop)
     c:RegisterEffect(e1)
 end
-s.listed_names={291}
+s.listed_names={290}
     --  *EFECTO 0°
 function s.thfilter(c)
-	return c:IsCode(291) or (c:ListsCode(291) and c:IsMonster()) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsCode(290) or (c:ListsCode(290) and c:IsMonster()) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -70,7 +70,7 @@ function s.thspop(e,tp,eg,ep,ev,re,r,rp)
 		aux.Stringid(id,3)
 	)
 	local c=e:GetHandler()
-	--  *You cannot Special Summon from the Extra Deck for the rest of this turn, except Synchro Monsters
+	--  *Limite de Invocación desde el Deck Extra
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,4))
 	e1:SetType(EFFECT_TYPE_FIELD)

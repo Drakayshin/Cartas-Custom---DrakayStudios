@@ -34,13 +34,13 @@ function s.initial_effect(c)
     e1b:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
     c:RegisterEffect(e1b)
 end
-s.listed_names={291}
+s.listed_names={290}
 -- =========================================================
 -- EFECTO 1: Invocación Especial (Efecto Rápido)
 -- =========================================================
--- Filtro para buscar a Yacard, Héroe de la Fábula (ID 291)
+-- Filtro para buscar a Yacard, Héroe de la Fábula (ID 290)
 function s.yacardfilter(c)
-    return c:IsFaceup() and c:IsCode(291)
+    return c:IsFaceup() and c:IsCode(290)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
     return Duel.IsExistingMatchingCard(s.yacardfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -102,7 +102,6 @@ end
 function s.seqop(e,tp,eg,ep,ev,re,r,rp)
     local b1=Duel.IsExistingMatchingCard(s.trapfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil)
     local res=false
-    
     -- Secuencia 1: Añadir a la mano o Colocar Trampa Normal
     if b1 then
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
@@ -140,6 +139,6 @@ function s.seqop(e,tp,eg,ep,ev,re,r,rp)
     local b2=ct>0
     if b2 then
         if res then Duel.BreakEffect() end
-        Duel.Recover(tp,ct*600,REASON_EFFECT)
+        Duel.Recover(tp,ct*300,REASON_EFFECT)
     end
 end

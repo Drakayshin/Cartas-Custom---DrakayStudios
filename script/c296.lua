@@ -8,27 +8,27 @@ function s.initial_effect(c)
 	e0:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_TODECK)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_HAND)
-	e0:SetCountLimit(1,id)
+	e0:SetCountLimit(1,{id,0})
 	e0:SetCost(Cost.SelfReveal)
 	e0:SetTarget(s.thtg)
 	e0:SetOperation(s.thop)
     c:RegisterEffect(e0)
     --  Efecto 1:Invocar de Modo Especial 1 monstruo
     local e1=Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(id,1)) -- "Invocar de Modo Especial desde la mano o Deck"
+    e1:SetDescription(aux.Stringid(id,1))
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
     e1:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
     e1:SetRange(LOCATION_MZONE)
-    e1:SetCountLimit(1,id) -- Once por turno (HOPT)
+    e1:SetCountLimit(1,{id,1})
     e1:SetTarget(s.sptg)
     e1:SetOperation(s.spop)
     c:RegisterEffect(e1)
 end
-s.listed_names={291}
+s.listed_names={290,292}
     --  *EFECTO 0°
 function s.thfilter(c)
-	return c:IsCode(291) or (c:ListsCode(291) and c:IsMonster()) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsCode(290) or c:IsCode(292) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -48,40 +48,32 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
     --  *EFECTO 1°
--- =========================================================
--- Filtro: Monstruo que mencione a Yacard (291), excepto esta carta
--- =========================================================
 function s.spfilter(c,e,tp)
-    return c:ListsCode(291) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+    return c:ListsCode(290) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then 
-        return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
-            and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
+        return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
             and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,e,tp) 
     end
     Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
     if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-    
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
     local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp)
     if #g>0 then
         if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
-            -- Restricción por el resto del turno: Solo puedes Invocar de Modo Especial desde el Extra Deck monstruos Guerrero o Lanzador de Conjuros
-            local e1=Effect.CreateEffect(e:GetHandler())
+            --  *Limite de Invocación desde el Deck Extra
+            local e1=Effect.CreateEffect(c)
+            e1:SetDescription(aux.Stringid(id,2))
             e1:SetType(EFFECT_TYPE_FIELD)
             e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-            e1:SetDescription(aux.Stringid(id,3)) -- Hint de restricción de Extra Deck
             e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
             e1:SetTargetRange(1,0)
-            e1:SetTarget(s.splimit)
-            e1:SetReset(RESET_PHASE+PHASE_END)
+            e1:SetTarget(function(e,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsRace(RACE_SPELLCASTER|RACE_WARRIOR) end)
+            e1:SetReset(RESET_PHASE|PHASE_END)
             Duel.RegisterEffect(e1,tp)
         end
     end
-end
-function s.splimit(e,c,sumtp,sumpos,targetp,se)
-    return c:IsLocation(LOCATION_EXTRA) and not (c:IsRace(RACE_WARRIOR) or c:IsRace(RACE_SPELLCASTER))
 end
