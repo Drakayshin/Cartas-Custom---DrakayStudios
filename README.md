@@ -1,4 +1,4 @@
-# Cartas Custom - DrakayStudios: NEXO EDOPRO
+[configs.json](https://github.com/user-attachments/files/30723754/configs.json)# Cartas Custom - DrakayStudios: NEXO EDOPRO
 
 [![Estado](https://img.shields.io/badge/Estado-Activo-success)](https://github.com/Drakayshin/Cartas-Custom---DrakayStudios)
 [![Compatibilidad](https://img.shields.io/badge/Emulador-EDOPro-blue)](https://projectignis.org/)
@@ -9,7 +9,122 @@ Un repositorio dedicado a la recolección de cartas personalizadas (Custom Cards
 
 descarga este archivo:
 
-[configs.json](https://github.com/user-attachments/files/20527143/configs.json)
+[Uploading c{
+	"repos": [
+		{
+			"url": "https://github.com/ProjectIgnis/DeltaBagooska",
+			"repo_name": "Project Ignis updates",
+			"repo_path": "./repositories/delta-bagooska",
+			"has_core": true,
+			"core_path": "bin",
+			"data_path": "",
+			"script_path": "script",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/ProjectIgnis/LFLists",
+			"repo_name": "Forbidden & Limited Card Lists",
+			"repo_path": "./repositories/lflists",
+			"lflist_path": ".",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/ProjectIgnis/Puzzles",
+			"repo_name": "Project Ignis puzzles",
+			"repo_path": "./puzzles/Canon collection",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/Drakayshin/Cartas-Custom---DrakayStudios",
+			"repo_name": "Cartas Custom - DrakayStudios",
+			"repo_path": "./repositories/Drakayshin-PCD",
+			"data_path": "expansions",
+			"script_path": "script",
+			"has_core": true,
+			"core_path": "bin",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/termitaklk/lflist",
+			"repo_name": "Evolution Forbidden & Limited Card Lists",
+			"repo_path": "./repositories/evolution/lflists",
+			"lflist_path": ".",
+			"should_update": true,
+			"should_read": true
+		}
+	],
+	"urls": [
+		{
+			"url": "default",
+			"type": "pic"
+		},
+		{
+			"url": "default",
+			"type": "field"
+		},
+		{
+			"url": "default",
+			"type": "cover"
+		}
+	],
+	"servers": [
+		{
+			"name": "EU Central (Casual)",
+			"address": "eu.projectignis.org",
+			"duelport": 7912,
+			"roomaddress": "eu.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7923
+		},
+		{
+			"name": "EU Central (Competitive)",
+			"address": "eu.projectignis.org",
+			"duelport": 7911,
+			"roomaddress": "eu.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7922
+		},
+		{
+			"name": "US West (Casual)",
+			"address": "us.projectignis.org",
+			"duelport": 7911,
+			"roomaddress": "us.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7922
+		},
+		{
+			"name": "US West (Competitive)",
+			"address": "us.projectignis.org",
+			"duelport": 7912,
+			"roomaddress": "us.projectignis.org",
+			"roomlistprotocol": "http",
+			"roomlistport": 7923
+		},
+		{
+			"name": "Asia Central (Casual/Competitive)",
+			"address": "ignis-duel.ygopro.cn",
+			"duelport": 44444,
+			"roomaddress": "ignis-room.ygopro.cn",
+			"roomlistprotocol": "https",
+			"roomlistport": 443
+		},
+		{
+			"name": "Evolution Server",
+			"address": "server.evolutionygo.com",
+			"duelport": 7911,
+			"roomaddress": "server.evolutionygo.com",
+			"roomlistprotocol": "http",
+			"roomlistport": 7922
+		}
+	],
+	"posixPathExtension": "/usr/local/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands"
+}
+onfigs.json…]()
+
 
 ## ⚙️ Método de Implementación del Repositorio
 
