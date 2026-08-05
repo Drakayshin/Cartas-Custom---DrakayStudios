@@ -64,6 +64,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,e,tp)
     if #g>0 then
         if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
+            local c=e:GetHandler()
             --  *Limite de Invocación desde el Deck Extra
             local e1=Effect.CreateEffect(c)
             e1:SetDescription(aux.Stringid(id,2))
