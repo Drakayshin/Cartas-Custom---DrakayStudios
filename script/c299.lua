@@ -5,7 +5,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--  *Invocación por Sicronía opcional
 	local synchro_proc0=Synchro.AddProcedure(c,nil,2,99,aux.FilterSummonCode(290),1,1)
-	local synchro_proc1=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_FIEND),1,1,aux.FilterSummonCode(290),1,1)
+	local synchro_proc1=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_FIEND|RACE_SPELLCASTER),1,1,aux.FilterSummonCode(290),1,1)
 	synchro_proc0:SetDescription(aux.Stringid(id,0))
 	synchro_proc1:SetDescription(aux.Stringid(id,1))
 	--  Efecto 0: El nombre de esta carta se convierte en "Yacard, Héroe de la Fábula" en Campo o Cementerio
@@ -14,7 +14,7 @@ function s.initial_effect(c)
     e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e0:SetCode(EFFECT_CHANGE_CODE)
     e0:SetRange(LOCATION_MZONE|LOCATION_GRAVE)
-    e0:SetValue(291)
+    e0:SetValue(290)
     c:RegisterEffect(e0)
     --  Efecto 1: Secuencia al ser Invocado por Sincronía
 	local e1=Effect.CreateEffect(c)
@@ -45,7 +45,7 @@ function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
     local b1=Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,c,tp)
 	local b2=Duel.GetMatchingGroup(s.atkfilter,tp,0,LOCATION_MZONE,nil)
-	if chk==0 then return b1 or b2 end
+	if chk==0 then return b1 or b2 and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
 	e:SetLabel(Duel.IsBattlePhase() and 1 or 0)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED)
     Duel.SetPossibleOperationInfo(0,CATEGORY_ATKCHANGE,b2,#b2,tp,0)

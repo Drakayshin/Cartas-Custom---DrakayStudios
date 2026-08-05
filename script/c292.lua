@@ -15,7 +15,7 @@ function s.initial_effect(c)
     e0:SetTarget(s.scxyztg)
     e0:SetOperation(s.scxyzop)
     c:RegisterEffect(e0)
-    -- Efecto 1: Trigger si es Invocada en la Battle Phase
+    --  Efecto 1: Trigger si es Invocada en la Battle Phase
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,1)) -- "Aplicar efectos en secuencia"
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DRAW)
@@ -27,7 +27,6 @@ function s.initial_effect(c)
     e1:SetTarget(s.seqtg)
     e1:SetOperation(s.seqop)
     c:RegisterEffect(e1)
-    -- Clones del Efecto 2 (manteniendo la regla de letras)
     local e1a=e1:Clone()
     e1a:SetCode(EVENT_SPSUMMON_SUCCESS)
     c:RegisterEffect(e1a)
@@ -35,31 +34,25 @@ function s.initial_effect(c)
     e1b:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
     c:RegisterEffect(e1b)
 end
--- =========================================================
--- EFECTO 1: Sincronía / Xyz Rápida
--- =========================================================
+    --  EFECTO 1: Sincronía / Xyz Rápida
 function s.scxyzcon(e,tp,eg,ep,ev,re,r,rp)
-    -- Condición: Solo durante la Battle Phase
     return Duel.IsBattlePhase()
 end
 function s.syncxyzfilter(c,mc)
-    -- Filtra Sincronía o Xyz que puedan usar esta carta (mc) como material
+    --  *Filtra Sincronía o Xyz que puedan usar esta carta (mc) como material
     return c:IsType(TYPE_SYNCHRO|TYPE_XYZ) and (c:IsSynchroSummonable(mc) or c:IsXyzSummonable(mc))
 end
 function s.scxyztg(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    if chk==0 then return c:IsFaceup() and Duel.IsExistingMatchingCard(s.syncxyzfilter,tp,LOCATION_EXTRA,0,1,nil) end
+    if chk==0 then return Duel.IsExistingMatchingCard(s.syncxyzfilter,tp,LOCATION_EXTRA,0,1,nil) end
     Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.scxyzop(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    if c:IsControler(1-tp) or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
     local g=Duel.GetMatchingGroup(s.syncxyzfilter,tp,LOCATION_EXTRA,0,nil)
     if #g>0 then
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
         local tc=g:Select(tp,1,1,nil):GetFirst()
         if tc then
-            -- El motor resuelve correctamente si es Sincronía o Xyz
+            --  *El motor resuelve correctamente si es Sincronía o Xyz
             if tc:IsType(TYPE_SYNCHRO) then
                 Duel.SynchroSummon(tp,tc)
             elseif tc:IsType(TYPE_XYZ) then
@@ -105,7 +98,6 @@ function s.seqtg(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED)
     Duel.SetPossibleOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-
 function s.seqop(e,tp,eg,ep,ev,re,r,rp)
     local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_REMOVED,0,1,nil,e,tp)
     

@@ -78,7 +78,7 @@ function s.trapfilter(c)
 end
 -- Función para contar Atributos originales diferentes
 function s.get_att_count(tp)
-    local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+    local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
     local ct=0
     local atts={ATTRIBUTE_EARTH,ATTRIBUTE_WATER,ATTRIBUTE_FIRE,ATTRIBUTE_WIND,ATTRIBUTE_LIGHT,ATTRIBUTE_DARK,ATTRIBUTE_DIVINE}
     for _,att in ipairs(atts) do
@@ -139,6 +139,6 @@ function s.seqop(e,tp,eg,ep,ev,re,r,rp)
     local b2=ct>0
     if b2 then
         if res then Duel.BreakEffect() end
-        Duel.Recover(tp,ct*300,REASON_EFFECT)
+        Duel.Recover(tp,ct*600,REASON_EFFECT)
     end
 end

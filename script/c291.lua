@@ -16,7 +16,7 @@ function s.initial_effect(c)
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
     e1:SetType(EFFECT_TYPE_QUICK_O)
     e1:SetCode(EVENT_FREE_CHAIN)
-    e1:SetRange(LOCATION_HAND)
+    e1:SetRange(LOCATION_HAND|LOCATION_REMOVED)
     e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
     e1:SetCountLimit(1,id)
     e1:SetCondition(s.spcon1)
@@ -25,7 +25,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e1)
     -- Efecto 2: Al comienzo de la Fase de Batalla, Invocar a esta carta y otro monstruo
     local e2=Effect.CreateEffect(c)
-    e2:SetDescription(aux.Stringid(id,1)) -- "Invocar de Modo Especial desde mano/destierro y Deck"
+    e2:SetDescription(aux.Stringid(id,2)) -- "Invocar de Modo Especial desde mano/destierro y Deck"
     e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
     e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
     e2:SetCode(EVENT_PHASE+PHASE_BATTLE_START)

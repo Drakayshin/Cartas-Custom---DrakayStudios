@@ -14,7 +14,7 @@ function s.initial_effect(c)
     e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e0:SetCode(EFFECT_CHANGE_CODE)
     e0:SetRange(LOCATION_MZONE|LOCATION_GRAVE)
-    e0:SetValue(291)
+    e0:SetValue(290)
     c:RegisterEffect(e0)
     --  Efecto 1: Secuencia al ser Invocado por Sincronía
 	local e1=Effect.CreateEffect(c)
@@ -35,16 +35,16 @@ s.synchro_nt_required=1
 s.synchro_tuner_required=1
     --  *EFECTO 1°
 function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND|LOCATION_ONFIELD)
 	local b1=true
 	local b2=#g>0
-	if chk==0 then return b1 or b2 end
+	if chk==0 then return b1 or b2 and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
 	e:SetLabel(Duel.IsBattlePhase() and 1 or 0)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_DAMAGE,nil,1,1-tp,1000)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,1-tp,LOCATION_ONFIELD)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DAMAGE,nil,1,1-tp,1200)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,1-tp,LOCATION_HAND|LOCATION_ONFIELD)
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND|LOCATION_ONFIELD)
 	local b1=true
 	local b2=#g>0
 	local bp=e:GetLabel()==1
@@ -55,7 +55,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	local breakeffect=false
 	if (op and op==1) or (bp and b1 and (not b2 or Duel.SelectYesNo(tp,aux.Stringid(id,5)))) then
 		--	*Infliger daño
-		Duel.Damage(1-tp,1000,REASON_EFFECT)
+		Duel.Damage(1-tp,1200,REASON_EFFECT)
 		breakeffect=true
 	end
 	if (op and op==2) or (bp and b2 and (not breakeffect or Duel.SelectYesNo(tp,aux.Stringid(id,6)))) then
