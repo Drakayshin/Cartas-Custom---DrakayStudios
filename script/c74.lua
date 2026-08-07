@@ -4,60 +4,59 @@ local s,id=GetID()
 function s.initial_effect(c)
     --  *Solo puedes controlar 1
     c:SetUniqueOnField(1,0,id)
-    --  Efecto 1: Invocación de Modo Especial desde la mano (Sacrificando 1 del adversario)
+    --  Efecto 0: Invocación de Modo Especial desde la mano (Sacrificando 1 del adversario)
+    local e0=Effect.CreateEffect(c)
+    e0:SetType(EFFECT_TYPE_FIELD)
+    e0:SetCode(EFFECT_SPSUMMON_PROC)
+    e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+    e0:SetRange(LOCATION_HAND)
+    e0:SetCondition(s.spcon)
+    e0:SetTarget(s.sptg)
+    e0:SetOperation(s.spop)
+    c:RegisterEffect(e0)
+    --  Efecto 1: Tomar el control
     local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_SPSUMMON_PROC)
-    e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-    e1:SetRange(LOCATION_HAND)
-    e1:SetCondition(s.spcon)
-    e1:SetTarget(s.sptg)
-    e1:SetOperation(s.spop)
+    e1:SetDescription(aux.Stringid(id,0))
+    e1:SetCategory(CATEGORY_CONTROL)
+    e1:SetType(EFFECT_TYPE_QUICK_O)
+    e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+    e1:SetCode(EVENT_FREE_CHAIN)
+    e1:SetRange(LOCATION_MZONE)
+    e1:SetCountLimit(1,{id,1})
+    e1:SetCondition(function()return Duel.IsMainPhase() end)
+    e1:SetTarget(s.ctltg)
+    e1:SetOperation(s.ctlop)
     c:RegisterEffect(e1)
-    --  Efecto 2: Tomar el control (Efecto Disparado al ser Invocado Normal)
+    --  Efecto 2: Desterrar para bloquear activaciones
     local e2=Effect.CreateEffect(c)
-    e2:SetDescription(aux.Stringid(id,0))
-    e2:SetCategory(CATEGORY_CONTROL)
-    e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-    e2:SetCode(EVENT_SUMMON_SUCCESS)
-    e2:SetCountLimit(1,id) -- El ID base comparte el límite con e3
-    e2:SetTarget(s.ctltg)
-    e2:SetOperation(s.ctlop)
+    e2:SetDescription(aux.Stringid(id,1))
+    e2:SetType(EFFECT_TYPE_QUICK_O)
+    e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+    e2:SetCode(EVENT_FREE_CHAIN)
+    e2:SetRange(LOCATION_MZONE)
+    e2:SetCountLimit(1,{id,1})
+    e2:SetCondition(s.stuncon)
+    e2:SetCost(s.stuncost)
+    e2:SetOperation(s.stunop)
     c:RegisterEffect(e2)
-    local e2a=e2:Clone()
-    e2a:SetCode(EVENT_SPSUMMON_SUCCESS)
-    c:RegisterEffect(e2a)
-    --  Efecto 1: Desterrar para bloquear activaciones
-    local e3=Effect.CreateEffect(c)
-    e3:SetDescription(aux.Stringid(id,1))
-    e3:SetType(EFFECT_TYPE_QUICK_O)
-    e3:SetCode(EVENT_FREE_CHAIN)
-    e3:SetRange(LOCATION_MZONE)
-    e3:SetCountLimit(1,id) -- El ID base comparte el límite con e2
-    e3:SetCondition(s.stuncon)
-    e3:SetCost(s.stuncost)
-    e3:SetOperation(s.stunop)
-    c:RegisterEffect(e3)
 end
 s.listed_series={0x3e7}
     --  *Filtro global para identificar los tipos de monstruos objetivo
 function s.exfilter(c)
     return c:IsType(TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 end
-    --  *EFECTO 1°
+    --  *EFECTO 0°
 function s.spfilter(c,tp)
-    return s.exfilter(c) and c:IsReleasable() and c:IsControler(1-tp)
+    return s.exfilter(c) and c:IsReleasable()
 end
 function s.spcon(e,c)
     if c==nil then return true end
     local tp=c:GetControler()
-    -- Se requiere espacio en TU campo, ya que sacrificas en el campo rival
-    return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-        and Duel.IsExistingMatchingCard(s.spfilter,tp,0,LOCATION_MZONE,1,nil,tp)
+    --  *Se requiere espacio en TU campo, ya que sacrificas en el campo rival
+    return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-    local g=Duel.GetMatchingGroup(s.spfilter,tp,0,LOCATION_MZONE,nil,tp)
+    local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
     local tc=g:SelectUnselect(nil,tp,false,true,1,1)
     if tc then
@@ -71,7 +70,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
         Duel.Release(tc,REASON_COST)
     end
 end
-    -- *EFECTO 2°
+    -- *EFECTO 1°
 function s.ctlfilter(c)
     return c:IsFaceup() and s.exfilter(c) and c:IsControlerCanBeChanged()
 end
@@ -107,7 +106,7 @@ function s.ctlop(e,tp,eg,ep,ev,re,r,rp)
         tc:RegisterEffect(e3)
     end
 end
-    --  EFECTO 3°
+    --  EFECTO 2°
 function s.cfilter(c)
     return c:IsFaceup() and c:IsSetCard(0x3e7) 
 end
@@ -116,15 +115,27 @@ function s.stuncon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.stuncost(e,tp,eg,ep,ev,re,r,rp,chk)
     local c=e:GetHandler()
-    if chk==0 then return c:IsAbleToRemoveAsCost() end
-    Duel.Remove(c,POS_FACEUP,REASON_COST)
+	if chk==0 then return c:IsAbleToRemoveAsCost() end
+	if Duel.Remove(c,POS_FACEUP,REASON_COST+REASON_TEMPORARY)~=0 then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetReset(RESET_PHASE|PHASE_END)
+		e1:SetLabelObject(c)
+		e1:SetCountLimit(1)
+		e1:SetOperation(s.retop)
+		Duel.RegisterEffect(e1,tp)
+	end
+end
+function s.retop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.ReturnToField(e:GetLabelObject())
 end
 function s.stunop(e,tp,eg,ep,ev,re,r,rp)
     local e1=Effect.CreateEffect(e:GetHandler())
     e1:SetType(EFFECT_TYPE_FIELD)
     e1:SetCode(EFFECT_CANNOT_ACTIVATE)
     e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(0,1)
+    e1:SetTargetRange(1,1)
     e1:SetValue(s.aclimit)
     e1:SetReset(RESET_PHASE+PHASE_END)
     Duel.RegisterEffect(e1,tp)
