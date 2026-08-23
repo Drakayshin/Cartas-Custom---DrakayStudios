@@ -44,7 +44,14 @@ function s.initial_effect(c)
 	e3:SetOperation(s.spop)
     c:RegisterEffect(e3)
     --  Efecto 3: Efectos de secuencia
-
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,0)) 
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_PHASE+PHASE_BATTLE_START)
+	e4:SetRange(LOCATION_MZONE) -- Asumiendo que es un monstruo en el campo. Cámbialo si es Mágica/Trampa.
+	e4:SetTarget(s.target)
+	e4:SetOperation(s.operation)
+	c:RegisterEffect(e4)
 end
 s.material={290}
 s.listed_names={290}
@@ -66,4 +73,104 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
---  *Efecto 3°
+	--  *Efecto 4°
+-- Filtros de Condiciones
+function s.syncfilter(c)
+    return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
+end
+
+function s.negfilter(c)
+    return c:IsFaceup() and not c:IsDisabled()
+end
+
+function s.atkfilter(c)
+    return c:IsFaceup() and c:GetBaseDefense()>0
+end
+
+-- Selección de Objetivos / Opciones
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+    if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and s.negfilter(chkc) end
+    
+    local b1=Duel.IsExistingTarget(s.negfilter,tp,0,LOCATION_ONFIELD,1,nil)
+    local b2=Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_MZONE,0,1,nil)
+    
+    if chk==0 then return b1 or b2 end
+    
+    local op=0
+    if b1 and b2 then
+        -- Si ambas son posibles: 0=Negar, 1=ATK, 2=Ambas
+        op=Duel.SelectOption(tp,aux.Stringid(id,1),aux.Stringid(id,2),aux.Stringid(id,3))
+    elseif b1 then
+        op=Duel.SelectOption(tp,aux.Stringid(id,1))
+    else
+        op=Duel.SelectOption(tp,aux.Stringid(id,2))+1
+    end
+    
+    e:SetLabel(op)
+    
+    -- Manejo dinámico del Target (Solo si es la opción 0 [Negar] o la 2 [Ambas])
+    if op==0 or op==2 then
+        e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+        local ct=Duel.GetMatchingGroupCount(s.syncfilter,tp,LOCATION_MZONE,0,nil)+1
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISABLE)
+        local g=Duel.SelectTarget(tp,s.negfilter,tp,0,LOCATION_ONFIELD,1,ct,nil)
+        Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
+    else
+        e:SetProperty(0)
+    end
+    
+    if op==1 or op==2 then
+        Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,nil,0,tp,LOCATION_MZONE)
+    end
+end
+
+-- Resolución del Efecto
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    local op=e:GetLabel()
+    
+    -- Operación: Negar (Opción 0 o 2)
+    if op==0 or op==2 then
+        local tg=Duel.GetTargetCards(e)
+        if tg and #tg>0 then
+            for tc in aux.Next(tg) do
+                if tc:IsFaceup() and not tc:IsDisabled() and tc:IsRelateToEffect(e) then
+                    Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+                    
+                    local e1=Effect.CreateEffect(c)
+                    e1:SetType(EFFECT_TYPE_SINGLE)
+                    e1:SetCode(EFFECT_DISABLE)
+                    e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+                    tc:RegisterEffect(e1)
+                    
+                    local e1a=e1:Clone()
+                    e1a:SetCode(EFFECT_DISABLE_EFFECT)
+                    e1a:SetValue(RESET_TURN_SET)
+                    tc:RegisterEffect(e1a)
+                    
+                    if tc:IsType(TYPE_TRAPMONSTER) then
+                        local e1b=e1:Clone()
+                        e1b:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+                        tc:RegisterEffect(e1b)
+                    end
+                end
+            end
+        end
+    end
+    -- Romper la cadena en caso de seleccionar ambas opciones
+    if op==2 then
+        Duel.BreakEffect()
+    end
+    -- Operación: Ganar ATK (Opción 1 o 2)
+    if op==1 or op==2 then
+        local g=Duel.GetMatchingGroup(s.atkfilter,tp,LOCATION_MZONE,0,nil)
+        for tc in aux.Next(g) do
+            local e2=Effect.CreateEffect(c)
+            e2:SetType(EFFECT_TYPE_SINGLE)
+            e2:SetCode(EFFECT_UPDATE_ATTACK)
+            e2:SetValue(tc:GetBaseDefense())
+            e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE)
+            tc:RegisterEffect(e2)
+        end
+    end
+end
