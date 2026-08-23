@@ -5,7 +5,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--  *Invocación por Sicronía opcional
 	local synchro_proc0=Synchro.AddProcedure(c,nil,2,99,aux.FilterSummonCode(290),1,1)
-	local synchro_proc1=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_FIEND|RACE_SPELLCASTER),1,1,aux.FilterSummonCode(290),1,1)
+	local synchro_proc1=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_FIEND),1,1,aux.FilterSummonCode(290),1,1)
 	synchro_proc0:SetDescription(aux.Stringid(id,0))
 	synchro_proc1:SetDescription(aux.Stringid(id,1))
 	--  Efecto 0: El nombre de esta carta se convierte en "Yacard, Héroe de la Fábula" en Campo o Cementerio
@@ -55,7 +55,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
     --  *Evaluamos ambas condiciones nuevamente al momento de resolver
     local c=e:GetHandler()
     local b1=c:IsRelateToEffect(e) and c:IsFaceup() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,c,tp)
-	local b2=Duel.GetMatchingGroup(s.atkfilter,tp,0,LOCATION_MZONE,nil)
+	local b2=Duel.GetMatchingGroup(s.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,c)
 	local bp=e:GetLabel()==1
 	local op=nil
 	if not bp then
@@ -73,7 +73,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
     end
     
 	if (op and op==2) or (bp and b2 and (not breakeffect or Duel.SelectYesNo(tp,aux.Stringid(id,6)))) then
-		--Cambiar el ATK/DEF a 0 y gana LP igual a el ATK de esos monstruos
+		--  *Cambiar el ATK/DEF a 0 y gana LP igual a el ATK de esos monstruos
 		if #b2>0 then
             for tc in b2:Iter() do
                 local atk=tc:GetAttack()
