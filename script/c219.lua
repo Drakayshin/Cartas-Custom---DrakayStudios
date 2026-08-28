@@ -8,10 +8,10 @@ function s.initial_effect(c)
     Pendulum.AddProcedure(c,false)
     --  *Invocación por Fusión
     c:EnableReviveLimit()
-	Fusion.AddProcMixN(c,true,true,s.ffilter,5)
+	Fusion.AddProcMixN(c,true,true,s.ffilter,4)
 	--  *Fusión por contacto
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,false,nil,1)
-    --   0° Invocar solo una vez por turno por Invocación o Fusión o Fusión por contacto
+    --	Efecti 0: Invocar solo una vez por turno por Invocación o Fusión o Fusión por contacto
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -19,12 +19,12 @@ function s.initial_effect(c)
 	e0:SetCondition(s.regcon)
 	e0:SetOperation(s.regop)
     c:RegisterEffect(e0)
-    --  1° Puede atacar en Posición de Defensa
+    --  Efecto 1: Puede atacar en Posición de Defensa
     local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DEFENSE_ATTACK)
 	c:RegisterEffect(e1)
-    --  2° Colocar esta carta en tu Zona de Péndulo
+    --  Efecto 2: Colocar esta carta en tu Zona de Péndulo
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -34,34 +34,36 @@ function s.initial_effect(c)
 	e2:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk) if chk==0 then return Duel.CheckPendulumZones(tp) end end)
 	e2:SetOperation(s.penop)
 	c:RegisterEffect(e2)
-    --  3° Reducir 2000 ATK/DEF a un monstruo en el Campo de tu adversario
+	--  Efecto 3: Destruir todos los monstruos que tengan ATK igual o menor al ATK de esta carta
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER|TIMING_END_PHASE)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetTarget(s.atktg)
-	e3:SetOperation(s.atkop)
+	e3:SetDescription(aux.Stringid(id,2))
+	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCountLimit(1,{id,3})
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
     c:RegisterEffect(e3)
-    --  4° Destruir todos los monstruos que tengan ATK igual o menor al ATK de esta carta
+    --  Efecto 4: Reducir 2000 ATK/DEF a un monstruo en el Campo de tu adversario
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,2))
-	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetCountLimit(1,{id,3})
-	e4:SetTarget(s.destg)
-	e4:SetOperation(s.desop)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE+CATEGORY_DESTROY)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER|TIMING_END_PHASE)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetCost(Cost.PayLP(2000))
+	e4:SetTarget(s.atktg)
+	e4:SetOperation(s.atkop)
     c:RegisterEffect(e4)
-    --  5° Negar efecto y cambiar la posición de batalla de est carta
+    --  Efecto 5: Negar efecto y cambiar la posición de batalla de est carta
     local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,3))
 	e5:SetCategory(CATEGORY_POSITION+CATEGORY_NEGATE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetCode(EVENT_CHAINING)
 	e5:SetRange(LOCATION_MZONE)
@@ -73,7 +75,7 @@ function s.initial_effect(c)
     
     --  EFECTO DE PENDULO
 
-    -- 	6° Limite de Invocación por Péndulo a Monstruos Péndulo
+    -- 	Efecto 6: Limite de Invocación por Péndulo a Monstruos Péndulo
     local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_FIELD)
 	e6:SetRange(LOCATION_PZONE)
@@ -82,39 +84,28 @@ function s.initial_effect(c)
 	e6:SetTargetRange(1,0)
 	e6:SetTarget(function(e,c,sump,sumtype,sumpos,targetp)return not c:IsType(TYPE_PENDULUM) and (sumtype&SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM end)
 	c:RegisterEffect(e6)
-	--	7° Limite de ataques del adversario
+	--	Efecto 7: Negar efectos de monstruos en el Campo del adversario
 	local e7=Effect.CreateEffect(c)
-    e7:SetDescription(aux.Stringid(id,4))
-    e7:SetCategory(CATEGORY_POSITION)
+    e7:SetDescription(aux.Stringid(id,5))
+    e7:SetCategory(CATEGORY_DISABLE)
     e7:SetType(EFFECT_TYPE_IGNITION)
-    e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
     e7:SetRange(LOCATION_PZONE)
     e7:SetCountLimit(1,{id,5})
-    e7:SetTarget(s.postg)
-    e7:SetOperation(s.posop)
+    e7:SetCost(s.negcost)
+    e7:SetTarget(s.negtg)
+    e7:SetOperation(s.negop)
 	c:RegisterEffect(e7)
-	--	8° Negar efectos de monstruos en el Campo del adversario
+	-- 	Efecto 8: Invocar desde la Zona de Péndulo
 	local e8=Effect.CreateEffect(c)
-    e8:SetDescription(aux.Stringid(id,5))
-    e8:SetCategory(CATEGORY_DISABLE)
+    e8:SetDescription(aux.Stringid(id,6))
+    e8:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
     e8:SetType(EFFECT_TYPE_IGNITION)
     e8:SetRange(LOCATION_PZONE)
     e8:SetCountLimit(1,{id,6})
-    e8:SetCost(s.negcost)
-    e8:SetTarget(s.negtg)
-    e8:SetOperation(s.negop)
-	c:RegisterEffect(e8)
-	-- 9° Invocar desde la Zona de Péndulo
-	local e9=Effect.CreateEffect(c)
-    e9:SetDescription(aux.Stringid(id,6))
-    e9:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
-    e9:SetType(EFFECT_TYPE_IGNITION)
-    e9:SetRange(LOCATION_PZONE)
-    e9:SetCountLimit(1,{id,7})
-    e9:SetCondition(s.spcon)
-    e9:SetTarget(s.sptg)
-    e9:SetOperation(s.spop)
-    c:RegisterEffect(e9)
+    e8:SetCondition(s.spcon)
+    e8:SetTarget(s.sptg)
+    e8:SetOperation(s.spop)
+    c:RegisterEffect(e8)
 end
     --  *Filtro de materilaes de Fusión
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
@@ -157,40 +148,6 @@ function s.penop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
     --  *EFECTO 3°
-function s.atkfilter(c)
-	return c:IsFaceup() and c:GetAttack()~=0
-end
-function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.atkfilter,tp,0,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.atkfilter,tp,0,LOCATION_MZONE,1,1,nil)
-end
-function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	local dg=Group.CreateGroup()
-    if tc:IsFaceup() and tc:IsRelateToEffect(e) then
-        --  *Reducir ATK/DEF
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-2000)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-        tc:RegisterEffect(e1)
-        local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		e2:SetValue(-2000)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e2)
-		if preatk~=0 and tc:GetAttack()==0 then dg:AddCard(tc) end
-	end
-	if #dg==0 then return end
-	Duel.BreakEffect()
-	Duel.Destroy(dg,REASON_EFFECT)
-end
-    --  *EFECTO 4°
 function s.filter(c,atk)
 	return c:IsFaceup() and c:IsAttackBelow(atk) and c:IsDestructable()
 end
@@ -216,6 +173,41 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
+    --  *EFECTO 4°
+function s.atkfilter(c)
+	return c:IsFaceup()
+end
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.atkfilter,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectTarget(tp,s.atkfilter,tp,0,LOCATION_MZONE,1,3,nil)
+	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,#g,0,0)
+end
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local dg=Group.CreateGroup()
+	local g=Duel.GetTargetCards(e):Filter(Card.IsFaceup,nil)
+    for oc in g:Iter() do
+        --Reducir ATK/DEF
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(-2000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+        oc:RegisterEffect(e1)
+        local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_UPDATE_DEFENSE)
+		e2:SetValue(-2000)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		oc:RegisterEffect(e2)
+		if preatk~=0 and oc:GetAttack()==0 then dg:AddCard(oc) end
+	end
+	if #dg==0 then return end
+	Duel.BreakEffect()
+	Duel.Destroy(dg,REASON_EFFECT)
+end
     --  *EFECTO 5°
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -226,37 +218,22 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) and Duel.ChangePosition(c,POS_FACEUP_DEFENSE)~=0 then
 		Duel.NegateActivation(ev)
+		if c:IsFaceup() and c:IsRelateToEffect(e) then
+			Duel.BreakEffect()
+			--Inafectada por efecto de otras cartas este turno
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(3100)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetCode(EFFECT_IMMUNE_EFFECT)
+			e1:SetRange(LOCATION_MZONE)
+			e1:SetValue(function(e, te) return te:GetOwner()~=e:GetOwner() end)
+			e1:SetReset(RESETS_STANDARD_PHASE_END)
+			c:RegisterEffect(e1)
+		end
 	end
 end
-	--  *EFECTO 7°
-function s.posfilter(c)
-    return c:IsPosition(POS_FACEUP_ATTACK) and c:IsCanChangePosition()
-end
-function s.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-    if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.posfilter(chkc) end
-    if chk==0 then return Duel.IsExistingTarget(s.posfilter,tp,LOCATION_MZONE,0,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-    local g=Duel.SelectTarget(tp,s.posfilter,tp,LOCATION_MZONE,0,1,1,nil)
-    Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
-end
-function s.posop(e,tp,eg,ep,ev,re,r,rp)
-    local tc=Duel.GetFirstTarget()
-    if tc:IsRelateToEffect(e) and Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)~=0 then
-        --	Aplicar la restricción de ataque al adversario
-        local e1a=Effect.CreateEffect(e:GetHandler())
-        e1a:SetType(EFFECT_TYPE_FIELD)
-        e1a:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
-        e1a:SetRange(LOCATION_MZONE)
-        e1a:SetTargetRange(0,LOCATION_MZONE)
-        e1a:SetValue(s.atktg)
-        e1a:SetReset(RESET_EVENT+RESETS_STANDARD)
-        tc:RegisterEffect(e1a)
-    end
-end
-function s.atktg1(e,c)
-    return c~=e:GetHandler()
-end
-	--	*EFECTO 8°
+	--	*EFECTO 7°
 function s.cfilter(c)
     return c:IsType(TYPE_PENDULUM) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsAbleToRemoveAsCost()
 end
@@ -277,7 +254,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
     local tc=g:GetFirst()
     for tc in aux.Next(g) do
         if tc:IsAttribute(attr) then
-            --	Niega los efectos
+            --Niega los efectos
             local e2a=Effect.CreateEffect(c)
             e2a:SetType(EFFECT_TYPE_SINGLE)
             e2a:SetCode(EFFECT_DISABLE)
@@ -291,7 +268,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
         end
     end
 end
-	--	*EFECTO 9°
+	--	*EFECTO 8°
 function s.confilter(c)
     return c:IsFaceup()
 end
@@ -314,7 +291,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
     if not c:IsRelateToEffect(e) then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    -- Selecciona la carta a destruir en la Zona de Péndulo
+    --Selecciona la carta a destruir en la Zona de Péndulo
     local g=Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_PZONE,0,1,1,c)
     if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0 then
         Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
