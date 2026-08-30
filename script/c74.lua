@@ -1,4 +1,4 @@
---Irae, Atemporal Terranigma
+--Arcignis, La Predadora Terranigma
 --DrakayStudios
 local s,id=GetID()
 function s.initial_effect(c)
@@ -27,18 +27,29 @@ function s.initial_effect(c)
     e1:SetTarget(s.ctltg)
     e1:SetOperation(s.ctlop)
     c:RegisterEffect(e1)
-    --  Efecto 2: Desterrar para bloquear activaciones
+    --  Efecto 2: Rápido durante la Main Phase
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,1))
+    e2:SetCategory(CATEGORY_REMOVE)
     e2:SetType(EFFECT_TYPE_QUICK_O)
-    e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
     e2:SetCode(EVENT_FREE_CHAIN)
     e2:SetRange(LOCATION_MZONE)
+    e2:SetHintTiming(0, TIMINGS_CHECK_MONSTER_E + TIMING_MAIN_END)
     e2:SetCountLimit(1,{id,1})
-    e2:SetCondition(s.stuncon)
-    e2:SetCost(s.stuncost)
-    e2:SetOperation(s.stunop)
+    e2:SetCondition(s.condition)
+    e2:SetTarget(s.target)
+    e2:SetOperation(s.operation)
     c:RegisterEffect(e2)
+
+    --  Rastrear activaciones globales de efectos por tipo de monstruo en el turno
+    if not s.global_check then
+        s.global_check = true
+        local ge1 = Effect.CreateEffect(c)
+        ge1:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+        ge1:SetCode(EVENT_CHAINING)
+        ge1:SetOperation(s.checkop)
+        Duel.RegisterEffect(ge1, 0)
+    end
 end
 s.listed_series={0x3e7}
     --  *Filtro global para identificar los tipos de monstruos objetivo
@@ -107,40 +118,74 @@ function s.ctlop(e,tp,eg,ep,ev,re,r,rp)
     end
 end
     --  EFECTO 2°
-function s.cfilter(c)
-    return c:IsFaceup() and c:IsSetCard(0x3e7) 
+    -- Rastrear cuándo un jugador activa un efecto de un Tipo de Monstruo específico
+function s.checkop(e, tp, eg, ep, ev, re, r, rp)
+    if re:IsActiveType(TYPE_MONSTER) then
+        local monster_types = {TYPE_RITUAL, TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_LINK}
+        for _, t in ipairs(monster_types) do
+            if re:IsActiveType(t) then
+                -- Registra 1 conteo para el jugador (rp) y este tipo de monstruo en el turno
+                Duel.RegisterFlagEffect(rp, id + t, RESET_PHASE + PHASE_END, 0, 1)
+            end
+        end
+    end
 end
-function s.stuncon(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
+
+-- Condición de activación: Debe ser Main Phase y no haberse activado el turno anterior
+function s.condition(e, tp, eg, ep, ev, re, r, rp)
+    return Duel.IsMainPhase() and Duel.GetFlagEffect(tp,id+100) == 0
 end
-function s.stuncost(e,tp,eg,ep,ev,re,r,rp,chk)
+
+-- Target: Comprobar que la carta puede ser desterrada
+function s.target(e, tp, eg, ep, ev, re, r, rp, chk)
     local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemoveAsCost() end
-	if Duel.Remove(c,POS_FACEUP,REASON_COST+REASON_TEMPORARY)~=0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		e1:SetLabelObject(c)
-		e1:SetCountLimit(1)
-		e1:SetOperation(s.retop)
-		Duel.RegisterEffect(e1,tp)
-	end
+    if chk==0 then return c:IsAbleToRemove() end
+    Duel.SetOperationInfo(0,CATEGORY_REMOVE,c,1,0,0)
 end
-function s.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ReturnToField(e:GetLabelObject())
+
+-- Resolución del efecto
+function s.operation(e, tp, eg, ep, ev, re, r, rp)
+    local c = e:GetHandler()
+    -- 1. Desterrar esta carta hasta la End Phase (en resolución)
+    if c:IsRelateToEffect(e) and Duel.Banish(c, POS_FACEUP, REASON_EFFECT + REASON_TEMPORARY) ~= 0 then
+        -- Programar el retorno de la carta al campo al final del turno
+        local e1 = Effect.CreateEffect(c)
+        e1:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+        e1:SetCode(EVENT_PHASE + PHASE_END)
+        e1:SetReset(RESET_PHASE + PHASE_END)
+        e1:SetCountLimit(1)
+        e1:SetLabelObject(c)
+        e1:SetOperation(s.retop)
+        Duel.RegisterEffect(e1, tp)
+        -- 2. Restricción para el resto del turno: máximo 1 efecto activado por Tipo de Monstruo por jugador
+        local e2 = Effect.CreateEffect(c)
+        e2:SetType(EFFECT_TYPE_FIELD)
+        e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+        e2:SetCode(EFFECT_CANNOT_ACTIVATE)
+        e2:SetTargetRange(1,1)
+        e2:SetValue(s.aclimit)
+        e2:SetReset(RESET_PHASE+PHASE_END)
+        Duel.RegisterEffect(e2,tp)
+        -- 3. Bloquear la activación de este efecto durante el siguiente turno (expira al final del 2do turno)
+        Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,2)
+    end
 end
-function s.stunop(e,tp,eg,ep,ev,re,r,rp)
-    local e1=Effect.CreateEffect(e:GetHandler())
-    e1:SetType(EFFECT_TYPE_FIELD)
-    e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-    e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-    e1:SetTargetRange(1,1)
-    e1:SetValue(s.aclimit)
-    e1:SetReset(RESET_PHASE+PHASE_END)
-    Duel.RegisterEffect(e1,tp)
+
+-- Operación para retornar al campo en la End Phase
+function s.retop(e, tp, eg, ep, ev, re, r, rp)
+    Duel.ReturnToField(e:GetLabelObject())
 end
-function s.aclimit(e,re,tp)
-    local tc=re:GetHandler()
-    return re:IsActiveType(TYPE_MONSTER) and tc:IsLocation(LOCATION_MZONE) and s.exfilter(tc)
+
+-- Lógica de restricción de activación
+function s.aclimit(e, re, tp)
+    if re:IsActiveType(TYPE_MONSTER) then
+        local monster_types = {TYPE_RITUAL, TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_LINK}
+        for _, t in ipairs(monster_types) do
+            -- Si la carta que se intenta activar es de ese tipo y el jugador ya activó >= 1 en el turno:
+            if re:IsActiveType(t) and Duel.GetFlagEffect(tp,id+t)>= 1 then
+                return true -- Previene la activación
+            end
+        end
+    end
+    return false
 end

@@ -70,7 +70,7 @@ function s.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(op)
 	if op==1 then
 		e:SetCategory(CATEGORY_DESTROY)
-		local g1=Duel.GetMatchingGroup(Card.IsAttackPos,tp,0,LOCATION_MZONE,nil)
+		local g1=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 		local g2=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil)
 		local b1=#g1>0
 		local b2=#g2>0
@@ -88,7 +88,7 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==1 then
 		local cd=e:GetChainData()
 		if cd.choice==1 then
-			local g=Duel.GetMatchingGroup(Card.IsAttackPos,tp,0,LOCATION_MZONE,nil)
+			local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 			if #g>0 then Duel.Destroy(g,REASON_EFFECT) end
 		elseif cd.choice==2 then
 			local g=Duel.GetMatchingGroup(Card.IsSpellTrap,tp,0,LOCATION_ONFIELD,nil)
