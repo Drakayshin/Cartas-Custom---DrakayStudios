@@ -118,7 +118,7 @@ function s.ctlop(e,tp,eg,ep,ev,re,r,rp)
     end
 end
     --  EFECTO 2°
-    -- Rastrear cuándo un jugador activa un efecto de un Tipo de Monstruo específico
+-- Rastrear cuándo un jugador activa un efecto de un Tipo de Monstruo específico
 function s.checkop(e, tp, eg, ep, ev, re, r, rp)
     if re:IsActiveType(TYPE_MONSTER) then
         local monster_types = {TYPE_RITUAL, TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_LINK}
@@ -133,21 +133,23 @@ end
 
 -- Condición de activación: Debe ser Main Phase y no haberse activado el turno anterior
 function s.condition(e, tp, eg, ep, ev, re, r, rp)
-    return Duel.IsMainPhase() and Duel.GetFlagEffect(tp,id+100) == 0
+    return Duel.IsMainPhase() and Duel.GetFlagEffect(tp, id + 100) == 0
 end
 
 -- Target: Comprobar que la carta puede ser desterrada
 function s.target(e, tp, eg, ep, ev, re, r, rp, chk)
-    local c=e:GetHandler()
-    if chk==0 then return c:IsAbleToRemove() end
-    Duel.SetOperationInfo(0,CATEGORY_REMOVE,c,1,0,0)
+    local c = e:GetHandler()
+    if chk == 0 then return c:IsAbleToRemove() end
+    Duel.SetOperationInfo(0, CATEGORY_REMOVE, c, 1, 0, 0)
 end
 
 -- Resolución del efecto
 function s.operation(e, tp, eg, ep, ev, re, r, rp)
     local c = e:GetHandler()
-    -- 1. Desterrar esta carta hasta la End Phase (en resolución)
-    if c:IsRelateToEffect(e) and Duel.Banish(c, POS_FACEUP, REASON_EFFECT + REASON_TEMPORARY) ~= 0 then
+    
+    -- 1. Desterrar esta carta hasta la End Phase en resolución (Duel.Remove es la función correcta en Ignis)
+    if c:IsRelateToEffect(e) and Duel.Remove(c, POS_FACEUP, REASON_EFFECT + REASON_TEMPORARY) > 0 then
+        
         -- Programar el retorno de la carta al campo al final del turno
         local e1 = Effect.CreateEffect(c)
         e1:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
@@ -157,23 +159,28 @@ function s.operation(e, tp, eg, ep, ev, re, r, rp)
         e1:SetLabelObject(c)
         e1:SetOperation(s.retop)
         Duel.RegisterEffect(e1, tp)
+
         -- 2. Restricción para el resto del turno: máximo 1 efecto activado por Tipo de Monstruo por jugador
         local e2 = Effect.CreateEffect(c)
         e2:SetType(EFFECT_TYPE_FIELD)
         e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
         e2:SetCode(EFFECT_CANNOT_ACTIVATE)
-        e2:SetTargetRange(1,1)
+        e2:SetTargetRange(1, 1)
         e2:SetValue(s.aclimit)
-        e2:SetReset(RESET_PHASE+PHASE_END)
-        Duel.RegisterEffect(e2,tp)
+        e2:SetReset(RESET_PHASE + PHASE_END)
+        Duel.RegisterEffect(e2, tp)
+
         -- 3. Bloquear la activación de este efecto durante el siguiente turno (expira al final del 2do turno)
-        Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,2)
+        Duel.RegisterFlagEffect(tp, id + 100, RESET_PHASE + PHASE_END, 0, 2)
     end
 end
 
 -- Operación para retornar al campo en la End Phase
 function s.retop(e, tp, eg, ep, ev, re, r, rp)
-    Duel.ReturnToField(e:GetLabelObject())
+    local tc = e:GetLabelObject()
+    if tc then
+        Duel.ReturnToField(tc)
+    end
 end
 
 -- Lógica de restricción de activación
@@ -182,7 +189,7 @@ function s.aclimit(e, re, tp)
         local monster_types = {TYPE_RITUAL, TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_LINK}
         for _, t in ipairs(monster_types) do
             -- Si la carta que se intenta activar es de ese tipo y el jugador ya activó >= 1 en el turno:
-            if re:IsActiveType(t) and Duel.GetFlagEffect(tp,id+t)>= 1 then
+            if re:IsActiveType(t) and Duel.GetFlagEffect(tp, id + t) >= 1 then
                 return true -- Previene la activación
             end
         end
