@@ -68,15 +68,13 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
     if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
         Duel.ConfirmCards(1-tp,g)
-        if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 then
-            local sg=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil)
+        local sg=Duel.GetMatchingGroup(s.sumfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil)
             -- "...puedes Invocar de Modo Normal 1 monstruo de Oscuridad."
-            if #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-                Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
-                local sc=sg:Select(tp,1,1,nil):GetFirst()
-                if sc then
-                    Duel.Summon(tp,sc,true,nil)
-                end
+        if #sg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+            Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+            local sc=sg:Select(tp,1,1,nil):GetFirst()
+            if sc then
+                Duel.Summon(tp,sc,true,nil)
             end
         end
     end
