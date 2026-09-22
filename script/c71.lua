@@ -6,7 +6,7 @@ function s.initial_effect(c)
     local e0=Effect.CreateEffect(c)
     e0:SetType(EFFECT_TYPE_FIELD)
     e0:SetCode(EFFECT_UPDATE_ATTACK)
-    e0:SetRange(LOCATION_MZONE) -- Cambia a LOCATION_SZONE si esta carta es una Mágica/Trampa
+    e0:SetRange(LOCATION_MZONE|LOCATION_SZONE) -- Cambia a LOCATION_SZONE si esta carta es una Mágica/Trampa
     e0:SetTargetRange(0,LOCATION_MZONE)
     e0:SetValue(s.val)
     c:RegisterEffect(e0)
