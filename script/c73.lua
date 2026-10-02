@@ -37,10 +37,7 @@ end
 s.listed_series={0x3e7}
     --  *EFECTO 1°
 function s.desfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3e7) or (c:IsAttribute(ATTRIBUTE_DARK))
-end
-function s.rescon(sg,e,tp,mg)
-	return sg:IsExists(Card.ListsCode,1,nil,CARD_LIGHT_AND_DARKNESS_RITUAL)
+	return (c:IsFaceup() and c:IsSetCard(0x3e7)) or (c:IsMonster() and c:IsAttribute(ATTRIBUTE_DARK))
 end
 function s.desfilter2(c,e)
 	return s.desfilter(c) and c:IsCanBeEffectTarget(e)

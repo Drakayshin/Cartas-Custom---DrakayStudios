@@ -40,7 +40,7 @@ function s.tgfilter(c,tp)
         and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,lvl)
 end
 function s.thfilter(c,lvl)
-    return c:IsSetCard(0x3e7) and c:IsType(TYPE_MONSTER) and c:GetLevel()~=lvl and c:IsAbleToHand()
+    return c:IsSetCard(0x3e7) and c:IsMonster() and c:GetLevel()~=lvl and c:IsAbleToHand()
 end
 function s.sumfilter(c)
     return c:IsAttribute(ATTRIBUTE_DARK) and c:IsSummonable(true,nil)
@@ -80,17 +80,17 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     end
 end
 	--	*EFECTO 2°
-function s.thfilter(c,tp)
+function s.thfilter1(c,tp)
     return c:IsSetCard(0x3e7) and c:IsAbleToHand() and not Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,c:GetCode())
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,tp) and Duel.IsPlayerCanDraw(1-tp,1) end
+    if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter1,tp,LOCATION_DECK,0,1,nil,tp) and Duel.IsPlayerCanDraw(1-tp,1) end
     Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
     Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-    local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+    local g=Duel.SelectMatchingCard(tp,s.thfilter1,tp,LOCATION_DECK,0,1,1,nil,tp)
     if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
         Duel.ConfirmCards(1-tp,g)
         if g:GetFirst():IsLocation(LOCATION_HAND) then
