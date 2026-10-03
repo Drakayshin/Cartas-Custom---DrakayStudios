@@ -10,14 +10,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e0)
 	--  Efecto 1: Invocar de Modo Especial esta carta
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED)
-	e1:SetCountLimit(1,{id,1})
-	e1:SetTarget(s.sptg)
-	e1:SetOperation(s.spop)
+    e1:SetDescription(aux.Stringid(id,0))
+    e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
+    e1:SetType(EFFECT_TYPE_IGNITION)
+    e1:SetRange(LOCATION_HAND|LOCATION_GRAVE|LOCATION_REMOVED)
+    e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+    e1:SetCountLimit(1) -- "Una vez por turno" (Soft OPT)
+    e1:SetTarget(s.sptg)
+    e1:SetOperation(s.spop)
     c:RegisterEffect(e1)
     --  Efecto 2: Efecto multiple: Robar 1 carta, o Infigir daño a los LP del adversario
     local e2=Effect.CreateEffect(c)
@@ -37,21 +37,18 @@ end
 s.listed_series={0x3e7}
     --  *EFECTO 1°
 function s.desfilter(c)
-	return (c:IsFaceup() and c:IsSetCard(0x3e7)) or (c:IsMonster() and c:IsAttribute(ATTRIBUTE_DARK))
-end
-function s.desfilter2(c,e)
-	return s.desfilter(c) and c:IsCanBeEffectTarget(e)
+	return c:IsFaceup() and ((c:IsAttribute(ATTRIBUTE_DARK) and c:IsType(TYPE_MONSTER)) or c:IsSetCard(0x3e7))
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and s.desfilter(chkc) end
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=Duel.GetMatchingGroup(s.desfilter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e)
-	if chk==0 then return ft>-2 and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) 
-		and #g>2 and aux.SelectUnselectGroup(g,e,tp,2,2,aux.ChkfMMZ(1),0) end
-	local sg=aux.SelectUnselectGroup(g,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_DESTROY)
-	Duel.SetTargetCard(sg)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	if chkc then return chkc:IsOnField() and s.desfilter(chkc) end
+    -- Verifica si hay 2 objetivos válidos y si la carta se puede Invocar
+    if chk==0 then return Duel.IsExistingTarget(s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,2,nil)
+        and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+    -- Selecciona exactamente 2 cartas
+    local g=Duel.SelectTarget(tp,s.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,2,2,nil)
+    Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
+    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards(e)
@@ -73,6 +70,28 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
             c:RegisterEffect(e2)
         end
 	end
+	local c=e:GetHandler()
+    local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+    if not tg then return end
+    local g=tg:Filter(Card.IsRelateToEffect,nil,e)
+    -- Si se destruye al menos 1 carta de los objetivos
+    if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0 then
+        -- Invoca esta carta desde la mano
+        if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+            --  *No puede ser destruir por batalla o por efectos
+            local e1=Effect.CreateEffect(c)
+            e1:SetDescription(3008)
+            e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+            e1:SetType(EFFECT_TYPE_SINGLE)
+            e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+            e1:SetValue(1)
+            e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
+            c:RegisterEffect(e1)
+            local e2=e1:Clone()
+            e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+            c:RegisterEffect(e2)
+        end
+    end
 end
     --  *EFECTO 2°
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
