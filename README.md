@@ -26,8 +26,12 @@ descarga este archivo:
 
 | Tipo | Arquetipo / Proyecto | Temas Clave |
 | :--- | :--- | :--- |
-| **Arquetipo Principal** | Terranigma | Control total del campo, OTK |
+| **Arquetipo Principal**  | Terranigma | Control, OTK |
 | **Arquetipo Secundario** | Oricalcos | FTK, OTK, Stun |
+| **Arquetipo resaltante** | Flauriga  | OTK, Burn |
+| **Arquetipo resaltante** | Fábula    | OTK, Burn |
+| **Arquetipo resaltante** | Périlleux    | OTK |
+| **Arquetipo resaltante** | Yao GUai     | Control |
 | **Soporte Genérico** | Ojos Azules/Ciber Dragón/Señoroscuro(a), entre otros. |  |
 
 **Palabras clave de búsqueda:** Custom Cards, EDOPro, Yu-Gi-Oh! Custom, Cartas Personalizadas, Drakayshin, Yu-Gi-Oh!
