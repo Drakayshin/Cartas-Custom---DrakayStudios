@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--	Efecto 2:
+	--	Efecto 2: Destruir o cambiar Posición de Batalla
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -39,7 +39,7 @@ s.listed_series={0x3e7}
 	--	*EFECTO 1°
 function s.cfilter(c,tp)
 	return c:IsReason(REASON_BATTLE|REASON_EFFECT) and c:IsPreviousSetCard(0x3e7) 
-	and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+	and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousControler(tp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
@@ -107,12 +107,13 @@ function s.effop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 			tc:RegisterEffect(e1)
-			--	*Duplicar el daño de batalla a tu adversario de esta carta
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
-			e2:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
-			c:RegisterEffect(e2)
 		end
 	end
+	--	*Duplicar el daño por batalla de esta carta a tu adversario
+	local c=e:GetHandler()
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	e2:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
+	c:RegisterEffect(e2)
 end
